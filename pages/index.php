@@ -4,6 +4,8 @@ includeCore();
 includeDashboardFunctions();
 includeDashboardModal();
 $evac_centers = getEvacuationCenters();
+$takers_month= getFormAnswersDistinctDate();
+$account_type = $_SESSION["account_type"];
 if(!isset($_GET['evac_id']))
 {
         $evac_id = 1;
@@ -12,6 +14,37 @@ if(!isset($_GET['evac_id']))
 else
 {
     $evac_id = $_GET['evac_id'];
+
+}
+if(!isset($_GET['month']))
+{
+        $month = "August";
+
+}
+else
+{
+    $month = $_GET['month'];
+
+}
+
+if(!isset($_GET['month1']))
+{
+        $month1 = "August";
+
+}
+else
+{
+    $month1 = $_GET['month1'];
+
+}
+if(!isset($_GET['month2']))
+{
+        $month2 = "August";
+
+}
+else
+{
+    $month2 = $_GET['month2'];
 
 }
 ?>
@@ -49,34 +82,11 @@ else
                                     </div>
                                     <div class="col-xs-9 text-right">
                                         <div class="huge"><?php echo get_total("idp");?></div>
-                                        <div>IDP</div>
+                                        <div>Students</div>
                                     </div>
                                 </div>
                             </div>
                             <a href="idp.list.php">
-                                <div class="panel-footer">
-                                    <span class="pull-left">View Details</span>
-                                    <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
-                                    <div class="clearfix"></div>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-                    <!-- ./col -->
-                    <div class="col-lg-3 col-md-6">
-                        <div class="panel panel-green">
-                            <div class="panel-heading">
-                                <div class="row">
-                                    <div class="col-xs-3">
-                                        <i class="fa fa-home  fa-5x"></i>
-                                    </div>
-                                    <div class="col-xs-9 text-right">
-                                        <div class="huge"><?php echo get_total("evacuation_centers");?></div>
-                                        <div>Evacuation Centers</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <a href="evac.manage.centers.php">
                                 <div class="panel-footer">
                                     <span class="pull-left">View Details</span>
                                     <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
@@ -136,32 +146,27 @@ else
                 </div>
                 <!-- /.row -->
                 <div class="row">
-                    <div class="col-lg-4">
+                       <div class="col-lg-4">
                         <div class="panel panel-default">
                             <div class="panel-heading">
-                                <i class="fa fa-bar-chart-o fa-fw"></i> Gender
+                                <i class="fa fa-bar-chart-o fa-fw"></i> Students Per College/School
                             </div>
                             <div class="panel-body">
-                                 <div id="morrisdetails-item" class="morris-hover morris-default-style" style="display: none">
-                                <div class="morris-hover-row-label"></div>
-                              <div class="morris-hover-point"></div>
-                                   </div>
-                                <div id="morris-donut-chart"></div>
-                                
+                                <canvas width="400" height="350" id="morris-donut-evac"></canvas>
                             </div>
-
                         </div>
                     </div>
 
+                    
 
                    <div class="col-lg-8">
                         <div class="panel panel-default">
                             <div class="panel-heading">
-                                <i class="fa fa-bar-chart-o fa-fw"></i> IDP
+                                <i class="fa fa-bar-chart-o fa-fw"></i> Student
                                 <div class="pull-right">
                                     <div class="btn-group">
                                         <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
-                                            Evacuation Centers
+                                            College/School
                                             <span class="caret"></span>
                                         </button>
                                         <ul id = "sizelist" class="dropdown-menu pull-right" role="menu">
@@ -189,14 +194,14 @@ else
                                 if(getDistinctDate($evac_id) !=NULL)
                                     {
                                 ?>
-                                        <div id="evac1"></div>
+                                        <canvas id="evac1"></canvas>
                                 
                                 <?php 
                                     }  
                                 else 
                                     { 
                                 ?>      
-                                        <div> No IDPs in these evacaution </div>
+                                        <div> No Students in this college/school </div>
                                 
                                 <?php
                                     } 
@@ -213,15 +218,32 @@ else
                     <div class="col-lg-4">
                         <div class="panel panel-default">
                             <div class="panel-heading">
+                                <i class="fa fa-bar-chart-o fa-fw"></i> Gender
+                            </div>
+                            <div class="panel-body">
+                                 <div id="morrisdetails-item" class="morris-hover morris-default-style" style="display: none">
+                                <div class="morris-hover-row-label"></div>
+                              <div class="morris-hover-point"></div>
+                                   </div>
+                                <canvas id="piechart" width="400" height="350"></canvas> 
+                                
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
                                 <i class="fa fa-bar-chart-o fa-fw"></i> Age
                             </div>
                             <div class="panel-body">
-                                <div id="morris-donut2-chart"></div>
-                                <a href="#" class="btn btn-default btn-block">View Details</a>
+                                <canvas width="400" height="350" id="morris-donut2-chart"></canvas> 
+                                
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-8">
+                    <div class="col-lg-4">
                         <div class="panel panel-default">
                             <div class="panel-heading">
                                 <i class="fa fa-bar-chart-o fa-fw"></i> Education
@@ -229,7 +251,7 @@ else
                             <div class="panel-body">
 
                              
-                                        <div id="morris-Education"></div>
+                                         <canvas width="400" height="350" id="morris-Education"></canvas>
                                 
                              
                                 
@@ -237,38 +259,32 @@ else
 
                         </div>
                     </div>
-                </div>
-
-                <div class="row">
                     <div class="col-lg-4">
                         <div class="panel panel-default">
                             <div class="panel-heading">
                                 <i class="fa fa-bar-chart-o fa-fw"></i> Marital Status
                             </div>
                             <div class="panel-body">
-                                <div id="morris-donut-marital"></div>
-                                <a href="#" class="btn btn-default btn-block">View Details</a>
+                                 <canvas width="400" height="350" id="morris-donut-marital"></canvas>
+                                
                             </div>
                         </div>
                     </div>
-                </div>
 
-                  <div class="row">
-                    <div class="col-lg-4">
+                     <div class="col-lg-4">
                         <div class="panel panel-default">
                             <div class="panel-heading">
                                 <i class="fa fa-bar-chart-o fa-fw"></i> Religion
                             </div>
                             <div class="panel-body">
-                                <div id="morris-donut-religion"></div>
+                                <canvas width="400" height="350" id="morris-donut-religion"></canvas>
                             </div>
                         </div>
                     </div>
+                  
                 </div>
-
                 
-
-            </div>
+               
             <!-- /#page-wrapper -->
 
         </div>
@@ -290,6 +306,30 @@ else
          $this.addClass("select").siblings().removeClass("select");
          $('#evac' + $this.data("value")).show();
          window.location.href = "index.php?evac_id=" + $this.data("value"); 
+    })
+    $("#sizelist1").on("click", "a", function(e)
+    {
+         e.preventDefault();
+         var $this = $(this).parent();
+         $this.addClass("select").siblings().removeClass("select");
+         $('#evac' + $this.data("value")).show();
+         window.location.href = "index.php?month=" + $this.data("value"); 
+    })
+     $("#sizelist2").on("click", "a", function(e)
+    {
+         e.preventDefault();
+         var $this = $(this).parent();
+         $this.addClass("select").siblings().removeClass("select");
+         $('#evac' + $this.data("value")).show();
+         window.location.href = "index.php?month1=" + $this.data("value"); 
+    })
+    $("#sizelist3").on("click", "a", function(e)
+    {
+         e.preventDefault();
+         var $this = $(this).parent();
+         $this.addClass("select").siblings().removeClass("select");
+         $('#evac' + $this.data("value")).show();
+         window.location.href = "index.php?month=" + $this.data("value"); 
     })
     
     </script>

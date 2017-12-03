@@ -47,9 +47,9 @@
                 </li>
                 <?php
                 } ?>
-                <li>
+                <!--<li>
                     <a href="evac.manage.centers.php"><i class="fa fa-home fa-fw"></i> Evacuation Centers</a>
-                </li>
+                </li>-->
                 <?php
                 if($_SESSION["account_type"] == '77') {
                 ?>

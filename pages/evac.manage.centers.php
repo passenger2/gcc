@@ -68,11 +68,9 @@ $Cities = getCities();
                                 <table width="100%" class="table table-bordered table-hover" id="table-evac-list">
                                     <thead>
                                         <tr>
-                                            <th>Evacuation Center Name</th>
-                                            <th>Evacuation Center Address</th>
-                                            <th>Evacuation Center Manager</th>
-                                            <th>Evacuation Center Contact</th>
-                                            <th>Evacuation Center Specific Address</th>
+                                            <th>College</th>
+                                            <th>Dean</th>
+                                            <th>Contact</th>
                                             <?php
                                             if($_SESSION['account_type'] == '77')
                                             {
@@ -111,7 +109,7 @@ $Cities = getCities();
                 },
                 "columnDefs":[
                     {
-                        "targets": [],
+                        "targets": [3],
                         "orderable":false
                     },
                 ]

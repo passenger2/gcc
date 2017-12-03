@@ -921,6 +921,7 @@ function getList($data, $listType = 'IDP', $listTarget = '')
                 $subArray["DT_RowId"] = $row["IDP_ID"];
                 $subArray[] = $row["IDPName"];
                 $subArray[] = $row["IDP_ID"];
+                $subArray[] = " ";
                 $subArray[] = $row["Gender"];
                 $age = calculateAge($row["Bdate"]);
                 if($age == 'N/A')
@@ -990,10 +991,9 @@ function getList($data, $listType = 'IDP', $listTarget = '')
                 $recordsFiltered = get_total_all_records('Evac', 0);
                 $subArray["DT_RowId"] = $row["EvacuationCentersID"];
                 $subArray[] = $row["EvacName"];
-                $subArray[] = getFullAddress($row["EvacAddress"]);
+                //$subArray[] = getFullAddress($row["EvacAddress"]);
                 $subArray[] = $row["EvacManager"];
                 $subArray[] = $row["EvacManagerContact"];
-                $subArray[] = $row["SpecificAddress"];
                 if($_SESSION['account_type'] == '77')
                 {
                     $subArray[] = '<a class="btn btn-info btn-xs center-block" href="evac.edit.php?evacid='.$row["EvacuationCentersID"].'">

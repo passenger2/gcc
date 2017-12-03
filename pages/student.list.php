@@ -50,6 +50,7 @@ $_SESSION['disaster_id'] = 1;
                                         <tr>
                                             <th align="left"><b>Name</b></th>
                                             <th align="left"><b>Student ID</b></th>
+                                            <th align="left"><b>College - Course</b></th>
                                             <th align="left"><b>Gender</b></th>
                                             <th align="left"><b>Age</b></th>
                                             <th align="left"><b>Action</b></th>

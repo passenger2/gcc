@@ -2,208 +2,355 @@
 
 $total_male = get_total('idp where gender =1');
 $total_female = get_total('idp where gender =2');
-// $total_children = get_total('idp WHERE Age < 18');
-// $total_adults = get_total('idp WHERE Age >= 18 AND Age < 60');
-// $total_senior = get_total('idp WHERE Age >= 60');
+
 $total_married =  get_total('idp WHERE MaritalStatus = 2');
 $total_single =  get_total('idp WHERE MaritalStatus = 1');
+$total_Anulled =  get_total('idp WHERE MaritalStatus = 3');
+$total_Widowed =  get_total('idp WHERE MaritalStatus = 4');
 $education_data = getDistinctEducation();
 $religion_data = getDistinctReligion();
 
-// $total_male = get_total('idp where gender = 1');
-// $total_female = get_total('idp where gender = 2');
 $total_children = get_total('age', 'children');
 $total_adults = get_total('age', 'adults');
 $total_senior = get_total('age', 'senior');
 $total_undefined = get_total('age', 'undefined');
+$form_names = getForms();
+$form_names2 = getForms();
+$assessment_takers = getAssessmentTakerCount();
+
+$takers_dates = getFormAnswersDistinctDate();
+
+$idp_count_evac_data = getIDPCountPerEvac();
 
 if(!isset($_GET['evac_id']))
     {
         $evac_id = 1;
-         $evac1_data = getDistinctDate($evac_id );
+         $evac1_data = getDistinctDate($evac_id);
     }
 else
     {
         $evac_id = $_GET['evac_id'];
-         $evac1_data = getDistinctDate($evac_id );
+         $evac1_data = getDistinctDate($evac_id);
     } 
 
-?>
 
-
-<script type="text/javascript">
-	$(function() {
-        var donut = new Morris.Donut({
-        element: 'morris-donut-chart',
-        data: [{
-            label: "Male",
-            value: <?php echo $total_male; ?>
-        }, {
-            label: "Female",
-            value: <?php echo $total_female; ?>
-        }],
-        resize: true
-         }).on('click', function (i, row) {  
-               // $('#myModal').modal({ show: true });
-               // $('.modal-title').text(row.label);
-               // $('.gender-donut').hide();
-               
-               $('#'+row.label+'-info').show();
-               $(".col-lg-8").animate({left: $( window ).width()+ 'px'}, function(){
-                if($('.col-lg-8').is(':visible')){
-               $(".col-lg-8").hide();
-                }
-                else{
-                  $(".col-lg-8").animate({left: '0px'});
-                  $(".col-lg-8").show();
-                }
-               });
-               
-            });
-
-  for(i = 0; i < donut.segments.length; i++) 
-  {
-      donut.segments[i].handlers['hover'].push( function(i)
-      {
-        $('#morrisdetails-item').show();
-        $("#morrisdetails-item").css({position:"absolute", top:event.pageY - 200, left: event.pageX-200});
-        $('#morrisdetails-item .morris-hover-row-label').text("Click for more details");
-      });
+if(!isset($_GET['month']))
+    {
+        $month = $takers_dates[0]["MONTH"];
+        $phq_data = getScores(3, $month);
+       
     }
-
-
-
-   Morris.Donut({
-        element: 'morris-donut2-chart',
-        data: [{
-            label: "Undefined",
-            value: <?php echo $total_undefined; ?>
-        },{
-            label: "Children",
-            value: <?php echo $total_children; ?>
-        }, {
-            label: "Adults",
-            value: <?php echo $total_adults; ?>
-        }, {
-            label: "Senior",
-            value: <?php echo $total_senior; ?>
-        }],
-        resize: true
-    });
-
-  Morris.Donut({
-        element: 'morris-donut-marital',
-
-        data: [{
-            label: "Married",
-            value: <?php echo $total_married; ?>
-        }, {
-            label: "Single",
-            value: <?php echo $total_single; ?>
-        }],
-        resize: true
-    });
-
-
-
-    
-});
-
-</script>
-
-
-
-
-<script type="text/javascript">
-    $(function() {
-      Morris.Area({
-        element: 'evac1',
-        data: [
-        <?php 
-            foreach($evac1_data as $row) {
-             $date = $row['dates'];
-            
-             $idp_count = $row['total'];
-             
-        ?>
-
-             { 
-            period : '<?php echo $date; ?>',
-            IDPS: '<?php echo $idp_count; ?>',
-            
-                 },
-         <?php } ?>
-        
-        
-
-        ],
-        xkey: 'period',
-        ykeys: ['IDPS'],
-        labels: ['IDPS'],
-        pointSize: 2,
-        hideHover: 'auto',
-        resize: true,
+else
+    {
+        $month = $_GET['month'];
+         $phq_data = getScores(3, $month);
        
+    } 
+
+if(!isset($_GET['month1']))
+    {
+        $month = $takers_dates[0]["MONTH"];
+        $Gad_data1 = getScores(12, $month);
        
-    });
-      });
+    }
+else
+    {
+        $month =$takers_dates[0]["MONTH"];
+         $Gad_data1 = getScores(12, $month);
 
-</script>
+    } 
+if(!isset($_GET['month2']))
+    {
+        $month = $takers_dates[0]["MONTH"];
+        $Gad_data2 = getScores(13, $month);
+       
+    }
+else
+    {
+        $month = $_GET['month2'];
+         $Gad_data2 = getScores(13, $month);
 
-<script type="text/javascript">
-    $(function() {
-      Morris.Area({
-        element: 'morris-Education',
-        data: [
-        <?php 
+    } 
+
+
+$idp_count_gradeschool =0;
+$idp_count_hs =0;
+$idp_count_col =0;
+$idp_count_unspecified =0;
             foreach($education_data as $row) {
              $education = $row['education'];
               
              $idp_count = $row['TOTAL'];
+             if($education == NULL)
+             {
+              $education = "Unspecified ";
+              $idp_count_unspecified += $idp_count;
+             
+            
+             }
 
-             if($education <=6)
+             if($education <=6 && $education >=1)
              {
               $education = "Grade School" ;
+              $idp_count_gradeschool += $idp_count;
+               
              }
-             else if($education >=7 && $education <= 10)
+             if($education >=7 && $education <= 10)
              {
               $education = "Highschool" ;
+                $idp_count_hs +=$idp_count;
              }
-             else if($education >= 11)
+             if($education >= 11)
              {
               $education = "College ";
+              $idp_count_col += $idp_count;
+             
+            
              }
              
-        ?>
+         }
 
-             { 
-            period : '<?php echo $education; ?>',
-            IDPS: '<?php echo $idp_count; ?>',
-            
-                 },
-         <?php } ?>
-        
-        
 
-        ],
-        xkey: 'period',
-        ykeys: ['IDPS'],
-        labels: ['IDPS'],
-        pointSize: 4,
-        hideHover: 'auto',
-        resize: true,
-       parseTime: false
-       
-    });
-      });
+             
+?>
+
+
+
+
+
+
+
+<script>
+
+var ctx = document.getElementById("piechart");
+var myChart = new Chart(ctx, {
+    type: 'pie',
+    data:{
+    datasets: [{
+        data: [<?php echo $total_male; ?>, <?php echo $total_female; ?>],
+        backgroundColor: ["#3e95cd", "#8e5ea2"]
+    }],
+
+    // These labels appear in the legend and in the tooltips when hovering different arcs
+    labels: [
+        'Male',
+        'Female'
+    ],},
+    options:{
+          responsive: true,
+          maintainAspectRatio: false,
+          pieceLabel: {
+            render: 'percentage',
+            fontColor: 'white',
+            precision: 2
+          }}
+});
+
+
+</script>
+
+<script>
+
+var ctx = document.getElementById("morris-donut-evac");
+var myChart = new Chart(ctx, {
+    type: 'pie',
+    data:{
+    datasets: [{
+        data: [
+
+        <?php
+            foreach ($idp_count_evac_data as $result) {
+               echo $result['TOTAL']. ",";
+             } 
+        ?>],
+        backgroundColor: ["#3e95cd", "#8e5ea2","#ff6384", "#ffce56"]
+    }],
+
+    // These labels appear in the legend and in the tooltips when hovering different arcs
+    labels: [
+   <?php
+            foreach ($idp_count_evac_data as $result) {
+               echo "'" .getEvacName($result['EvacuationCenters_EvacuationCentersID']). "',";
+             } 
+        ?>],},
+    options:{
+          responsive: true,
+          maintainAspectRatio: false,
+          pieceLabel: {
+            render: 'value',
+            fontColor: 'white',
+            precision: 2
+          }}
+});
+
 
 </script>
 
 <script type="text/javascript">
-  $(function() {
- Morris.Donut({
-        element: 'morris-donut-religion',
+  
+
+
+
+     var ctx1 = document.getElementById("evac1");
+var myChart1 =  new Chart(ctx1, {
+    type: 'line',
+    data: {
+  labels: [
+            <?php 
+            foreach($evac1_data as $row) {
+             $date = $row['dates'];
+            
+             $idp_count = $row['total'];
+             echo "'". $date ."',";} ?>
+          ],
+  datasets: [{
+    label: "Students Enrolled Per Month",
+    data: [
+            <?php 
+            foreach($evac1_data as $row) {
+             
+             $idp_count = $row['total'];
+             echo $idp_count .","; 
+           }?>
+          ],
+    lineTension: 0,
+    fill: false,
+    borderColor: 'orange',
+    backgroundColor: 'transparent',
+    borderDash: [5, 5],
+    pointBorderColor: 'orange',
+    pointBackgroundColor: 'rgba(255,150,0,0.5)',
+    pointRadius: 5,
+    pointHoverRadius: 10,
+    pointHitRadius: 30,
+    pointBorderWidth: 2,
+    pointStyle: 'rectRounded'
+  }]
+},
+    options: {
+        elements: {
+            line: {
+                tension: 0, // disables bezier curves
+            }
+        }
+    }
+});
+
+</script>
+
+<script>
+
+var ctx = document.getElementById("morris-donut2-chart");
+var myChart = new Chart(ctx, {
+    type: 'pie',
+    data:{
+    datasets: [{
+        data: [<?php echo $total_undefined ."," . $total_children ."," . $total_adults ."," . $total_senior?>],
+        backgroundColor: ["#3e95cd", "#8e5ea2", "#ff6384", "#ffce56"]
+    }],
+
+    // These labels appear in the legend and in the tooltips when hovering different arcs
+    labels: [
+        'Undefined',
+        'Children',
+        'Adults', 
+        'Senior'
+    ],},
+    options:{
+          responsive: true,
+          maintainAspectRatio: false,
+          pieceLabel: {
+            render: 'percentage',
+            fontColor: 'white',
+            precision: 2
+          }}
+});
+
+
+</script>
+
+<script type="text/javascript">
+      
+      var ctx = document.getElementById("morris-donut-marital");
+var myChart = new Chart(ctx, {
+    type: 'pie',
+    data:{
+    datasets: [{
+        data: [<?php echo $total_single ."," . $total_married ."," . $total_Anulled ."," . $total_Widowed?>],
+        backgroundColor: ["#3e95cd", "#8e5ea2", "#ff6384", "#ffce56"]
+    }],
+
+    // These labels appear in the legend and in the tooltips when hovering different arcs
+    labels: [
+        'Single',
+        'Married',
+        'Anulled', 
+        'Widowed'
+    ],},
+    options:{
+          responsive: true,
+          maintainAspectRatio: false,
+          pieceLabel: {
+            render: 'percentage',
+            fontColor: 'white',
+            precision: 0
+          }}
+});
+</script>
+
+<script type="text/javascript">
+     
+      var ctx = document.getElementById("morris-Education");
+var myChart = new Chart(ctx, {
+    type: 'pie',
+    data:{
+    datasets: [{
+        data: [<?php echo $idp_count_gradeschool ."," . $idp_count_hs ."," . $idp_count_col ."," . $idp_count_unspecified?>],
+        backgroundColor: ["#3e95cd", "#8e5ea2", "#ff6384", "#ffce56"]
+    }],
+
+    // These labels appear in the legend and in the tooltips when hovering different arcs
+    labels: [
+        'Grade School',
+        'Highschool',
+        'College', 
+        'Unspecified'
+    ],},
+    options:{
+          responsive: true,
+          maintainAspectRatio: false,
+          pieceLabel: {
+            render: 'percentage',
+            fontColor: 'white',
+            precision: 0
+          }}
+});
+</script>
+<script type="text/javascript">
+
+        var ctx = document.getElementById("morris-donut-religion");
+var myChart = new Chart(ctx, {
+    type: 'pie',
+    data:{
+    datasets: [{
         data: [
+         <?php  foreach($religion_data as $row) {
+             $religion = $row['Religion'];
+             if($religion == NULL)
+             {
+              $religion = "Unspecified";
+             }
+             $idp_count = $row['TOTAL'];
+             echo $idp_count . ",";
+             }
+        ?>
+       
+        ],
+        backgroundColor: ["#3e95cd", "#8e5ea2", "#ff6384", "#ffce56"]
+    }],
+
+    // These labels appear in the legend and in the tooltips when hovering different arcs
+    labels: [
         <?php  foreach($religion_data as $row) {
              $religion = $row['Religion'];
              if($religion == NULL)
@@ -211,18 +358,138 @@ else
               $religion = "Unspecified";
              }
              $idp_count = $row['TOTAL'];
-             
+             echo "'". $religion . "',";
+             }
         ?>
-        {
-            label: '<?php echo $religion; ?>',
-            value: <?php echo $idp_count; ?>
-        },
+    ],},
+    options:{
+          responsive: true,
+          maintainAspectRatio: false,
+          pieceLabel: {
+            render: 'percentage',
+            fontColor: 'white',
+            precision: 2
+          }}
+});
+      
+          
+          
+      
 
-        <?php } ?>
-        ],
-        resize: true
+
+</script>
+
+
+        
+       
 
       
-    });
-   });
-</script>
+
+
+
+
+    <script>
+        
+        var horizontalBarChartData = {
+           
+
+            datasets: [
+
+                            
+                {
+                label: [],
+                borderWidth: 1,
+                backgroundColor: ["#3e95cd", "#8e5ea2", "#ff6384", "#ffce56"],
+                showLine:false,
+                pointHoverRadius:15,
+                fill: false,
+                pointRadius: 10,
+
+                data: [
+                              <?php 
+
+                                foreach ($phq_data as $value) {
+                                        $str = $value['Score'];
+                                
+                                  echo $str.",";
+                               } ?>            
+                    ]
+            },
+           
+            ]
+
+        };
+
+            var ctx = document.getElementById("charts-form-takers-count");
+            var myChart = new Chart(ctx, {
+                type: 'line',
+                data: horizontalBarChartData,
+                options: {
+                    responsive: true,
+                    title:{
+                        display:true,
+                        
+                    },
+                    legend: {
+                        display: false
+                    },
+                    elements: {
+                        point: {
+                            pointStyle: 'Circle'
+                        }
+                    },
+                       scales: {
+        xAxes: [{
+            ticks: {
+                max: 150,
+                min: 0,
+                stepSize: 10
+            }
+        }]
+    }
+                }
+            });
+
+       
+
+        
+    </script>
+
+  <script type="text/javascript">
+    google.charts.load("current", {packages:['corechart']});
+    google.charts.setOnLoadCallback(drawChart);
+    function drawChart() {
+      var data = google.visualization.arrayToDataTable([
+        ["Element", "Density", { role: "style" } ],
+         <?php
+            
+
+                foreach ($phq_data as $datum) {
+                    if($datum['Score'] >= 10)
+                    {
+                    echo "['" . getIDPName($datum['IDP_IDP_ID']). "'," . $datum['Score']. ", 'red'],";
+                    }
+                    else
+                    {
+                        echo "['" . getIDPName($datum['IDP_IDP_ID']). "'," . $datum['Score']. ", 'green'],";
+                    }
+                }
+            ?>
+      ]);
+
+     
+
+      var options = {
+        title: "GAD [Frequency]",
+        width: 1000,
+        height: 400,
+        bar: {groupWidth: "100%"},
+        legend: {position:"none",}
+
+
+      };
+      var chart = new google.visualization.Histogram(document.getElementById("GAD2"));
+      chart.draw(data, options);
+  }
+  </script>
+
