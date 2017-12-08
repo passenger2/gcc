@@ -67,20 +67,20 @@ function includeLayoutGenerator()
 #---- include functions end ----
 
 #---- db fetch functions ----
-function getIDPDetails($id = '')
+function getStudentDetails($id = '')
 # Author: Laranjo, Sam Paul L.
-# Last Modified: 12-06-17
+# Last Modified: 12-08-17
 # Modified by: Laranjo, Sam Paul L.
 {
     $db_handle = new DBController();
     $db_handle->prepareStatement(
-        "SELECT * FROM `idp`
-         WHERE IDP_ID = :idpID");
+        "SELECT * FROM `students`
+         WHERE StudentID = :studentID");
     
-    $db_handle->bindVar(':idpID', $id, PDO::PARAM_INT,0);
-    $idp = $db_handle->runFetch();
+    $db_handle->bindVar(':studentID', $id, PDO::PARAM_INT,0);
+    $studentInfo = $db_handle->runFetch();
 
-    return $idp;
+    return $studentInfo;
 }
 
 function getStudentExtensiveDetails($id = '')
@@ -447,18 +447,18 @@ function getFormID($questionID)
 
 function getAllAssessmentTools()
 # Author: Laranjo, Sam Paul L.
-# Last Modified: 12-06-17
+# Last Modified: 12-08-17
 # Modified by: Laranjo, Sam Paul L.
 {
     $db_handle = new DBController();
     $db_handle->prepareStatement(
         "SELECT *
-         FROM `form`
-         ORDER BY FormType");
+         FROM `assessmenttools`
+         ORDER BY Name");
     
-    $forms = $db_handle->runFetch();
+    $tools = $db_handle->runFetch();
 
-    return $forms;
+    return $tools;
 }
 
 function getMultipleAssessmentTools($qIDs = '')
@@ -1010,15 +1010,15 @@ function getList($data, $listType = 'IDP', $listTarget = '')
     {
         $query .=
             "SELECT
-                FormType,
-                FormID
-             FROM `form`  ";
+                Name,
+                AssessmentToolID
+             FROM `assessmenttools`  ";
 
         if($keyword != '')
         {
             $query .=
-                " WHERE FormID LIKE :keyword
-                  OR FormType LIKE :keyword ";
+                " WHERE AssessmentToolID LIKE :keyword
+                  OR Name LIKE :keyword ";
         }
 
         if($order != '')
@@ -1040,24 +1040,24 @@ function getList($data, $listType = 'IDP', $listTarget = '')
     else if($listType === 'Assessment_taken')
     {
         $query .=
-            "SELECT form_answers.DateTaken,
-                form.FormType AS FormID,
-                form_answers.Score,
-                auto_assmt.Assessment,
-                form_answers.IDP_IDP_ID AS IDP,
-                form_answers.FORM_ANSWERS_ID,
+            "SELECT assessmenttoolanswers.DateTaken,
+                assessmenttools.Name AS FormID,
+                assessmenttoolanswers.Score,
+                autoassessments.Assessment,
+                assessmenttoolanswers.IDP_IDP_ID AS IDP,
+                assessmenttoolanswers.FORM_ANSWERS_ID,
                 CONCAT(user.Lname, ', ', user.Fname, ' ', user.Mname) as User,
-                form_answers.UnansweredItems,
-                auto_assmt.Cutoff,
-                form_answers.FORM_FormID
-             FROM form_answers
-             LEFT JOIN form
-                ON form_answers.FORM_FormID = form.FormID
+                assessmenttoolanswers.UnansweredItems,
+                autoassessments.Cutoff,
+                assessmenttoolanswers.FORM_FormID
+             FROM assessmenttoolanswers
+             LEFT JOIN assessmenttools
+                ON assessmenttoolanswers.FORM_FormID = assessmenttools.AssessmentToolID
              LEFT JOIN auto_assmt
-                ON form_answers.FORM_FormID = auto_assmt.FORM_FormID
+                ON assessmenttoolanswers.FORM_FormID = autoassessments.AssessmentToolID
              LEFT JOIN user
-                ON form_answers.USER_UserID = user.UserID
-             WHERE form_answers.IDP_IDP_ID = :idpID ";
+                ON assessmenttoolanswers.USER_UserID = user.UserID
+             WHERE assessmenttoolanswers.IDP_IDP_ID = :idpID ";
 
         if($keyword != '')
         {
@@ -1204,7 +1204,7 @@ function getList($data, $listType = 'IDP', $listTarget = '')
                         } else {
                             $subArray[] = '(blank)';
                         }
-                        if(isset($row['Result3'])) {
+                        if(isset($row['Result3']) && $row['Result3'] != '') {
                             $subArray[] = $row['Result3'];
                         } else {
                             $subArray[] = '(blank)';
@@ -1341,10 +1341,10 @@ function getList($data, $listType = 'IDP', $listTarget = '')
             {
                 $recordsFiltered = get_total_all_records('Tool', 0);
 
-                $subArray["DT_RowId"] = $row["FormID"];
-                $subArray[] = $row["FormType"];
+                $subArray["DT_RowId"] = $row["AssessmentToolID"];
+                $subArray[] = $row["Name"];
                 $subArray[] = 
-                    '<a class="btn btn-info btn-xs center-block" href="forms.edit.tool.php?form_id='.$row["FormID"].'">
+                    '<a class="btn btn-info btn-xs center-block" href="forms.edit.tool.php?form_id='.$row["AssessmentToolID"].'">
                         <i class="fa fa-pencil-square-o"></i>Edit Tool
                      </a>';
             }
@@ -1428,7 +1428,7 @@ function get_total_all_records($type, $target = '')
     }
     else if($type === 'Tool')
     {
-        $db_handle->prepareStatement("SELECT COUNT(*) AS total FROM `form`");
+        $db_handle->prepareStatement("SELECT COUNT(*) AS total FROM `assessmenttools`");
         $result = $db_handle->runFetch();
     }
     else if($type === 'Evac')

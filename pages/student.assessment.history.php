@@ -136,7 +136,7 @@ $intakeCount = getIntakeCount($id);
                                     if($intakeCount[0]['Count'] !== '0')
                                     {
                                     ?>
-                                    <a href="assessment.select.forms.php?id=<?php echo($id); ?>" class="btn btn-success btn-xs btn-fill" id="assessmentButton">
+                                    <a href="assessment.select.tools.php?id=<?php echo($id); ?>" class="btn btn-success btn-xs btn-fill" id="assessmentButton">
                                         <i class="icon_check_alt"></i>Apply Assessment tool
                                     </a>
                                     <?php
