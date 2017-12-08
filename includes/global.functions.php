@@ -644,7 +644,7 @@ function getIntakeCount($idpID = '')
 
 function getAnswerInfo($faID='', $type='')
 # Author: Laranjo, Sam Paul L.
-# Last Modified: 12-06-17
+# Last Modified: 12-08-17
 # Modified by: Laranjo, Sam Paul L.
 {
     $db_handle = new DBController();
@@ -652,18 +652,18 @@ function getAnswerInfo($faID='', $type='')
     {
         $db_handle->prepareStatement(
             "SELECT
-                INTAKE_ANSWERS_ID,
-                CONCAT(idp.Lname,', ',idp.Fname,' ',idp.Mname) as IDPName,
-                CONCAT(user.Lname,', ', user.Fname, ' ', user.Mname) as UserResponsible,
-                intake_answers.Date_taken
-             FROM intake_answers
-             JOIN idp
-                ON IDP_IDP_ID = idp.IDP_ID
-             JOIN user
-                ON intake_answers.USER_UserID = user.UserID
+                IntakeFormAnswerID,
+                CONCAT(students.Lname,', ',students.Fname,' ',students.Mname) as StudentName,
+                CONCAT(users.Lname,', ', users.Fname, ' ', users.Mname) as UserResponsible,
+                intakeformanswers.DateTaken
+             FROM intakeformanswers
+             JOIN students
+                ON intakeformanswers.StudentID = students.StudentID
+             JOIN users
+                ON intakeformanswers.ActiveUserID = users.UserID
              JOIN intake
-                ON intake.IntakeID = intake_answers.INTAKE_IntakeID
-             WHERE intake_answers.INTAKE_ANSWERS_ID = :faID");
+                ON intakeforms.IntakeFormID = intakeformanswers.IntakeFormID
+             WHERE intakeformanswers.IntakeFormAnswerID = :faID");
     } else if($type == 'tool')
     {
         $db_handle->prepareStatement(
@@ -1083,20 +1083,19 @@ function getList($data, $listType = 'IDP', $listTarget = '')
     else if($listType === 'Intake')
     {
         $query =
-            "SELECT intake_answers.IDP_IDP_ID AS IDP, intake_answers.INTAKE_ANSWERS_ID,
-                IF(intake_answers.INTAKE_IntakeID = 2, 'Intake for Adults', 'Intake for Children') as FormID,
-                CONCAT(user.Lname, ', ', user.Fname, ' ', user.Mname) AS User,
-                intake_answers.Date_taken AS DateTaken,
-                'N/A' AS Score
-             FROM intake_answers
-             JOIN intake
-                ON intake_answers.INTAKE_IntakeID = intake.IntakeID
-             JOIN user
-                ON user.UserID = intake_answers.USER_UserID
-             WHERE intake_answers.IDP_IDP_ID = :id  ";
+            "SELECT intakeformanswers.StudentID, intakeformanswers.IntakeFormAnswerID,
+                IF(intakeformanswers.IntakeFormID = 2, 'Intake for Adults', 'Intake for Children') as FormID,
+                CONCAT(users.Lname, ', ', users.Fname, ' ', users.Mname) AS User,
+                intakeformanswers.DateTaken
+             FROM intakeformanswers
+             JOIN intakeforms
+                ON intakeformanswers.IntakeFormID = intakeforms.IntakeFormID
+             JOIN users
+                ON users.UserID = intakeformanswers.ActiveUserID
+             WHERE intakeformanswers.StudentID = :studentID  ";
 
         $db_handle->prepareStatement($query);
-        $db_handle->bindVar(':id', $listTarget, PDO::PARAM_STR,0);
+        $db_handle->bindVar(':studentID', $listTarget, PDO::PARAM_STR,0);
         $firstResult = $db_handle->runFetch();
 
         $query = '';
@@ -1106,81 +1105,82 @@ function getList($data, $listType = 'IDP', $listTarget = '')
             foreach($firstResult as $forms) {
                 if($forms["FormID"] == "Intake for Adults") {
                     $query =
-                        "SELECT Date_taken AS DateTaken,
+                        "SELECT DateTaken,
 
                             (SELECT
                                 Answer
-                             FROM answers_quanti
-                             WHERE INTAKE_ANSWERS_INTAKE_ANSWERS_ID = :intakeID
-                             AND QUESTIONS_QuestionsID = 220) as Result1,
+                             FROM quantitativeanswers
+                             WHERE IntakeFormAnswerID = :intakeID
+                             AND QuestionID = 220) as Result1,
 
                             (SELECT
                                 Answer
-                             FROM answers_quanti
-                             WHERE INTAKE_ANSWERS_INTAKE_ANSWERS_ID = :intakeID
-                             AND QUESTIONS_QuestionsID = 221) as Result2,
+                             FROM quantitativeanswers
+                             WHERE IntakeFormAnswerID = :intakeID
+                             AND QuestionID = 221) as Result2,
 
                             (SELECT
                                 Answer
-                             FROM answers_quali
-                             WHERE INTAKE_ANSWERS_INTAKE_ANSWERS_ID = :intakeID
-                             AND QUESTIONS_QuestionsID = 222) as Result3,
+                             FROM qualitativeanswers
+                             WHERE IntakeFormAnswerID = :intakeID
+                             AND QuestionID = 222) as Result3,
 
                             (SELECT
                                 Answer
-                             FROM answers_quanti
-                             WHERE INTAKE_ANSWERS_INTAKE_ANSWERS_ID = :intakeID
-                             AND QUESTIONS_QuestionsID = 223) as Result4,
+                             FROM quantitativeanswers
+                             WHERE IntakeFormAnswerID = :intakeID
+                             AND QuestionID = 223) as Result4,
 
-                            CONCAT(user.Lname, ', ', user.Fname, ' ', user.Mname) AS User,
-                            INTAKE_IntakeID
+                            CONCAT(users.Lname, ', ', users.Fname, ' ', users.Mname) AS User,
+                            IntakeFormAnswerID
 
-                    FROM intake_answers
-                    JOIN user
-                        ON intake_answers.USER_UserID = user.UserID
-                    WHERE INTAKE_ANSWERS_ID = :intakeID
+                    FROM intakeformanswers
+                    JOIN users
+                        ON intakeformanswers.ActiveUserID = users.UserID
+                    WHERE IntakeFormAnswerID = :intakeID
                     ORDER BY DateTaken DESC";
                 } else {
                     $query =
-                        "SELECT Date_taken AS DateTaken,
+                        "SELECT DateTaken,
 
                             (SELECT
                                 Answer
-                             FROM answers_quanti
-                             WHERE INTAKE_ANSWERS_INTAKE_ANSWERS_ID = :intakeID
-                             AND QUESTIONS_QuestionsID = 216) as Result1,
+                             FROM quantitativeanswers
+                             WHERE IntakeFormAnswerID = :intakeID
+                             AND QuestionID = 216) as Result1,
 
                             (SELECT
                                 Answer
-                             FROM answers_quanti
-                             WHERE INTAKE_ANSWERS_INTAKE_ANSWERS_ID = :intakeID
-                             AND QUESTIONS_QuestionsID = 217) as Result2,
+                             FROM quantitativeanswers
+                             WHERE IntakeFormAnswerID = :intakeID
+                             AND QuestionID = 217) as Result2,
 
                             (SELECT
                                 Answer
-                             FROM answers_quali
-                             WHERE INTAKE_ANSWERS_INTAKE_ANSWERS_ID = :intakeID
-                             AND QUESTIONS_QuestionsID = 218) as Result3,
+                             FROM qualitativeanswers
+                             WHERE IntakeFormAnswerID = :intakeID
+                             AND QuestionID = 218) as Result3,
 
                             (SELECT
                                 Answer
-                             FROM answers_quanti
-                             WHERE INTAKE_ANSWERS_INTAKE_ANSWERS_ID = :intakeID
-                             AND QUESTIONS_QuestionsID = 219) as Result4,
+                             FROM quantitativeanswers
+                             WHERE IntakeFormAnswerID = :intakeID
+                             AND QuestionID = 219) as Result4,
 
-                            CONCAT(user.Lname, ', ', user.Fname, ' ', user.Mname) AS User,
-                            INTAKE_IntakeID
+                            CONCAT(users.Lname, ', ', users.Fname, ' ', users.Mname) AS User,
+                            IntakeFormAnswerID
 
-                 FROM intake_answers
-                 JOIN user
-                    ON intake_answers.USER_UserID = user.UserID
-                 WHERE INTAKE_ANSWERS_ID = :intakeID ORDER BY DateTaken DESC";
+                    FROM intakeformanswers
+                    JOIN users
+                        ON intakeformanswers.ActiveUserID = users.UserID
+                    WHERE IntakeFormAnswerID = :intakeID
+                    ORDER BY DateTaken DESC";
                 }
                 
                 $db_handle->prepareStatement($query);
                 
-                $db_handle->bindVar(':idpID', $listTarget, PDO::PARAM_INT,0);
-                $db_handle->bindVar(':intakeID', $forms["INTAKE_ANSWERS_ID"], PDO::PARAM_INT,0);
+                $db_handle->bindVar(':studentID', $listTarget, PDO::PARAM_INT,0);
+                $db_handle->bindVar(':intakeID', $forms["IntakeFormAnswerID"], PDO::PARAM_INT,0);
                 
                 $result = $db_handle->runFetch();
                 $rowCount += $db_handle->getFetchCount();
@@ -1191,7 +1191,7 @@ function getList($data, $listType = 'IDP', $listTarget = '')
                     {
                         $recordsFiltered = get_total_all_records('Intake', $listTarget);
 
-                        $subArray["DT_RowId"] = $forms["INTAKE_ANSWERS_ID"];
+                        $subArray["DT_RowId"] = $forms["IntakeFormAnswerID"];
                         $phpdate = strtotime($row['DateTaken']);
                         $subArray[] = date('M d, Y <\b\r> h:i a', $phpdate);
                         if(isset($row['Result1'])) {
@@ -1438,7 +1438,7 @@ function get_total_all_records($type, $target = '')
     }
     else if($type === 'Intake')
     {
-        $db_handle->prepareStatement("SELECT COUNT(intake_answers.INTAKE_ANSWERS_ID) AS total FROM intake_answers WHERE intake_answers.IDP_IDP_ID = :id");
+        $db_handle->prepareStatement("SELECT COUNT(*) AS total FROM intakeformanswers WHERE intakeformanswers.StudentID = :id");
         $db_handle->bindVar(':id', $target, PDO::PARAM_INT, 0);
         $result = $db_handle->runFetch();
     }

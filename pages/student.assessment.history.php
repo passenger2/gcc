@@ -8,6 +8,7 @@ $ag = getAgeGroup($id);
 
 $studentInfo = getStudentExtensiveDetails($id);
 $intakeCount = getIntakeCount($id);
+#die(print_r($intakeCount));
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -167,7 +168,7 @@ $intakeCount = getIntakeCount($id);
     </body>
     <script>
         $(document).ready(function() {
-            var intakeDataTable = $('#table-sintake-list').DataTable( {
+            var intakeDataTable = $('#table-intake-list').DataTable( {
                 "responsive": true,
                 "processing": true,
                 "serverSide": true,
