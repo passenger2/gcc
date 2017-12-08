@@ -461,38 +461,37 @@ function getAllAssessmentTools()
     return $tools;
 }
 
-function getMultipleAssessmentTools($qIDs = '')
+function getMultipleAssessmentTools($toolIDs = '')
 # Author: Laranjo, Sam Paul L.
-# Last Modified: 12-06-17
+# Last Modified: 12-08-17
 # Modified by: Laranjo, Sam Paul L.
 {
-    if(!isset($qIDs)) $qIDs = ['z']; //safeguard for tampered $qIDs
+    if(!isset($toolIDs)) $toolIDs = ['z']; //safeguard for tampered IDs
     $db_handle = new DBController();
-    $inQuery = implode(',', array_fill(0, count($qIDs), '?'));
+    $inQuery = implode(',', array_fill(0, count($toolIDs), '?'));
     $db_handle->prepareStatement(
         "SELECT *
-         FROM `form`
-         WHERE FormID IN (".$inQuery .")");
+         FROM `assessmenttools`
+         WHERE AssessmentToolID IN (".$inQuery .")");
     
-    $formInfo = $db_handle->fetchWithIn($qIDs);
+    $formInfo = $db_handle->fetchWithIn($toolIDs);
 
     return $formInfo;
 }
 
-function getAssessmentTool($qID)
+function getAssessmentTool($toolID)
 # Author: Laranjo, Sam Paul L.
-# Last Modified: 12-06-17
+# Last Modified: 12-08-17
 # Modified by: Laranjo, Sam Paul L.
 {
-    if(!isset($qIDs)) $qIDs = ['z']; //safeguard for tampered $qIDs
     $db_handle = new DBController();
 
     $db_handle->prepareStatement(
         "SELECT *
-         FROM `form`
-         WHERE FormID = :id");
+         FROM `assessmenttools`
+         WHERE AssessmentToolID = :id");
     
-    $db_handle->bindVar(':id', $qID, PDO::PARAM_INT,0);
+    $db_handle->bindVar(':id', $toolID, PDO::PARAM_INT,0);
     $formInfo = $db_handle->runFetch();
     
     if(!isset($formInfo))$formInfo = '';
@@ -550,27 +549,78 @@ function getAssessmentQuestions($type = '',$qIDs = '')
     return $questionsResult;
 }
 
-function getEditToolQuestions($qID = '')
+function getEditToolQuestions($toolID = '')
 # Author: Laranjo, Sam Paul L.
-# Last Modified: 12-06-17
+# Last Modified: 12-08-17
 # Modified by: Laranjo, Sam Paul L.
 {
-    if(!isset($qIDs)) $qIDs = ['z']; //safeguard for tampered $qIDs
+    if(!isset($toolID)) $toolIDs = ['z']; //safeguard for tampered IDs
     $db_handle = new DBController();
 
     $db_handle->prepareStatement(
         "SELECT *
          FROM `questions`
-         LEFT JOIN html_form
-            ON html_form.HTML_FORM_ID = questions.HTML_FORM_HTML_FORM_ID
-         WHERE FORM_FormID = :id");
+         LEFT JOIN htmlforms
+            ON htmlforms.HtmlFormID = questions.HtmlFormID
+         WHERE AssessmentToolID = :id");
     
-    $db_handle->bindVar(':id', $qID, PDO::PARAM_INT,0);
-    $questionsResult = $db_handle->runFetch();
+    $db_handle->bindVar(':id', $toolID, PDO::PARAM_INT,0);
+    $questions = $db_handle->runFetch();
 
-    if(!isset($questionsResult))$questionsResult = '';
+    if(!isset($questions))$questions = '';
     
-    return $questionsResult;
+    return $questions;
+}
+
+function getTranslations($toolID = '')
+# Author: Laranjo, Sam Paul L.
+# Last Modified: 12-08-17
+# Modified by: Laranjo, Sam Paul L.
+{
+    if(!isset($toolID)) $toolIDs = ['z']; //safeguard for tampered IDs
+    $db_handle = new DBController();
+
+    $db_handle->prepareStatement(
+        "SELECT
+            translations.TranslationID,
+            translations.QuestionID,
+            translations.AssessmentToolID,
+            translations.Translation,
+            translations.Dialect
+         FROM translations
+         WHERE translations.AssessmentToolID = :toolID");
+    
+    $db_handle->bindVar(':toolID', $toolID, PDO::PARAM_INT,0);
+    $translations = $db_handle->runFetch();
+
+    if(!isset($translations))$translations = '';
+    return $translations;
+}
+
+function getTranslationsArray($toolID = '')
+# Author: Laranjo, Sam Paul L.
+# Last Modified: 12-08-17
+# Modified by: Laranjo, Sam Paul L.
+{
+    $translationsData = getTranslations($toolID);
+    $translationsArray = array();
+    
+    foreach($translationsData as $translation)
+    {
+        if(!isset($translationsArray[$translation['QuestionID']]))
+        {
+            $translationsArray[$translation['QuestionID']] = [];
+            $translationsArray[$translation['QuestionID']][$translation['Dialect']] = $translation['Translation'];
+        } else
+        {
+            if(!isset($translationsArray[$translation['QuestionID']][$translation['Dialect']]))
+            {
+                $translationsArray[$translation['QuestionID']][$translation['Dialect']] = $translation['Translation'];
+            }
+        }
+    }
+    #die(print_r($translationsArray));
+    return $translationsArray;
 }
 
 function getIntakeInfo($id = '')
