@@ -67,36 +67,79 @@ function includeLayoutGenerator()
 #---- include functions end ----
 
 #---- db fetch functions ----
-function getIDPDetails($id = '') {
+function getIDPDetails($id = '')
+# Author: Laranjo, Sam Paul L.
+# Last Modified: 12-06-17
+# Modified by: Laranjo, Sam Paul L.
+{
     $db_handle = new DBController();
-    $db_handle->prepareStatement("SELECT * FROM `idp` WHERE IDP_ID = :idpID");
+    $db_handle->prepareStatement(
+        "SELECT * FROM `idp`
+         WHERE IDP_ID = :idpID");
+    
     $db_handle->bindVar(':idpID', $id, PDO::PARAM_INT,0);
     $idp = $db_handle->runFetch();
 
     return $idp;
 }
 
-function getIDPExtensiveDetails($id = '') {
-    $db_handle = new DBController();
-    $db_handle->prepareStatement(
-        "SELECT idp.IDP_ID,
-                 CONCAT(Lname, ', ', Fname, ' ', Mname) AS IDPName, idp.Lname, idp.Fname, idp.Mname, idp.Bdate, idp.Age,
-                 idp.Gender, idp.Education, idp.MaritalStatus, idp.Religion, idp.Ethnicity,
-                 idp.PhoneNum, idp.Origin_Barangay, idp.EvacuationCenters_EvacuationCentersID AS EvacID, idp.Email, idp.Occupation, 
-                 idp.Remarks, idp.SpecificAddress FROM idp
-        WHERE idp.IDP_ID = :idpID");
-
-    $db_handle->bindVar(':idpID', $id, PDO::PARAM_INT, 0);
-    $idpInfo = $db_handle->runFetch();
-
-    return $idpInfo;
-}
-
-function getUserInfo($userID = '')
+function getStudentExtensiveDetails($id = '')
+# Author: Laranjo, Sam Paul L.
+# Last Modified: 12-06-17
+# Modified by: Laranjo, Sam Paul L.
 {
     $db_handle = new DBController();
     $db_handle->prepareStatement(
-        "SELECT user.Lname, user.Fname, user.Mname, user.DateAdded, user.Sex, user.PhoneNum, user.AGENCY_AgencyID, account.Username FROM user LEFT JOIN account ON account.USER_UserID = user.UserID WHERE user.UserID = :userID");
+        "SELECT
+            StudentID,
+            CONCAT(Lname, ', ', Fname, ' ', Mname) AS StudentName,
+            students.Lname,
+            students.Fname,
+            students.Mname,
+            students.Bdate,
+            students.Age,
+            students.Gender,
+            students.Course,
+            students.DepartmentID,
+            students.Religion,
+            students.Ethnicity,
+            students.PhoneNum,
+            students.AddressBarangayID,
+            students.MonthlyNetIncome,
+            students.Email,
+            students.Occupation, 
+            students.Remarks,
+            students.SpecificAddress
+         FROM students
+         WHERE students.StudentID = :studentID");
+
+    $db_handle->bindVar(':studentID', $id, PDO::PARAM_INT, 0);
+    $studentInfo = $db_handle->runFetch();
+
+    return $studentInfo;
+}
+
+function getUserInfo($userID = '')
+# Author: Laranjo, Sam Paul L.
+# Last Modified: 12-06-17
+# Modified by: Laranjo, Sam Paul L.
+{
+    $db_handle = new DBController();
+    $db_handle->prepareStatement(
+        "SELECT
+            user.Lname,
+            user.Fname,
+            user.Mname,
+            user.Birthdate,
+            user.Sex,
+            user.PhoneNum,
+            user.AgencyID,
+            user.Position,
+            account.Username
+         FROM user
+         LEFT JOIN account
+            ON account.USER_UserID = user.UserID
+         WHERE user.UserID = :userID");
 
     $db_handle->bindVar(':userID', $userID, PDO::PARAM_INT, 0);
     $userInfo = $db_handle->runFetch();
@@ -105,6 +148,9 @@ function getUserInfo($userID = '')
 }
 
 function calculateAge($birthDate = '')
+# Author: Laranjo, Sam Paul L.
+# Last Modified: 12-06-17
+# Modified by: Laranjo, Sam Paul L.
 {
     $today = date("Y-m-d");
     $diff = date_diff(date_create($birthDate), date_create($today));
@@ -119,6 +165,9 @@ function calculateAge($birthDate = '')
 }
 
 function translateDate($date = '', $time = '')
+# Author: Laranjo, Sam Paul L.
+# Last Modified: 12-06-17
+# Modified by: Laranjo, Sam Paul L.
 {
     if($time == 'time')
     {
@@ -137,61 +186,10 @@ function translateDate($date = '', $time = '')
     }
 }
 
-function getEducationalAttainment($eaCode = '')
-{
-    $educationalAttainment = array(
-        1 => 'Grade 1',
-        2 => 'Grade 2',
-        3 => 'Grade 3',
-        4 => 'Grade 4',
-        5 => 'Grade 5',
-        6 => 'Grade 6',
-        7 => 'Elementary Graduate',
-        8 => 'Grade 7 / 1st Year Highschool',
-        9 => 'Grade 8 / 2nd Year Highschool',
-        10 => 'Grade 9 / 3rd Year Highschool',
-        11 => 'Grade 10 / 4th Year Highschool',
-        12 => 'Grade 11',
-        13 => 'Grade 12',
-        14 => 'High School Graduate',
-        15 => '1st Year College',
-        16 => '2nd Year College',
-        17 => '3rd Year College',
-        18 => '4th Year College',
-        19 => 'College Graduate',
-        20 => 'Elementary',
-        21 => 'High School',
-        22 => 'College'
-    );
-    
-    if($eaCode != '')
-    {
-        return $educationalAttainment[$eaCode];
-    } else
-    {
-        return 'unspecified';
-    }
-}
-
-function getMaritalStatus($msCode = '')
-{
-    $maritalStatus = array(
-        1 => 'Single',
-        2 => 'Married',
-        3 => 'Annulled',
-        4 => 'Widowed'
-    );
-    
-    if($msCode != '')
-    {
-        return $maritalStatus[$msCode];
-    } else
-    {
-        return 'unspecified';
-    }
-}
-
 function getGender($genderID = '')
+# Author: Laranjo, Sam Paul L.
+# Last Modified: 12-06-17
+# Modified by: Laranjo, Sam Paul L.
 {
     $gender = array(
         1 => 'Male',
@@ -208,45 +206,100 @@ function getGender($genderID = '')
 }
 
 function getProvinces()
+# Author: Laranjo, Sam Paul L.
+# Last Modified: 12-06-17
+# Modified by: Laranjo, Sam Paul L.
 {
     $db_handle = new DBController();
-    $db_handle->prepareStatement("SELECT * FROM `province` ORDER BY ProvinceName");
+    $db_handle->prepareStatement(
+        "SELECT * FROM `province`
+         ORDER BY ProvinceName
+         LIMIT 10");
+    
     $provinces = $db_handle->runFetch();
 
     return $provinces;
 }
 
 function getCities()
+# Author: Laranjo, Sam Paul L.
+# Last Modified: 12-06-17
+# Modified by: Laranjo, Sam Paul L.
 {
     $db_handle = new DBController();
-    $db_handle->prepareStatement("SELECT * FROM city_mun JOIN province ON city_mun.PROVINCE_ProvinceID = province.ProvinceID ORDER BY `City_Mun_Name`");
+    $db_handle->prepareStatement(
+        "SELECT * FROM city_mun
+        JOIN province
+            ON city_mun.PROVINCE_ProvinceID = province.ProvinceID
+        ORDER BY `City_Mun_Name`
+        LIMIT 10");
+    
     $cities = $db_handle->runFetch();
 
     return $cities;
 }
 
 function getBarangays()
+# Author: Laranjo, Sam Paul L.
+# Last Modified: 12-06-17
+# Modified by: Laranjo, Sam Paul L.
 {
     $db_handle = new DBController();
-    $db_handle->prepareStatement("SELECT * FROM `barangay` JOIN city_mun ON barangay.City_CityID = city_mun.City_Mun_ID ORDER BY `BarangayName`");
+    $db_handle->prepareStatement(
+        "SELECT * FROM `barangay`
+        JOIN city_mun
+            ON barangay.City_CityID = city_mun.City_Mun_ID
+        ORDER BY `BarangayName`
+        LIMIT 10");
+    
     $barangays = $db_handle->runFetch();
 
     return $barangays;
 }
 
 function getFullAddress($barangayID='', $idpID='')
+# Author: Laranjo, Sam Paul L.
+# Last Modified: 12-06-17
+# Modified by: Laranjo, Sam Paul L.
 {
     $db_handle = new DBController();
     $result = [];
     if(isset($idpID) && ($idpID != '' || $idpID != 0))
     {
-        $db_handle->prepareStatement("SELECT CONCAT((CASE WHEN idp.SpecificAddress = '' THEN '' ELSE CONCAT(idp.SpecificAddress, ', ') END), barangay.BarangayName, ', ', city_mun.City_Mun_Name, ', ', province.ProvinceName) AS Address FROM barangay LEFT JOIN idp ON barangay.BarangayID = idp.Origin_Barangay LEFT JOIN city_mun ON barangay.City_CityID = city_mun.City_Mun_ID LEFT JOIN province ON city_mun.PROVINCE_ProvinceID = province.ProvinceID WHERE barangay.BarangayID = :barangay AND idp.IDP_ID = :idpID");
+        $db_handle->prepareStatement(
+            "SELECT
+                CONCAT(
+                    (CASE
+                        WHEN idp.SpecificAddress = '' THEN ''
+                        ELSE CONCAT(idp.SpecificAddress, ', ')
+                     END),
+                barangay.BarangayName, ', ', city_mun.City_Mun_Name, ', ', province.ProvinceName
+                ) AS Address
+             FROM barangay
+             LEFT JOIN idp
+                ON barangay.BarangayID = idp.Origin_Barangay
+             LEFT JOIN city_mun
+                ON barangay.City_CityID = city_mun.City_Mun_ID
+             LEFT JOIN province
+                ON city_mun.PROVINCE_ProvinceID = province.ProvinceID
+             WHERE barangay.BarangayID = :barangay
+               AND idp.IDP_ID = :idpID");
+        
         $db_handle->bindVar(':barangay', $barangayID, PDO::PARAM_INT,0);
         $db_handle->bindVar(':idpID', $idpID, PDO::PARAM_INT,0);
         
         $result = $db_handle->runFetch();
     } else {
-        $db_handle->prepareStatement("SELECT CONCAT(barangay.BarangayName, ', ', city_mun.City_Mun_Name, ', ', province.ProvinceName) AS Address FROM barangay LEFT JOIN city_mun ON barangay.City_CityID = city_mun.City_Mun_ID LEFT JOIN province ON city_mun.PROVINCE_ProvinceID = province.ProvinceID WHERE barangay.BarangayID = :barangay");
+        $db_handle->prepareStatement(
+            "SELECT
+                CONCAT(barangay.BarangayName, ', ', city_mun.City_Mun_Name,', ', province.ProvinceName) AS Address
+             FROM barangay
+             LEFT JOIN city_mun
+                ON barangay.City_CityID = city_mun.City_Mun_ID
+             LEFT JOIN province
+                ON city_mun.PROVINCE_ProvinceID = province.ProvinceID
+             WHERE barangay.BarangayID = :barangay");
+        
         $db_handle->bindVar(':barangay', $barangayID, PDO::PARAM_INT,0);
         
         $result = $db_handle->runFetch();
@@ -263,9 +316,23 @@ function getFullAddress($barangayID='', $idpID='')
 }
 
 function getAddressIDs($barangayID)
+# Author: Laranjo, Sam Paul L.
+# Last Modified: 12-06-17
+# Modified by: Laranjo, Sam Paul L.
 {
     $db_handle = new DBController();
-    $db_handle->prepareStatement("SELECT barangay.BarangayID, city_mun.City_Mun_ID, province.ProvinceID FROM barangay LEFT JOIN city_mun ON city_mun.City_Mun_ID = barangay.City_CityID LEFT JOIN province ON province.ProvinceID = city_mun.PROVINCE_ProvinceID WHERE barangay.BarangayID = :barangayID");
+    $db_handle->prepareStatement(
+        "SELECT
+            barangay.BarangayID,
+            city_mun.City_Mun_ID,
+            province.ProvinceID
+        FROM barangay
+        LEFT JOIN city_mun
+            ON city_mun.City_Mun_ID = barangay.City_CityID
+        LEFT JOIN province
+            ON province.ProvinceID = city_mun.PROVINCE_ProvinceID
+        WHERE barangay.BarangayID = :barangayID");
+    
     $db_handle->bindVar(':barangayID', $barangayID, PDO::PARAM_INT, 0);
     $addressIDs = $db_handle->runFetch();
 
@@ -273,6 +340,9 @@ function getAddressIDs($barangayID)
 }
 
 function getEvacuationCenters()
+# Author: Laranjo, Sam Paul L.
+# Last Modified: 12-06-17
+# Modified by: Laranjo, Sam Paul L.
 {
     $db_handle = new DBController();
     $db_handle->prepareStatement("SELECT * FROM evacuation_centers");
@@ -282,80 +352,159 @@ function getEvacuationCenters()
 }
 
 function getEvacDetails($evacID = '')
+# Author: Laranjo, Sam Paul L.
+# Last Modified: 12-06-17
+# Modified by: Laranjo, Sam Paul L.
 {
     $db_handle = new DBController();
-    $db_handle->prepareStatement("SELECT evacuation_centers.EvacuationCentersID, CONCAT(evacuation_centers.EvacName, ': ' ,barangay.BarangayName, ', ', city_mun.City_Mun_Name, ', ', province.ProvinceName) AS EvacAndAddress FROM evacuation_centers LEFT JOIN barangay ON evacuation_centers.EvacAddress = barangay.BarangayID LEFT JOIN city_mun ON city_mun.City_Mun_ID = barangay.City_CityID LEFT JOIN province ON province.ProvinceID = city_mun.PROVINCE_ProvinceID WHERE evacuation_centers.EvacuationCentersID = :evacID");
-    $db_handle->bindVar(':evacID', $evacID, PDO::PARAM_INT,0);
+    $db_handle->prepareStatement(
+        "SELECT
+            evacuation_centers.EvacuationCentersID,
+            CONCAT
+                (evacuation_centers.EvacName, ': ', barangay.BarangayName, ', ',
+                 city_mun.City_Mun_Name, ', ', province.ProvinceName) AS EvacAndAddress
+        FROM evacuation_centers
+        LEFT JOIN barangay
+            ON evacuation_centers.EvacAddress = barangay.BarangayID
+        LEFT JOIN city_mun
+            ON city_mun.City_Mun_ID = barangay.City_CityID
+        LEFT JOIN province
+            ON province.ProvinceID = city_mun.PROVINCE_ProvinceID
+        WHERE evacuation_centers.EvacuationCentersID = :evacID");
     
+    $db_handle->bindVar(':evacID', $evacID, PDO::PARAM_INT,0);
     $result = $db_handle->runFetch();
     
     return $result[0]['EvacAndAddress'];
 }
 
 function getExtensiveEvacDetails($evacID = '')
+# Author: Laranjo, Sam Paul L.
+# Last Modified: 12-06-17
+# Modified by: Laranjo, Sam Paul L.
 {
     $db_handle = new DBController();
-    $db_handle->prepareStatement("SELECT evacuation_centers.EvacuationCentersID, evacuation_centers.EvacName, evacuation_centers.EvacAddress, evacuation_centers.EvacType, evacuation_centers.EvacManager, evacuation_centers.EvacManagerContact, evacuation_centers.SpecificAddress, city_mun.City_Mun_ID, city_mun.City_Mun_Name, province.ProvinceID, province.ProvinceName FROM evacuation_centers LEFT JOIN barangay ON barangay.BarangayID = evacuation_centers.EvacAddress LEFT JOIN city_mun ON city_mun.City_Mun_ID = barangay.City_CityID LEFT JOIN province ON province.ProvinceID = city_mun.PROVINCE_ProvinceID WHERE evacuation_centers.EvacuationCentersID = :evacID");
-    $db_handle->bindVar(':evacID', $evacID, PDO::PARAM_INT,0);
+    $db_handle->prepareStatement(
+        "SELECT
+            evacuation_centers.EvacuationCentersID,
+            evacuation_centers.EvacName,
+            evacuation_centers.EvacAddress,
+            evacuation_centers.EvacType,
+            evacuation_centers.EvacManager,
+            evacuation_centers.EvacManagerContact,
+            evacuation_centers.SpecificAddress,
+            city_mun.City_Mun_ID,
+            city_mun.City_Mun_Name,
+            province.ProvinceID,
+            province.ProvinceName
+        FROM evacuation_centers
+        LEFT JOIN barangay
+            ON barangay.BarangayID = evacuation_centers.EvacAddress
+        LEFT JOIN city_mun
+            ON city_mun.City_Mun_ID = barangay.City_CityID
+        LEFT JOIN province
+            ON province.ProvinceID = city_mun.PROVINCE_ProvinceID
+        WHERE evacuation_centers.EvacuationCentersID = :evacID");
     
+    $db_handle->bindVar(':evacID', $evacID, PDO::PARAM_INT,0);
     $result = $db_handle->runFetch();
     
     return $result;
 }
 
 function getAgencies()
+# Author: Laranjo, Sam Paul L.
+# Last Modified: 12-06-17
+# Modified by: Laranjo, Sam Paul L.
 {
     $db_handle = new DBController();
-    $db_handle->prepareStatement("SELECT * FROM `agency` ORDER BY AgencyName");
+    $db_handle->prepareStatement(
+        "SELECT *
+         FROM `agency`
+         ORDER BY AgencyName");
+    
     $agencies = $db_handle->runFetch();
 
     return $agencies;
 }
 
 function getFormID($questionID)
+# Author: Laranjo, Sam Paul L.
+# Last Modified: 12-06-17
+# Modified by: Laranjo, Sam Paul L.
 {
     $db_handle = new DBController();
-    $db_handle->prepareStatement("SELECT FORM_FormID FROM `questions` WHERE QuestionsID = :qid");
+    $db_handle->prepareStatement(
+        "SELECT FORM_FormID
+         FROM `questions`
+         WHERE QuestionsID = :qid");
+    
     $db_handle->bindVar(":qid", $questionID, PDO::PARAM_INT,0);
     $formID = $db_handle->runFetch();
     
     return($formID[0]['FORM_FormID']);
 }
 
-function getAllAssessmentTools() {
+function getAllAssessmentTools()
+# Author: Laranjo, Sam Paul L.
+# Last Modified: 12-06-17
+# Modified by: Laranjo, Sam Paul L.
+{
     $db_handle = new DBController();
-    $db_handle->prepareStatement("SELECT * FROM `form` ORDER BY FormType");
+    $db_handle->prepareStatement(
+        "SELECT *
+         FROM `form`
+         ORDER BY FormType");
+    
     $forms = $db_handle->runFetch();
 
     return $forms;
 }
 
 function getMultipleAssessmentTools($qIDs = '')
+# Author: Laranjo, Sam Paul L.
+# Last Modified: 12-06-17
+# Modified by: Laranjo, Sam Paul L.
 {
     if(!isset($qIDs)) $qIDs = ['z']; //safeguard for tampered $qIDs
     $db_handle = new DBController();
     $inQuery = implode(',', array_fill(0, count($qIDs), '?'));
     $db_handle->prepareStatement(
-        'SELECT * FROM `form` WHERE FormID IN (' . $inQuery . ')'
-    );
+        "SELECT *
+         FROM `form`
+         WHERE FormID IN (".$inQuery .")");
+    
     $formInfo = $db_handle->fetchWithIn($qIDs);
 
     return $formInfo;
 }
 
 function getAssessmentTool($qID)
+# Author: Laranjo, Sam Paul L.
+# Last Modified: 12-06-17
+# Modified by: Laranjo, Sam Paul L.
 {
     if(!isset($qIDs)) $qIDs = ['z']; //safeguard for tampered $qIDs
     $db_handle = new DBController();
 
-    $db_handle->prepareStatement("SELECT * FROM `form` WHERE FormID = :id");
+    $db_handle->prepareStatement(
+        "SELECT *
+         FROM `form`
+         WHERE FormID = :id");
+    
     $db_handle->bindVar(':id', $qID, PDO::PARAM_INT,0);
     $formInfo = $db_handle->runFetch();
+    
     if(!isset($formInfo))$formInfo = '';
+    
     return $formInfo;
 }
 
-function getAssessmentQuestions($type = '',$qIDs = '') {
+function getAssessmentQuestions($type = '',$qIDs = '')
+# Author: Laranjo, Sam Paul L.
+# Last Modified: 12-06-17
+# Modified by: Laranjo, Sam Paul L.
+{
     if(!isset($qIDs)) $qIDs = ['z']; //safeguard for tampered $qIDs
     $db_handle = new DBController();
     if($type == 'Tool')
@@ -363,13 +512,17 @@ function getAssessmentQuestions($type = '',$qIDs = '') {
         $toolIDs = implode(',',$qIDs);
         $inQuery = implode(',', array_fill(0, count($qIDs), '?'));
         $db_handle->prepareStatement(
-            "SELECT FORM_FormID, QuestionsID, Question,
-                    html_form.HTML_FORM_TYPE AS FormType,
-                    html_form.HTML_FORM_INPUT_QUANTITY AS InputRange
+            "SELECT
+                FORM_FormID,
+                QuestionsID,
+                Question,
+                html_form.HTML_FORM_TYPE AS FormType,
+                html_form.HTML_FORM_INPUT_QUANTITY AS InputRange
             FROM `questions`
             JOIN html_form
                 ON questions.HTML_FORM_HTML_FORM_ID = html_form.HTML_FORM_ID
-            WHERE FORM_FormID IN (".$inQuery.") ORDER BY FIELD(FORM_FormID, ?)");
+            WHERE FORM_FormID IN (".$inQuery.")
+            ORDER BY FIELD(FORM_FormID, ?)");
 
         $qIDs[] = $toolIDs;
         $questionsResult = $db_handle->fetchWithIn($qIDs);
@@ -377,46 +530,67 @@ function getAssessmentQuestions($type = '',$qIDs = '') {
     else if($type == 'Intake')
     {
         $db_handle->prepareStatement(
-            "SELECT INTAKE_IntakeID AS FORM_FormID, QuestionsID, Question,
-                    html_form.HTML_FORM_TYPE AS FormType,
-                    html_form.HTML_FORM_INPUT_QUANTITY AS InputRange
+            "SELECT
+                INTAKE_IntakeID AS FORM_FormID,
+                QuestionsID,
+                Question,
+                html_form.HTML_FORM_TYPE AS FormType,
+                html_form.HTML_FORM_INPUT_QUANTITY AS InputRange
             FROM questions
             JOIN html_form
                 ON questions.HTML_FORM_HTML_FORM_ID = html_form.HTML_FORM_ID
             WHERE INTAKE_IntakeID = :formID");
+        
         $db_handle->bindVar(':formID', $qIDs, PDO::PARAM_INT,0);
         $questionsResult = $db_handle->runFetch();
     }
+    
     if(!isset($questionsResult))$questionsResult = '';
+    
     return $questionsResult;
 }
 
 function getEditToolQuestions($qID = '')
+# Author: Laranjo, Sam Paul L.
+# Last Modified: 12-06-17
+# Modified by: Laranjo, Sam Paul L.
 {
     if(!isset($qIDs)) $qIDs = ['z']; //safeguard for tampered $qIDs
     $db_handle = new DBController();
 
     $db_handle->prepareStatement(
-        "SELECT * FROM `questions`
-        LEFT JOIN html_form
+        "SELECT *
+         FROM `questions`
+         LEFT JOIN html_form
             ON html_form.HTML_FORM_ID = questions.HTML_FORM_HTML_FORM_ID
-        WHERE FORM_FormID = :id");
+         WHERE FORM_FormID = :id");
+    
     $db_handle->bindVar(':id', $qID, PDO::PARAM_INT,0);
     $questionsResult = $db_handle->runFetch();
 
     if(!isset($questionsResult))$questionsResult = '';
+    
     return $questionsResult;
 }
 
 function getIntakeInfo($id = '')
+# Author: Laranjo, Sam Paul L.
+# Last Modified: 12-06-17
+# Modified by: Laranjo, Sam Paul L.
 {
     $db_handle = new DBController();
     $db_handle->prepareStatement(
-        "SELECT IntakeID as FormID,
-            (CASE WHEN (AgeGroup = 2) THEN 'Intake for Adults' ELSE 'Intake for Children' END) AS FormType,
-            DISASTER_DisasterID, AgeGroup
-        FROM `intake` WHERE IntakeID = :id"
-    );
+        "SELECT
+            IntakeID as FormID,
+            (CASE
+                WHEN (AgeGroup = 2) THEN 'Intake for Adults'
+                ELSE 'Intake for Children'
+                END
+            ) AS FormType,
+            DISASTER_DisasterID,
+            AgeGroup
+        FROM `intake` WHERE IntakeID = :id");
+    
     $db_handle->bindVar(':id', $id, PDO::PARAM_INT,0);
     $intakeInfo = $db_handle->runFetch();
 
@@ -424,9 +598,16 @@ function getIntakeInfo($id = '')
 }
 
 function getAgeGroup($id = '')
+# Author: Laranjo, Sam Paul L.
+# Last Modified: 12-06-17
+# Modified by: Laranjo, Sam Paul L.
 {
     $db_handle = new DBController();
-    $db_handle->prepareStatement("SELECT idp.Bdate FROM idp WHERE idp.IDP_ID = :id");
+    $db_handle->prepareStatement(
+        "SELECT students.Bdate
+         FROM students
+         WHERE students.StudentID = :id");
+    
     $db_handle->bindVar(':id', $id, PDO::PARAM_INT,0);
     $bDate = $db_handle->runFetch()[0]['Bdate'];
     
@@ -444,9 +625,17 @@ function getAgeGroup($id = '')
 }
 
 function getIntakeCount($idpID = '')
+# Author: Laranjo, Sam Paul L.
+# Last Modified: 12-06-17
+# Modified by: Laranjo, Sam Paul L.
 {
     $db_handle = new DBController();
-    $db_handle->prepareStatement("SELECT COUNT(*) AS count FROM intake_answers WHERE IDP_IDP_ID = :id");
+    $db_handle->prepareStatement(
+        "SELECT
+            COUNT(*) AS Count
+        FROM intakeformanswers
+        WHERE StudentID = :id");
+    
     $db_handle->bindVar(':id', $idpID, PDO::PARAM_INT,0);
     $intakeCount = $db_handle->runFetch();
     
@@ -454,97 +643,143 @@ function getIntakeCount($idpID = '')
 }
 
 function getAnswerInfo($faID='', $type='')
+# Author: Laranjo, Sam Paul L.
+# Last Modified: 12-06-17
+# Modified by: Laranjo, Sam Paul L.
 {
     $db_handle = new DBController();
     if($type == 'intake')
     {
-        $db_handle->prepareStatement("SELECT INTAKE_ANSWERS_ID, CONCAT(idp.Lname,', ',idp.Fname,' ',idp.Mname) as IDPName, CONCAT(user.Lname,', ', user.Fname, ' ', user.Mname) as UserResponsible, intake_answers.Date_taken FROM intake_answers JOIN idp on IDP_IDP_ID = idp.IDP_ID JOIN user on intake_answers.USER_UserID = user.UserID JOIN intake on intake.IntakeID = intake_answers.INTAKE_IntakeID WHERE intake_answers.INTAKE_ANSWERS_ID = :faID");
+        $db_handle->prepareStatement(
+            "SELECT
+                INTAKE_ANSWERS_ID,
+                CONCAT(idp.Lname,', ',idp.Fname,' ',idp.Mname) as IDPName,
+                CONCAT(user.Lname,', ', user.Fname, ' ', user.Mname) as UserResponsible,
+                intake_answers.Date_taken
+             FROM intake_answers
+             JOIN idp
+                ON IDP_IDP_ID = idp.IDP_ID
+             JOIN user
+                ON intake_answers.USER_UserID = user.UserID
+             JOIN intake
+                ON intake.IntakeID = intake_answers.INTAKE_IntakeID
+             WHERE intake_answers.INTAKE_ANSWERS_ID = :faID");
     } else if($type == 'tool')
     {
-        $db_handle->prepareStatement("SELECT FORM_ANSWERS_ID, form.FormID, form.FormType, form.Instructions, CONCAT(idp.Lname,', ',idp.Fname,' ',idp.Mname) as IDPName, CONCAT(user.Lname,', ', user.Fname, ' ', user.Mname) as UserResponsible, form_answers.UnansweredItems, form_answers.DateTaken FROM form_answers JOIN idp on IDP_IDP_ID = idp.IDP_ID JOIN user on form_answers.USER_UserID = user.UserID JOIN form on form.FormID = form_answers.FORM_FormID WHERE form_answers.FORM_ANSWERS_ID = :faID");
+        $db_handle->prepareStatement(
+            "SELECT
+                FORM_ANSWERS_ID,
+                form.FormID,
+                form.FormType,
+                form.Instructions,
+                CONCAT(idp.Lname,', ',idp.Fname,' ',idp.Mname) as IDPName,
+                CONCAT(user.Lname,', ', user.Fname, ' ', user.Mname) as UserResponsible,
+                form_answers.UnansweredItems, form_answers.DateTaken
+             FROM form_answers
+             JOIN idp
+                ON IDP_IDP_ID = idp.IDP_ID
+             JOIN user
+                ON form_answers.USER_UserID = user.UserID
+             JOIN form
+                ON form.FormID = form_answers.FORM_FormID
+             WHERE form_answers.FORM_ANSWERS_ID = :faID");
     }
-    $db_handle->bindVar(':faID', $faID, PDO::PARAM_INT,0);
     
+    $db_handle->bindVar(':faID', $faID, PDO::PARAM_INT,0);
     $answerInfo = $db_handle->runFetch();
     
     return $answerInfo;
 }
 
 function getAnswers($faID='', $type='')
+# Author: Laranjo, Sam Paul L.
+# Last Modified: 12-06-17
+# Modified by: Laranjo, Sam Paul L.
 {
     $db_handle = new DBController();
     if($type == 'intake')
     {
-        $db_handle->prepareStatement("SELECT
-            intake_answers.INTAKE_ANSWERS_ID,
-            questions.QuestionsID,
-            questions.Question,
-            html_form.HTML_FORM_TYPE AS FormType,
-            html_form.HTML_FORM_INPUT_QUANTITY AS AnswerRange,
-            AnswersTable.AnswerID,
-            AnswersTable.Answer
-        FROM intake_answers
-        LEFT JOIN questions ON intake_answers.INTAKE_IntakeID = questions.INTAKE_IntakeID
-        LEFT JOIN
-            (SELECT
-                answers_quanti.INTAKE_ANSWERS_INTAKE_ANSWERS_ID,
-                answers_quanti.ANSWERS_QUANTI_ID AS AnswerID,
-                answers_quanti.QUESTIONS_QuestionsID,
-                answers_quanti.Answer
-            FROM answers_quanti
-            UNION SELECT
-                answers_quali.INTAKE_ANSWERS_INTAKE_ANSWERS_ID,
-                answers_quali.ANSWERS_QUALI_ID,
-                answers_quali.QUESTIONS_QuestionsID,
-                answers_quali.Answer FROM answers_quali
-            ) AnswersTable
-            ON
-                questions.QuestionsID = AnswersTable.QUESTIONS_QuestionsID
-            AND
-                intake_answers.INTAKE_ANSWERS_ID = AnswersTable.INTAKE_ANSWERS_INTAKE_ANSWERS_ID
-        LEFT JOIN html_form ON questions.HTML_FORM_HTML_FORM_ID = html_form.HTML_FORM_ID
-        WHERE intake_answers.INTAKE_ANSWERS_ID = :faID");   
+        $db_handle->prepareStatement(
+            "SELECT
+                intake_answers.INTAKE_ANSWERS_ID,
+                questions.QuestionsID,
+                questions.Question,
+                html_form.HTML_FORM_TYPE AS FormType,
+                html_form.HTML_FORM_INPUT_QUANTITY AS AnswerRange,
+                AnswersTable.AnswerID,
+                AnswersTable.Answer
+            FROM intake_answers
+            LEFT JOIN questions
+                ON intake_answers.INTAKE_IntakeID = questions.INTAKE_IntakeID
+            LEFT JOIN
+                (SELECT
+                    answers_quanti.INTAKE_ANSWERS_INTAKE_ANSWERS_ID,
+                    answers_quanti.ANSWERS_QUANTI_ID AS AnswerID,
+                    answers_quanti.QUESTIONS_QuestionsID,
+                    answers_quanti.Answer
+                 FROM answers_quanti
+                 UNION
+                 SELECT
+                    answers_quali.INTAKE_ANSWERS_INTAKE_ANSWERS_ID,
+                    answers_quali.ANSWERS_QUALI_ID,
+                    answers_quali.QUESTIONS_QuestionsID,
+                    answers_quali.Answer FROM answers_quali
+                ) AnswersTable
+                ON
+                    questions.QuestionsID = AnswersTable.QUESTIONS_QuestionsID
+                AND
+                    intake_answers.INTAKE_ANSWERS_ID = AnswersTable.INTAKE_ANSWERS_INTAKE_ANSWERS_ID
+            LEFT JOIN html_form 
+                ON questions.HTML_FORM_HTML_FORM_ID = html_form.HTML_FORM_ID
+            WHERE intake_answers.INTAKE_ANSWERS_ID = :faID");   
     } else if($type == 'tool')
     {
-        $db_handle->prepareStatement("SELECT
-            form_answers.FORM_ANSWERS_ID,
-            form_answers.FORM_FormID,
-            questions.QuestionsID,
-            questions.Question,
-            html_form.HTML_FORM_TYPE AS FormType,
-            html_form.HTML_FORM_INPUT_QUANTITY AS AnswerRange,
-            AnswersTable.AnswerID,
-            AnswersTable.Answer
-        FROM form_answers
-        LEFT JOIN questions ON form_answers.FORM_FormID = questions.FORM_FormID
-        LEFT JOIN
-            (SELECT
-                answers_quanti.FORM_ANWERS_FORM_ANSWERS_ID,
-                answers_quanti.ANSWERS_QUANTI_ID AS AnswerID,
-                answers_quanti.QUESTIONS_QuestionsID,
-                answers_quanti.Answer
-            FROM answers_quanti
-            UNION SELECT
-                answers_quali.FORM_ANSWERS_FORM_ANSWERS_ID,
-                answers_quali.ANSWERS_QUALI_ID,
-                answers_quali.QUESTIONS_QuestionsID,
-                answers_quali.Answer FROM answers_quali
-            ) AnswersTable
-            ON
-                questions.QuestionsID = AnswersTable.QUESTIONS_QuestionsID
-            AND
-                form_answers.FORM_ANSWERS_ID = AnswersTable.FORM_ANWERS_FORM_ANSWERS_ID
-        LEFT JOIN html_form ON questions.HTML_FORM_HTML_FORM_ID = html_form.HTML_FORM_ID
-        WHERE form_answers.FORM_ANSWERS_ID = :faID");
+        $db_handle->prepareStatement(
+            "SELECT
+                form_answers.FORM_ANSWERS_ID,
+                form_answers.FORM_FormID,
+                questions.QuestionsID,
+                questions.Question,
+                html_form.HTML_FORM_TYPE AS FormType,
+                html_form.HTML_FORM_INPUT_QUANTITY AS AnswerRange,
+                AnswersTable.AnswerID,
+                AnswersTable.Answer
+            FROM form_answers
+            LEFT JOIN questions
+                ON form_answers.FORM_FormID = questions.FORM_FormID
+            LEFT JOIN
+                (SELECT
+                    answers_quanti.FORM_ANWERS_FORM_ANSWERS_ID,
+                    answers_quanti.ANSWERS_QUANTI_ID AS AnswerID,
+                    answers_quanti.QUESTIONS_QuestionsID,
+                    answers_quanti.Answer
+                FROM answers_quanti
+                UNION
+                SELECT
+                    answers_quali.FORM_ANSWERS_FORM_ANSWERS_ID,
+                    answers_quali.ANSWERS_QUALI_ID,
+                    answers_quali.QUESTIONS_QuestionsID,
+                    answers_quali.Answer FROM answers_quali
+                ) AnswersTable
+                ON
+                    questions.QuestionsID = AnswersTable.QUESTIONS_QuestionsID
+                AND
+                    form_answers.FORM_ANSWERS_ID = AnswersTable.FORM_ANWERS_FORM_ANSWERS_ID
+            LEFT JOIN html_form
+                ON questions.HTML_FORM_HTML_FORM_ID = html_form.HTML_FORM_ID
+            WHERE form_answers.FORM_ANSWERS_ID = :faID");
     }
-    $db_handle->bindVar(':faID', $faID, PDO::PARAM_INT,0);
     
+    $db_handle->bindVar(':faID', $faID, PDO::PARAM_INT,0);
     $answers = $db_handle->runFetch();
     
     return $answers;
 }
 
 function getIntakeID($idpID = '', $ag = '')
+# Author: Laranjo, Sam Paul L.
+# Last Modified: 12-06-17
+# Modified by: Laranjo, Sam Paul L.
 {
     $formID = 0;
     if(!filter_var($idpID, FILTER_VALIDATE_INT) === false) {
@@ -569,10 +804,30 @@ function getIntakeID($idpID = '', $ag = '')
 
 #---- db insert functions ----
 function updateEditHistory($formID, $message)
+# Author: Laranjo, Sam Paul L.
+# Last Modified: 12-06-17
+# Modified by: Laranjo, Sam Paul L.
 {
     $db_handle = new DBController();
     
-    $db_handle->prepareStatement("INSERT INTO `edit_history`(`EditHistoryID`, `USER_UserID`, `LastEdit`, `FORM_FormID`, `QUESTIONS_QuestionsID`, `INTAKE_IntakeID`, `Remark`) VALUES (NULL, :usr, now(), :formID, NULL, NULL, :edit)");
+    $db_handle->prepareStatement(
+        "INSERT INTO `edit_history`
+            (`EditHistoryID`,
+             `USER_UserID`,
+             `LastEdit`,
+             `FORM_FormID`,
+             `QUESTIONS_QuestionsID`,
+             `INTAKE_IntakeID`,
+             `Remark`)
+          VALUES
+            (NULL,
+             :usr,
+             now(),
+             :formID,
+             NULL,
+             NULL,
+             :edit)");
+    
     $db_handle->bindVar(':usr', $_SESSION['UserID'], PDO::PARAM_INT, 0);
     $db_handle->bindVar(':formID', $formID, PDO::PARAM_INT, 0);
     $db_handle->bindVar(':edit', $message, PDO::PARAM_STR, 0);
@@ -581,7 +836,10 @@ function updateEditHistory($formID, $message)
 #---- db insert functions end ----
 
 #---- assessment functions ----
-function getList($data, $listType = 'IDP', $listTarget = '') 
+function getList($data, $listType = 'IDP', $listTarget = '')
+# Author: Laranjo, Sam Paul L.
+# Last Modified: 12-06-17
+# Modified by: Laranjo, Sam Paul L.
 {
     global $db_handle;
     $keyword = '';
@@ -602,51 +860,100 @@ function getList($data, $listType = 'IDP', $listTarget = '')
     if(isset($data["order"])) $order = $data["order"];
     if(isset($data["length"])) $length = $data["length"];
 
-    if($listType === 'IDP')
+    if($listType === 'Student')
     {
-        $query .= "SELECT
-                        CONCAT(Lname, ', ', Fname, ' ', Mname) AS IDPName, IDP_ID, Bdate,
-                        (CASE WHEN (Gender = 1) THEN 'Male' WHEN (Gender = 2) THEN 'Female' ELSE 'unspecified' END) AS Gender,
-                        Age, COALESCE(MIN(j.INTAKE_ANSWERS_ID), 0) AS intake_answersID,
-                        (CASE WHEN (Age > 18) THEN 2 ELSE 1 END) AS age_group 
-                FROM `idp` i 
-                LEFT JOIN intake_answers j ON i.IDP_ID = j.IDP_IDP_ID ";
+        $query .=
+            "SELECT
+                CONCAT(Lname, ', ', Fname, ' ', Mname) AS StudentName,
+                i.StudentID,
+                i.Course,
+                Bdate,
+                (CASE
+                    WHEN (Gender = 1) THEN 'Male'
+                    WHEN (Gender = 2) THEN 'Female'
+                    ELSE 'unspecified'
+                    END
+                ) AS Gender,
+                Age,
+                colleges.CollegeName,
+                departments.DepartmentName,
+                COALESCE(
+                    MIN(j.IntakeFormAnswerID),
+                    0
+                ) AS NumOfIntakes,
+                (CASE
+                    WHEN (Age > 18) THEN 2
+                    ELSE 1
+                    END
+                ) AS AgeGroup 
+            FROM `students` i 
+            LEFT JOIN intakeformanswers j
+                ON i.StudentID = j.StudentID
+            LEFT JOIN departments
+                ON i.DepartmentID = departments.DepartmentID
+            LEFT JOIN colleges
+                ON colleges.CollegeID = departments.CollegeID ";
 
         if($keyword != '')
         {
-            $query .= " WHERE Lname LIKE :keyword OR Fname LIKE :keyword OR Mname LIKE :keyword  OR Fname LIKE :keyword OR IDP_ID LIKE :keyword OR DAFAC_DAFAC_SN LIKE :keyword ";
+            $query .=
+                " WHERE i.Lname LIKE :keyword
+                  OR i.Fname LIKE :keyword
+                  OR i.Mname LIKE :keyword
+                  OR i.Fname LIKE :keyword
+                  OR i.StudentID LIKE :keyword ";
         }
 
         if($order != '')
         {
             if($order['0']['dir'] == 'asc')
             {
-                $query .= 'GROUP BY i.IDP_ID, IDPName ORDER BY :orderColumn ASC ';
+                $query .=
+                    "GROUP BY
+                        i.StudentID,
+                        StudentName
+                     ORDER BY :orderColumn ASC ";
             }
             else
             {
-                $query .= 'GROUP BY i.IDP_ID, IDPName ORDER BY :orderColumn DESC ';
+                $query .=
+                    "GROUP BY
+                        i.StudentID,
+                        StudentName
+                    ORDER BY :orderColumn DESC ";
             }
 
         }
         else
         {
-            $query .= 'GROUP BY i.IDP_ID, IDPName ORDER BY 1 ASC ';
+            $query .=
+                "GROUP BY
+                    i.StudentID,
+                    StudentName
+                ORDER BY 1 ASC ";
         }
     } else if($listType === 'Users')
     {
-        $query .= "SELECT account.AccountID, user.UserID,
-                          CONCAT(user.Lname,', ', user.Fname, ' ', user.Mname) as User,
-                          user.PhoneNum,
-                          agency.AgencyName AS Agency,
-                          user.DateAdded
-                   FROM account
-                   JOIN user ON account.USER_UserID = user.UserID
-                   JOIN agency ON user.AGENCY_AgencyID = agency.AgencyID ";
+        $query .=
+            "SELECT account.AccountID, user.UserID,
+                CONCAT(user.Lname,', ', user.Fname, ' ', user.Mname) as User,
+                user.PhoneNum,
+                agency.AgencyName AS Agency,
+                user.DateAdded
+            FROM account
+            JOIN user
+                ON account.USER_UserID = user.UserID
+            JOIN agency
+                ON user.AGENCY_AgencyID = agency.AgencyID ";
 
         if($keyword != '')
         {
-            $query .= " WHERE user.Lname LIKE :keyword OR user.Fname LIKE :keyword OR user.Mname LIKE :keyword OR agency.AgencyName LIKE :keyword OR user.PhoneNum LIKE :keyword ";
+            $query .=
+                " WHERE user.Lname LIKE :keyword
+                  OR user.Fname LIKE :keyword
+                  OR user.Mname LIKE :keyword
+                  OR agency.AgencyName LIKE :keyword
+                  OR user.PhoneNum LIKE :keyword ";
         }
 
         if($order != '')
@@ -668,11 +975,19 @@ function getList($data, $listType = 'IDP', $listTarget = '')
     }
     else if($listType === 'Evac')
     {
-        $query .= "SELECT * FROM `evacuation_centers`  ";
+        $query .=
+            "SELECT *
+             FROM `evacuation_centers`  ";
 
         if($keyword != '')
         {
-            $query .= " WHERE EvacuationCentersID LIKE :keyword OR EvacName LIKE :keyword OR EvacAddress LIKE :keyword OR EvacType LIKE :keyword OR EvacManager LIKE :keyword OR SpecificAddress LIKE :keyword ";
+            $query .=
+                " WHERE EvacuationCentersID LIKE :keyword
+                  OR EvacName LIKE :keyword
+                  OR EvacAddress LIKE :keyword
+                  OR EvacType LIKE :keyword
+                  OR EvacManager LIKE :keyword
+                  OR SpecificAddress LIKE :keyword ";
         }
 
         if($order != '')
@@ -693,11 +1008,17 @@ function getList($data, $listType = 'IDP', $listTarget = '')
     }
     else if($listType === 'Tool')
     {
-        $query .= "SELECT FormType, FormID FROM `form`  ";
+        $query .=
+            "SELECT
+                FormType,
+                FormID
+             FROM `form`  ";
 
         if($keyword != '')
         {
-            $query .= " WHERE FormID LIKE :keyword OR FormType LIKE :keyword ";
+            $query .=
+                " WHERE FormID LIKE :keyword
+                  OR FormType LIKE :keyword ";
         }
 
         if($order != '')
@@ -718,21 +1039,25 @@ function getList($data, $listType = 'IDP', $listTarget = '')
     }
     else if($listType === 'Assessment_taken')
     {
-        $query .= "SELECT form_answers.DateTaken,
-                          form.FormType AS FormID,
-                          form_answers.Score,
-                          auto_assmt.Assessment,
-                          form_answers.IDP_IDP_ID AS IDP,
-                          form_answers.FORM_ANSWERS_ID,
-                          CONCAT(user.Lname, ', ', user.Fname, ' ', user.Mname) as User,
-                          form_answers.UnansweredItems,
-                          auto_assmt.Cutoff,
-                          form_answers.FORM_FormID
-                    FROM form_answers
-                    LEFT JOIN form ON form_answers.FORM_FormID = form.FormID
-                    LEFT JOIN auto_assmt ON form_answers.FORM_FormID = auto_assmt.FORM_FormID
-                    LEFT JOIN user ON form_answers.USER_UserID = user.UserID
-                    WHERE form_answers.IDP_IDP_ID = :idpID ";
+        $query .=
+            "SELECT form_answers.DateTaken,
+                form.FormType AS FormID,
+                form_answers.Score,
+                auto_assmt.Assessment,
+                form_answers.IDP_IDP_ID AS IDP,
+                form_answers.FORM_ANSWERS_ID,
+                CONCAT(user.Lname, ', ', user.Fname, ' ', user.Mname) as User,
+                form_answers.UnansweredItems,
+                auto_assmt.Cutoff,
+                form_answers.FORM_FormID
+             FROM form_answers
+             LEFT JOIN form
+                ON form_answers.FORM_FormID = form.FormID
+             LEFT JOIN auto_assmt
+                ON form_answers.FORM_FormID = auto_assmt.FORM_FormID
+             LEFT JOIN user
+                ON form_answers.USER_UserID = user.UserID
+             WHERE form_answers.IDP_IDP_ID = :idpID ";
 
         if($keyword != '')
         {
@@ -757,16 +1082,18 @@ function getList($data, $listType = 'IDP', $listTarget = '')
     }
     else if($listType === 'Intake')
     {
-        $query = "SELECT intake_answers.IDP_IDP_ID AS IDP, intake_answers.INTAKE_ANSWERS_ID,
-                            IF(intake_answers.INTAKE_IntakeID = 2, 'Intake for Adults', 'Intake for Children') as FormID,
-                            CONCAT(user.Lname, ', ', user.Fname, ' ', user.Mname) AS User,
-                            intake_answers.Date_taken AS DateTaken, 'N/A' AS Score
-                    FROM intake_answers
-                    JOIN intake
-                        ON intake_answers.INTAKE_IntakeID = intake.IntakeID
-                    JOIN user
-                        ON user.UserID = intake_answers.USER_UserID
-                    WHERE intake_answers.IDP_IDP_ID = :id  ";
+        $query =
+            "SELECT intake_answers.IDP_IDP_ID AS IDP, intake_answers.INTAKE_ANSWERS_ID,
+                IF(intake_answers.INTAKE_IntakeID = 2, 'Intake for Adults', 'Intake for Children') as FormID,
+                CONCAT(user.Lname, ', ', user.Fname, ' ', user.Mname) AS User,
+                intake_answers.Date_taken AS DateTaken,
+                'N/A' AS Score
+             FROM intake_answers
+             JOIN intake
+                ON intake_answers.INTAKE_IntakeID = intake.IntakeID
+             JOIN user
+                ON user.UserID = intake_answers.USER_UserID
+             WHERE intake_answers.IDP_IDP_ID = :id  ";
 
         $db_handle->prepareStatement($query);
         $db_handle->bindVar(':id', $listTarget, PDO::PARAM_STR,0);
@@ -778,36 +1105,71 @@ function getList($data, $listType = 'IDP', $listTarget = '')
         if(!empty($firstResult)){
             foreach($firstResult as $forms) {
                 if($forms["FormID"] == "Intake for Adults") {
-                    $query = "SELECT Date_taken AS DateTaken,
+                    $query =
+                        "SELECT Date_taken AS DateTaken,
 
-                                    (SELECT Answer FROM answers_quanti WHERE INTAKE_ANSWERS_INTAKE_ANSWERS_ID = :intakeID AND QUESTIONS_QuestionsID = 220) as Result1,
+                            (SELECT
+                                Answer
+                             FROM answers_quanti
+                             WHERE INTAKE_ANSWERS_INTAKE_ANSWERS_ID = :intakeID
+                             AND QUESTIONS_QuestionsID = 220) as Result1,
 
-                                    (SELECT Answer FROM answers_quanti WHERE INTAKE_ANSWERS_INTAKE_ANSWERS_ID = :intakeID AND QUESTIONS_QuestionsID = 221) as Result2,
+                            (SELECT
+                                Answer
+                             FROM answers_quanti
+                             WHERE INTAKE_ANSWERS_INTAKE_ANSWERS_ID = :intakeID
+                             AND QUESTIONS_QuestionsID = 221) as Result2,
 
-                                    (SELECT Answer FROM answers_quali WHERE INTAKE_ANSWERS_INTAKE_ANSWERS_ID = :intakeID AND QUESTIONS_QuestionsID = 222) as Result3,
+                            (SELECT
+                                Answer
+                             FROM answers_quali
+                             WHERE INTAKE_ANSWERS_INTAKE_ANSWERS_ID = :intakeID
+                             AND QUESTIONS_QuestionsID = 222) as Result3,
 
-                                    (SELECT Answer FROM answers_quanti WHERE INTAKE_ANSWERS_INTAKE_ANSWERS_ID = :intakeID AND QUESTIONS_QuestionsID = 223) as Result4,
+                            (SELECT
+                                Answer
+                             FROM answers_quanti
+                             WHERE INTAKE_ANSWERS_INTAKE_ANSWERS_ID = :intakeID
+                             AND QUESTIONS_QuestionsID = 223) as Result4,
 
-                                    CONCAT(user.Lname, ', ', user.Fname, ' ', user.Mname) AS User,
-                                    INTAKE_IntakeID
+                            CONCAT(user.Lname, ', ', user.Fname, ' ', user.Mname) AS User,
+                            INTAKE_IntakeID
 
                     FROM intake_answers
                     JOIN user
                         ON intake_answers.USER_UserID = user.UserID
-                    WHERE INTAKE_ANSWERS_ID = :intakeID ORDER BY DateTaken DESC";
+                    WHERE INTAKE_ANSWERS_ID = :intakeID
+                    ORDER BY DateTaken DESC";
                 } else {
-                    $query = "SELECT Date_taken AS DateTaken,
+                    $query =
+                        "SELECT Date_taken AS DateTaken,
 
-                                    (SELECT Answer FROM answers_quanti WHERE INTAKE_ANSWERS_INTAKE_ANSWERS_ID = :intakeID AND QUESTIONS_QuestionsID = 216) as Result1,
+                            (SELECT
+                                Answer
+                             FROM answers_quanti
+                             WHERE INTAKE_ANSWERS_INTAKE_ANSWERS_ID = :intakeID
+                             AND QUESTIONS_QuestionsID = 216) as Result1,
 
-                                    (SELECT Answer FROM answers_quanti WHERE INTAKE_ANSWERS_INTAKE_ANSWERS_ID = :intakeID AND QUESTIONS_QuestionsID = 217) as Result2,
+                            (SELECT
+                                Answer
+                             FROM answers_quanti
+                             WHERE INTAKE_ANSWERS_INTAKE_ANSWERS_ID = :intakeID
+                             AND QUESTIONS_QuestionsID = 217) as Result2,
 
-                                    (SELECT Answer FROM answers_quali WHERE INTAKE_ANSWERS_INTAKE_ANSWERS_ID = :intakeID AND QUESTIONS_QuestionsID = 218) as Result3,
+                            (SELECT
+                                Answer
+                             FROM answers_quali
+                             WHERE INTAKE_ANSWERS_INTAKE_ANSWERS_ID = :intakeID
+                             AND QUESTIONS_QuestionsID = 218) as Result3,
 
-                                    (SELECT Answer FROM answers_quanti WHERE INTAKE_ANSWERS_INTAKE_ANSWERS_ID = :intakeID AND QUESTIONS_QuestionsID = 219) as Result4,
+                            (SELECT
+                                Answer
+                             FROM answers_quanti
+                             WHERE INTAKE_ANSWERS_INTAKE_ANSWERS_ID = :intakeID
+                             AND QUESTIONS_QuestionsID = 219) as Result4,
 
-                                    CONCAT(user.Lname, ', ', user.Fname, ' ', user.Mname) AS User,
-                                    INTAKE_IntakeID
+                            CONCAT(user.Lname, ', ', user.Fname, ' ', user.Mname) AS User,
+                            INTAKE_IntakeID
 
                  FROM intake_answers
                  JOIN user
@@ -914,14 +1276,14 @@ function getList($data, $listType = 'IDP', $listTarget = '')
     {
         foreach($result as $row)
         {
-            if($listType === 'IDP')
+            if($listType === 'Student')
             {
-                $recordsFiltered = get_total_all_records('IDP', 0);
+                $recordsFiltered = get_total_all_records('Student', 0);
 
-                $subArray["DT_RowId"] = $row["IDP_ID"];
-                $subArray[] = $row["IDPName"];
-                $subArray[] = $row["IDP_ID"];
-                $subArray[] = " ";
+                $subArray["DT_RowId"] = $row["StudentID"];
+                $subArray[] = $row["StudentName"];
+                $subArray[] = $row["StudentID"];
+                $subArray[] = $row["CollegeName"]." - ".$row["Course"];
                 $subArray[] = $row["Gender"];
                 $age = calculateAge($row["Bdate"]);
                 if($age == 'N/A')
@@ -939,26 +1301,26 @@ function getList($data, $listType = 'IDP', $listTarget = '')
                     $subArray[] = $age;
                 }
                 
-                $ageGroup = getAgeGroup($row["IDP_ID"]);
-                if($row['intake_answersID'] == 0) {
+                $ageGroup = getAgeGroup($row["StudentID"]);
+                if($row['NumOfIntakes'] == 0) {
                     $subArray[] = 
-                        '<a class="btn btn-info btn-sm btn-block" href="student.assessment.history.php?id='.$row["IDP_ID"].'">
+                        '<a class="btn btn-info btn-sm btn-block" href="student.assessment.history.php?id='.$row["StudentID"].'">
                             <i class="pe-7s-info"></i>Assessment History
                         </a>
-                        <a href="assessment.informed.consent.php?id='.$row["IDP_ID"].'&ag='.$ageGroup.'&from=intake" class="btn btn-success btn-xs btn-block">
+                        <a href="assessment.informed.consent.php?id='.$row["StudentID"].'&ag='.$ageGroup.'&from=intake" class="btn btn-success btn-xs btn-block">
                             <i class="icon_check_alt"></i>Apply Intake
                         </a>';
                 } 
                 else
                 {
                     $subArray[] = 
-                        '<a class="btn btn-info btn-sm btn-block" href="student.assessment.history.php?id='.$row["IDP_ID"].'">
+                        '<a class="btn btn-info btn-sm btn-block" href="student.assessment.history.php?id='.$row["StudentID"].'">
                             <i class="pe-7s-info"></i>Assessment History
                          </a>
-                         <a href="assessment.informed.consent.php?id='.$row["IDP_ID"].'&ag='.$ageGroup.'&from=intake" class="btn btn-success btn-xs btn-block">
+                         <a href="assessment.informed.consent.php?id='.$row["StudentID"].'&ag='.$ageGroup.'&from=intake" class="btn btn-success btn-xs btn-block">
                             <i class="icon_check_alt"></i>Apply Intake
                          </a>
-                         <a href="assessment.select.forms.php?id='.$row["IDP_ID"].'" class="btn btn-primary btn-xs btn-block">
+                         <a href="assessment.select.forms.php?id='.$row["StudentID"].'" class="btn btn-primary btn-xs btn-block">
                                 Apply Assessment Tool
                          </a>';
                 }
@@ -1054,9 +1416,9 @@ function get_total_all_records($type, $target = '')
 {
     $db_handle = new DBController();
 
-    if($type === 'IDP')
+    if($type === 'Student')
     {
-        $db_handle->prepareStatement("SELECT COUNT(*) AS total FROM `idp`");
+        $db_handle->prepareStatement("SELECT COUNT(*) AS total FROM `students`");
         $result = $db_handle->runFetch();
     }
     else if($type === 'Users')

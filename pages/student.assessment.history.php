@@ -6,7 +6,7 @@ $_SESSION['idpID'] = $_GET['id'];
 $id = $_GET['id'];
 $ag = getAgeGroup($id);
 
-$idp = getIDPExtensiveDetails($id);
+$studentInfo = getStudentExtensiveDetails($id);
 $intakeCount = getIntakeCount($id);
 ?>
 <!DOCTYPE html>
@@ -15,7 +15,7 @@ $intakeCount = getIntakeCount($id);
     <head>
 
         <?php 
-        includeHead($idp[0]['IDPName']." - Assessment History");
+        includeHead($studentInfo[0]['StudentName']." - Assessment History");
         if($_SESSION['account_type'] == '77')
         {
             includeDataTables('advanced');
@@ -87,7 +87,7 @@ $intakeCount = getIntakeCount($id);
                 ?>
                 <div class="row">
                     <div class="header">
-                        <h3 class="title"><?php echo($idp[0]['IDPName']); ?>&nbsp;
+                        <h3 class="title"><?php echo($studentInfo[0]['StudentName']); ?>&nbsp;
                             <?php
                             if($_SESSION['account_type'] == '77')
                             {
@@ -132,7 +132,7 @@ $intakeCount = getIntakeCount($id);
                             <div class="panel-heading">
                                 <h4 class="title">&nbsp;Assessment tools taken&nbsp;
                                     <?php
-                                    if($intakeCount[0]['count'] !== '0')
+                                    if($intakeCount[0]['Count'] !== '0')
                                     {
                                     ?>
                                     <a href="assessment.select.forms.php?id=<?php echo($id); ?>" class="btn btn-success btn-xs btn-fill" id="assessmentButton">
@@ -167,7 +167,7 @@ $intakeCount = getIntakeCount($id);
     </body>
     <script>
         $(document).ready(function() {
-            var intakeDataTable = $('#table-intake-list').DataTable( {
+            var intakeDataTable = $('#table-sintake-list').DataTable( {
                 "responsive": true,
                 "processing": true,
                 "serverSide": true,
@@ -190,7 +190,7 @@ $intakeCount = getIntakeCount($id);
             } );
         } );
         $(document).ready(function() {
-            var assessmentDataTable = $('#table-assessment-list').DataTable( {
+            var assessmentDataTable = $('#table-sassessment-list').DataTable( {
                 "responsive": true,
                 "processing": true,
                 "serverSide": true,

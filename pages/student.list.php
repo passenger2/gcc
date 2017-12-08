@@ -1,10 +1,6 @@
 <?php
 include("../initialize.php");
 includeCore();
-
-$_SESSION['loc'] = $_SERVER['PHP_SELF'];
-$_SESSION['disaster_id'] = 1;
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -45,7 +41,7 @@ $_SESSION['disaster_id'] = 1;
                         <div class="panel panel-default">
 
                             <div class="panel-body">
-                                <table width="100%" class="table table-bordered table-hover" id="table-idp-list">
+                                <table width="100%" class="table table-bordered table-hover" id="table-student-list">
                                     <thead>
                                         <tr>
                                             <th align="left"><b>Name</b></th>
@@ -83,7 +79,7 @@ $_SESSION['disaster_id'] = 1;
             });
         }
         $(document).ready(function() {
-            var dataTable = $('#table-idp-list').DataTable( {
+            var dataTable = $('#table-student-list').DataTable( {
                 "responsive": true,
                 "processing": true,
                 "serverSide": true,
@@ -135,7 +131,7 @@ $_SESSION['disaster_id'] = 1;
                 ?>
             } );
         } );
-        $('#table-idp-list').on('click', 'tbody tr', function() {
+        $('#table-student-list').on('click', 'tbody tr', function() {
             console.log('TD cell textContent : ', this.id);
         })
     </script>

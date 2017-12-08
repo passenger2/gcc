@@ -3,7 +3,7 @@ class DBController {
     private $host = "localhost";
     private $user = "root";
     private $password = "";
-    private $database = "gcc";
+    private $database = "psrms-gcc";
     private $conn;
     private $stmt;
     public $update_status;
