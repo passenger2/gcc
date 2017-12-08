@@ -8,10 +8,23 @@ $instructions = $post['formInstructions'];
 $itemStart = $post['itemStart'];
 $formID = '';
 $query = '';
+$itemNo = 1;
 
 $db_handle = new DBController();
 
-$db_handle->prepareStatement("INSERT INTO `form` (`FormID`, `FormType`, `Instructions`, `AgeGroup`, `ItemStart`) VALUES (NULL, :formTitle, :instr, NULL, :itemStart)");
+$db_handle->prepareStatement(
+    "INSERT INTO `assessmenttools`(
+        `AssessmentToolID`,
+        `Name`,
+        `Instructions`,
+        `AgeGroup`,
+        `ItemsStartAt`)
+     VALUES (
+        NULL,
+        :formTitle,
+        :instr,
+        NULL,
+        :itemStart)");
 $db_handle->bindVar(':formTitle', $formTitle, PDO::PARAM_STR,0);
 $db_handle->bindVar(':instr', nl2br($instructions), PDO::PARAM_STR,0);
 $db_handle->bindVar(':itemStart', $itemStart, PDO::PARAM_INT,0);
@@ -23,17 +36,38 @@ foreach($post as $key => $result)
 {
     if(substr($key,0,12) == 'question_add')
     {
-        $query .= "INSERT INTO `questions` (`QuestionsID`, `Question`, `FORM_FormID`, `Category`, `AnswerType`, `HTML_FORM_HTML_FORM_ID`, `INTAKE_IntakeID`, `Dialect`) VALUES (NULL, :question".substr($key,12).", :formID".substr($key,12).", NULL, :at".substr($key,12).", NULL, NULL, NULL);";
+        $query .=
+            "INSERT INTO `questions`(
+                `QuestionID`,
+                `Question`,
+                `AssessmentToolID`,
+                `Category`,
+                `AnswerType`,
+                `HtmlFormID`,
+                `IntakeFormID`,
+                `ItemNumber`)
+             VALUES (
+                NULL,
+                :question".substr($key,12).",
+                :formID".substr($key,12).",
+                NULL,
+                :at".substr($key,12).",
+                NULL,
+                NULL,
+                :itemNo".substr($key,12).");";
     }
 }
+
 $db_handle->prepareStatement($query);
 
 foreach($post as $key => $result)
 {
     if(substr($key,0,12) == 'question_add')
     {
+        $itemNumber = $itemNo++;
         $db_handle->bindVar(':formID'.substr($key,12), $formID, PDO::PARAM_INT, 0);
         $db_handle->bindVar(':question'.substr($key,12), $result, PDO::PARAM_STR,0);
+        $db_handle->bindVar(':itemNo'.substr($key,12), $itemNumber, PDO::PARAM_INT,0);
     } else if(substr($key,0,10) == 'answerType')
     {
         $db_handle->bindVar(':at'.substr($key,10), $result, PDO::PARAM_INT, 0);
@@ -43,9 +77,24 @@ foreach($post as $key => $result)
 $db_handle->runUpdate();
 
 if($db_handle->getUpdateStatus()) {
-    $db_handle->prepareStatement("INSERT INTO `edit_history`(`EditHistoryID`, `USER_UserID`, `LastEdit`, `FORM_FormID`, `QUESTIONS_QuestionsID`, `INTAKE_IntakeID`, `Remark`) VALUES (NULL, :usr, now(), :formID, NULL, NULL, :edit)");
+    $db_handle->prepareStatement(
+        "INSERT INTO `edithistories`(
+            `EditHistoryID`,
+            `ActiveUserID`,
+            `EditDate`,
+            `EditType`,
+            `EditItemID`,
+            `EditDescription`)
+         VALUES(
+            NULL,
+            :usr,
+            NOW(),
+            :editType,
+            :formID,
+            :edit)");
     $db_handle->bindVar(':usr', $_SESSION['UserID'], PDO::PARAM_INT, 0);
     $db_handle->bindVar(':formID', $formID, PDO::PARAM_INT, 0);
+    $db_handle->bindVar(':editType', 'AssessmentTool', PDO::PARAM_STR, 0);
     $db_handle->bindVar(':edit', 'added assessment tool : '.$formTitle, PDO::PARAM_STR, 0);
     $db_handle->runUpdate();
     
