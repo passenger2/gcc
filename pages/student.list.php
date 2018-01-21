@@ -56,8 +56,6 @@ includeCore();
                             </div>
                         </div>
                         <!-- page end-->
-                        <div id="modal-container">
-                        </div>
                         <button id="modalToggle" type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal" style="display:none"></button>
                     </div>
                 </div>
@@ -72,12 +70,6 @@ includeCore();
 
     </body>
     <script>
-        window.loadModal = function(clickedID) {
-            $("#modal-container").load("/includes/fragments/idp_assessment_modal.php?id="+clickedID, function() {
-                $("#modalToggle").attr('data-target', '#myModal'+clickedID);
-                $("#modalToggle").click();
-            });
-        }
         $(document).ready(function() {
             var dataTable = $('#table-student-list').DataTable( {
                 "responsive": true,

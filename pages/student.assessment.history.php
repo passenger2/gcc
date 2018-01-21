@@ -94,9 +94,9 @@ $intakeCount = getIntakeCount($id);
                             {
                             ?>
                             <sup>
-                                <a type="button" class="btn btn-info btn-xs" href="student.details.php?id=<?php echo($id); ?>">
+                                <!--<a type="button" class="btn btn-info btn-xs" href="student.details.php?id=<?php echo($id); ?>">
                                     <i class="fa fa-info-circle"></i>&nbsp;Student Details
-                                </a>
+                                </a>-->
                             </sup>
                             <?php
                             }
@@ -191,7 +191,7 @@ $intakeCount = getIntakeCount($id);
             } );
         } );
         $(document).ready(function() {
-            var assessmentDataTable = $('#table-sassessment-list').DataTable( {
+            var assessmentDataTable = $('#table-assessment-list').DataTable( {
                 "responsive": true,
                 "processing": true,
                 "serverSide": true,

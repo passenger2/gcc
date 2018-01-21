@@ -1,13 +1,13 @@
 <?php
+#die(print_r($_POST));
 include("../../initialize.php");
 includeCore();
-
 $db_handle = new DBController();
-$formID = $_POST['formID'];
+$formID = $_GET['id'];
 $post_values = $_POST;
-$db_handle->prepareStatement("SELECT * FROM `html_form`");
+$db_handle->prepareStatement("SELECT * FROM `htmlforms`;");
 $html_forms = $db_handle->runFetch();
-$post =  array_values($_POST);  //$_POST assoc to numeric array; contains form type, quantity alternately
+$post =  array_values($_POST);  //$_POST assoc array to numeric array; contains form type, quantity alternately
 $post_len = count($post);
 $q_ids = array();               //array of question ids
 //extract ids from $_POST
@@ -39,7 +39,7 @@ $array_iterator = new RecursiveIteratorIterator(new RecursiveArrayIterator($html
 for($j = 0; $j < $q_ids_len; $j++) {
     foreach ($array_iterator as $sub) {
         $subArray = $array_iterator->getSubIterator();
-        if (($subArray['HTML_FORM_TYPE'] === $q_html_form[$j][0]) && ($subArray['HTML_FORM_INPUT_QUANTITY'] === $q_html_form[$j][1] || $subArray['HTML_FORM_INPUT_QUANTITY'] === null) ) {
+        if (($subArray['Type'] == $q_html_form[$j][0]) && ($subArray['Range'] == $q_html_form[$j][1] || $subArray['Range'] == null) ) {
             //$outputArray[] = iterator_to_array($subArray);
             $outputArray[] = array_values(iterator_to_array($subArray));
         }
@@ -48,7 +48,10 @@ for($j = 0; $j < $q_ids_len; $j++) {
 //----------------------------------------------------------------------------------------------------------------------------
 
 for($k = 0; $k < $q_ids_len; $k++) {
-    $query .= "UPDATE `questions` SET `HTML_FORM_HTML_FORM_ID` = :html".$outputArray[$k][0]." WHERE `questions`.`QuestionsID` = :qID".$q_ids[$k].";";
+    $query .= 
+        "UPDATE `questions`
+        SET `HtmlFormID` = :html".$outputArray[$k][0]."
+        WHERE `QuestionID` = :qID".$q_ids[$k].";";
 }
 $db_handle->prepareStatement($query);
 for($k = 0; $k < $q_ids_len; $k++) {
@@ -58,14 +61,28 @@ for($k = 0; $k < $q_ids_len; $k++) {
 $db_handle->runUpdate();
 
 if($db_handle->getUpdateStatus()) {
-    $db_handle->prepareStatement("INSERT INTO `edit_history`(`EditHistoryID`, `USER_UserID`, `LastEdit`, `FORM_FormID`, `QUESTIONS_QuestionsID`, `INTAKE_IntakeID`, `Remark`) VALUES (NULL, :usr, now(), :formID, NULL, NULL, :edit)");
+    $db_handle->prepareStatement(
+        "INSERT INTO `edithistories`(
+            `EditHistoryID`,
+            `ActiveUserID`,
+            `EditDate`,
+            `EditType`,
+            `EditItemID`,
+            `EditDescription`)
+        VALUES (
+            NULL,
+            :usr,
+            now(),
+            'Assessment Tool Layout',
+            :formID,
+            :edit)");
     $db_handle->bindVar(':usr', $_SESSION['UserID'], PDO::PARAM_INT, 0);
     $db_handle->bindVar(':formID', $formID, PDO::PARAM_INT, 0);
-    $db_handle->bindVar(':edit', 'edited this form\'s layout.', PDO::PARAM_STR, 0);
+    $db_handle->bindVar(':edit', 'Edited this tool\'s layout.', PDO::PARAM_STR, 0);
     $db_handle->runUpdate();
     
-    header("location: /pages/forms.edit.tool.php?form_id=".$formID."&status=layoutsuccess");
+    header("location: /pages/forms.edit.tool.php?id=".$formID."&status=layoutsuccess");
 } else {
-    header("location: /pages/forms.edit.tool.php?form_id=".$formID."&status=layouterror");
+    header("location: /pages/forms.edit.tool.php?id=".$formID."&status=layouterror");
 }
 ?>

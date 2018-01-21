@@ -14,6 +14,7 @@
 <link href="/assets/vendor/morrisjs/morris.css" rel="stylesheet">
 <link href="/assets/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 <link href="/assets/fonts/flaticon/flaticon.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+<link href="/assets/vendor/jquery-ui-1.12.1.custom/jquery-ui.css" rel="stylesheet">
+<!--<link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
-<link href='https://fonts.googleapis.com/css?family=Roboto+Slab' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Roboto+Slab' rel='stylesheet' type='text/css'>-->

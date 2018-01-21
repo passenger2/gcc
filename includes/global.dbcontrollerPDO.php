@@ -14,6 +14,7 @@ class DBController {
         try {
             $this->conn = new PDO("mysql:host=$this->host;dbname=$this->database", $this->user, $this->password);
             // set the PDO error mode to exception
+            #$this->conn->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         }
         catch(PDOException $e)

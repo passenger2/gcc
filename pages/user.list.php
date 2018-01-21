@@ -1,4 +1,5 @@
-<?php 
+<?php
+die("Under Construction <a href='".$_SERVER["HTTP_REFERER"]."'>back</a>");
 include("../initialize.php");
 includeCore();
 

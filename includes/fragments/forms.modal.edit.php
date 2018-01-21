@@ -9,19 +9,19 @@ $questTranslations = array();   //final associative array of tokenized questions
 $languages = array();           //array of available translation languages *updates in the question display foreach section
 
 if($editing === "title") {
-    $db_handle->prepareStatement("SELECT form.FormType AS 'result' FROM `form` WHERE FormID = :id");
+    $db_handle->prepareStatement("SELECT assessmenttools.Name AS 'result' FROM `assessmenttools` WHERE AssessmentToolID = :id");
     $db_handle->bindVar(':id', $id, PDO::PARAM_INT,0);
     $text = $db_handle->runFetch();
 } else if ($editing === "instr") {
-    $db_handle->prepareStatement("SELECT form.Instructions AS 'result' FROM `form` WHERE FormID = :id");
+    $db_handle->prepareStatement("SELECT assessmenttools.Instructions AS 'result' FROM `assessmenttools` WHERE AssessmentToolID = :id");
     $db_handle->bindVar(':id', $id, PDO::PARAM_INT,0);
     $text = $db_handle->runFetch();
 } else if ($editing === "quest") {
-    $db_handle->prepareStatement("SELECT questions.Question AS 'result' FROM `questions` WHERE QuestionsID = :id");
+    $db_handle->prepareStatement("SELECT questions.Question AS 'result' FROM `questions` WHERE QuestionID = :id");
     $db_handle->bindVar(':id', $id, PDO::PARAM_INT,0);
     $text = $db_handle->runFetch();
 } else if ($editing === "trans") {
-    $db_handle->prepareStatement("SELECT QuestionsID, Question FROM `questions` WHERE FORM_FormID = :id");
+    $db_handle->prepareStatement("SELECT QuestionID, Question FROM `questions` WHERE AssessmentToolID = :id");
     $db_handle->bindVar(':id', $id, PDO::PARAM_INT,0);
     $text = $db_handle->runFetch();
 } else {
@@ -60,11 +60,13 @@ if($editing === "trans") {
                         <form action="/includes/actions/forms.process.add.translation.php?id=<?php echo($id); ?>" method="post">
                             <div class="modal-header">
                                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                <span style="font-size:20px;">Add Translations</span>
-                                <span class="carousel-control" href="#carousel-example-generic" data-slide="next" role="button">
-                                    Translation Edit History &gt;
-                                </span>
-                                <h5> Language: <input type="text" name="transLang" pattern="[a-zA-Z\s]+" placeholder="Letters and spaces only" required></h5>
+                                <div class="col-md-6">
+                                    <span style="font-size:20px;">Add Translations</span>
+                                    <span class="carousel-control" href="#carousel-example-generic" data-slide="next" role="button">
+                                        Translation Edit History &gt;
+                                    </span>
+                                    <h5> Language: <input type="text" class="form-control" name="transLang" pattern="[a-zA-Z\s]+" placeholder="Letters and spaces only" required></h5>
+                                </div>
                             </div>
                             <div class="modal-body">
                                 <div>

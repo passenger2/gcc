@@ -14,6 +14,11 @@ body {
   min-height: 568px;
   background-color: white;
 }
+#preview-wrapper {
+  padding: 0 15px;
+  min-height: 568px;
+  background-color: white;
+}
 @media (min-width: 768px) {
   #page-wrapper {
     position: inherit;
@@ -21,6 +26,12 @@ body {
     padding: 0 30px;
     border-left: 1px solid #e7e7e7;
     margin-top: 51px;
+  }
+  #preview-wrapper {
+    position: inherit;
+    margin: 0 200px 0 200px;
+    padding: 0 30px;
+    border-left: 1px solid #e7e7e7;
   }
 }
 #exam-wrapper {

@@ -1,93 +1,76 @@
 <?php
+#die(print_r($_POST));
 include("../../initialize.php");
 includeCore();
 
 $db_handle = new DBController();
-$formID = $_GET['id'];
-$faID = $_GET['faid'];
+$assessmentToolAnswerID = $_GET['atid'];
+$studentID = $_GET['sid'];
 $post = $_POST;
-$keys = [];
-$tempScore = 0;
-$query = '';
-#die(print_r($_POST));
-foreach($post as $key => $value)
+$score = 0;
+$query = "";
+foreach($post as $key => $answer)
 {
-    $keys = explode('-', $key);
+    $keys = explode("-", $key);
+    #$keys[0] => assessment tool ID
+    #$keys[1] => answer type
+    #$keys[2] => question ID
+    #$keys[3] => question item number
+    #$keys[4] => answer ID
     
-    if($keys[0] != 'q' && $keys[1] == '1')
-    {
-        if($keys[3] != 'new')
-        {
-            $query .= "UPDATE `answers_quanti` SET `Answer` = :answer".$keys[2]." WHERE `answers_quanti`.`ANSWERS_QUANTI_ID` = :ansID".$keys[2].";";
-        } else
-        {
-            $query .= "INSERT INTO `answers_quanti` (`ANSWERS_QUANTI_ID`, `Answer`, `QUESTIONS_QuestionsID`, `FORM_ANWERS_FORM_ANSWERS_ID`, `INTAKE_ANSWERS_INTAKE_ANSWERS_ID`) VALUES (NULL, :answer".$keys[2].", :qid".$keys[2].", :faID".$keys[2].", NULL);";
-        }
-    } else if($keys[0] != 'q' && $keys[1] == '2')
-    {
-        if($keys[3] != 'new')
-        {
-            $query .= "UPDATE `answers_quali` SET `Answer` = :answer".$keys[2]." WHERE `answers_quali`.`ANSWERS_QUALI_ID` = :ansID".$keys[2].";";
-        } else
-        {
-            $query .= "INSERT INTO `answers_quali` (`ANSWERS_QUALI_ID`, `Answer`, `QUESTIONS_QuestionsID`, `FORM_ANWERS_FORM_ANSWERS_ID`, `INTAKE_ANSWERS_INTAKE_ANSWERS_ID`) VALUES (NULL, :answer".$keys[2].", :qid".$keys[2].", :faID".$keys[2].", NULL);";
-        }
-    }
-}
-
-#die($query);
-$db_handle->prepareStatement($query);
-
-foreach($post as $key => $value)
-{
-
-    $keys = explode('-', $key);
+    $itemsString = getAutoAssessmentItems($keys[0]);
+    $items = explode(",", $itemsString);
     
-    if(($keys[0] != 'q' && $keys[1] == '1') || ($keys[0] != 'q' && $keys[1] == '2'))
+    if(!empty($keys[4]))
     {
         if($keys[1] == '1')
         {
-            if($keys[3] != 'new')
-            {
-                $db_handle->bindVar(":answer".$keys[2], $value, PDO::PARAM_INT,0);
-                $db_handle->bindVar(":ansID".$keys[2], $keys[3], PDO::PARAM_INT,0);
-            } else
-            {
-                $db_handle->bindVar(":answer".$keys[2], $value, PDO::PARAM_INT,0);
-                $db_handle->bindVar(":qid".$keys[2], $keys[2], PDO::PARAM_INT,0);
-                $db_handle->bindVar(":faID".$keys[2], $faID, PDO::PARAM_INT,0);
-            }
-            
-            $tempScore += $value;
+            $query =
+                "UPDATE `quantitativeanswers`
+        SET `Answer` = :answer
+        WHERE `quantitativeanswers`.`QuantitativeAnswerID` = :answerID";
         } else if($keys[1] == '2')
         {
-            if($keys[3] != 'new')
+            $query =
+                "UPDATE `qualitativeanswers`
+        SET `Answer` = :answer
+        WHERE `qualitativeanswers`.`QualitativeAnswerID` = :answerID";
+        }
+
+        $db_handle->prepareStatement($query);
+        if($keys[1] == '1')
+        {
+            $db_handle->bindVar(":answer", $answer, PDO::PARAM_INT, 0);
+            if(in_array($keys[2], $items))
             {
-                $db_handle->bindVar(":answer".$keys[2], $value, PDO::PARAM_STR,0);
-                $db_handle->bindVar(":ansID".$keys[2], $keys[3], PDO::PARAM_INT,0);
-            } else
-            {
-                $db_handle->bindVar(":answer".$keys[2], $value, PDO::PARAM_STR,0);
-                $db_handle->bindVar(":qid".$keys[2], $keys[2], PDO::PARAM_INT,0);
-                $db_handle->bindVar(":faID".$keys[2], $faID, PDO::PARAM_INT,0);
+                $score += $answer;
             }
+        } else if($keys[1] == '2')
+        {
+            $db_handle->bindVar(":answer", $answer, PDO::PARAM_STR, 0);
+        }
+        $db_handle->bindVar(":answerID", $keys[4], PDO::PARAM_INT, 0);
+
+        $db_handle->runUpdate();
+    } else
+    {
+        insertAnswer('tool', $keys[1], $answer, $keys[2], $assessmentToolAnswerID);
+        if(in_array($keys[2], $items))
+        {
+            $score += $answer;
         }
     }
 }
-if($query != '')
-{
-    $db_handle->runUpdate();
-}
 
-if($db_handle->getUpdateStatus()) {
-    $db_handle->prepareStatement("UPDATE `form_answers` SET `Score` = :score WHERE `form_answers`.`FORM_ANSWERS_ID` = :faID");
-    $db_handle->bindVar(':score', $tempScore, PDO::PARAM_INT,0);
-    $db_handle->bindVar(':faID', $faID, PDO::PARAM_INT,0);
-    $db_handle->runUpdate();
-    
-    header("location: /pages/assessment.view.answers.tool.php?id=".$faID."&status=updatetoolsuccess");
-} else
-{
-    header("location: /pages/assessment.view.answers.tool.php?id=".$faID."&status=updatetoolempty");
-}
+$db_handle->prepareStatement(
+    "UPDATE `scores`
+    SET `Score` = :Score
+    WHERE `scores`.`AssessmentToolAnswerID` = :AssessmentToolAnswerID");
+
+$db_handle->bindVar(":AssessmentToolAnswerID", $assessmentToolAnswerID, PDO::PARAM_INT, 0);
+$db_handle->bindVar(":Score", $score, PDO::PARAM_INT, 0);
+
+$db_handle->runUpdate();
+
+header("location: /pages/student.assessment.history.php?id=".$studentID."&status=updatetoolsuccess");
 ?>

@@ -85,7 +85,7 @@ function getStudentDetails($id = '')
 
 function getStudentExtensiveDetails($id = '')
 # Author: Laranjo, Sam Paul L.
-# Last Modified: 12-06-17
+# Last Modified: 01-04-18
 # Modified by: Laranjo, Sam Paul L.
 {
     $db_handle = new DBController();
@@ -96,20 +96,39 @@ function getStudentExtensiveDetails($id = '')
             students.Lname,
             students.Fname,
             students.Mname,
+            students.Nickname,
             students.Bdate,
             students.Age,
             students.Gender,
-            students.Course,
-            students.DepartmentID,
-            students.Religion,
-            students.Ethnicity,
             students.PhoneNum,
-            students.AddressBarangayID,
-            students.MonthlyNetIncome,
             students.Email,
-            students.Occupation, 
+            students.PlaceOfBirth,
+            students.Citizenship,
+            students.DepartmentID,
+            students.CourseYear,
+            students.Religion,
+            students.DateEnrolled,
+            students.ActiveUserID,
+            students.PrevGPA,
+            students.OrdinalPosition,
+            students.FathersName,
+            students.FathersStatus,
+            students.FathersOccupation,
+            students.MothersName,
+            students.MothersStatus,
+            students.MothersOccupation,
+            students.ParentsMaritalStatus,
+            students.ParentsContactNo,
+            students.CurrentlyLivingWith,
+            students.CurrentAddress,
+            students.CurrentSpecificAddress,
+            students.ScholarshipStatus,
+            students.ScholarshipType,
+            students.FamilyMonthlyNetIncome,
+            students.SchoolLastAttended,
+            students.SchoolLastAttendedAddress,
             students.Remarks,
-            students.SpecificAddress
+            students.Status
          FROM students
          WHERE students.StudentID = :studentID");
 
@@ -466,7 +485,7 @@ function getMultipleAssessmentTools($toolIDs = '')
 # Last Modified: 12-08-17
 # Modified by: Laranjo, Sam Paul L.
 {
-    if(!isset($toolIDs)) $toolIDs = ['z']; //safeguard for tampered IDs
+    if(!isset($toolIDs)) $toolIDs = ['z'];
     $db_handle = new DBController();
     $inQuery = implode(',', array_fill(0, count($toolIDs), '?'));
     $db_handle->prepareStatement(
@@ -501,50 +520,40 @@ function getAssessmentTool($toolID)
 
 function getAssessmentQuestions($type = '',$qIDs = '')
 # Author: Laranjo, Sam Paul L.
-# Last Modified: 12-06-17
+# Last Modified: 01-10-18
 # Modified by: Laranjo, Sam Paul L.
 {
-    if(!isset($qIDs)) $qIDs = ['z']; //safeguard for tampered $qIDs
+    if(!isset($qIDs)) $qIDs = ['z'];
     $db_handle = new DBController();
     if($type == 'Tool')
     {
         $toolIDs = implode(',',$qIDs);
         $inQuery = implode(',', array_fill(0, count($qIDs), '?'));
         $db_handle->prepareStatement(
-            "SELECT
-                FORM_FormID,
-                QuestionsID,
-                Question,
-                html_form.HTML_FORM_TYPE AS FormType,
-                html_form.HTML_FORM_INPUT_QUANTITY AS InputRange
+            "SELECT *
             FROM `questions`
-            JOIN html_form
-                ON questions.HTML_FORM_HTML_FORM_ID = html_form.HTML_FORM_ID
-            WHERE FORM_FormID IN (".$inQuery.")
-            ORDER BY FIELD(FORM_FormID, ?)");
+            LEFT JOIN htmlforms
+                ON htmlforms.HtmlFormID = questions.HtmlFormID
+            WHERE AssessmentToolID IN (".$inQuery.")
+            ORDER BY FIELD(AssessmentToolID, ?)");
 
-        $qIDs[] = $toolIDs;
+        $qIDs[] = $toolIDs;#die(print_r($qIDs));
         $questionsResult = $db_handle->fetchWithIn($qIDs);
     }
     else if($type == 'Intake')
     {
         $db_handle->prepareStatement(
-            "SELECT
-                INTAKE_IntakeID AS FORM_FormID,
-                QuestionsID,
-                Question,
-                html_form.HTML_FORM_TYPE AS FormType,
-                html_form.HTML_FORM_INPUT_QUANTITY AS InputRange
-            FROM questions
-            JOIN html_form
-                ON questions.HTML_FORM_HTML_FORM_ID = html_form.HTML_FORM_ID
-            WHERE INTAKE_IntakeID = :formID");
+            "SELECT *
+            FROM `questions`
+            LEFT JOIN htmlforms
+                ON htmlforms.HtmlFormID = questions.HtmlFormID
+            WHERE IntakeFormID = :formID");
         
         $db_handle->bindVar(':formID', $qIDs, PDO::PARAM_INT,0);
         $questionsResult = $db_handle->runFetch();
     }
     
-    if(!isset($questionsResult))$questionsResult = '';
+    if(!isset($questionsResult))$questionsResult[] = '';
     
     return $questionsResult;
 }
@@ -554,7 +563,7 @@ function getEditToolQuestions($toolID = '')
 # Last Modified: 12-08-17
 # Modified by: Laranjo, Sam Paul L.
 {
-    if(!isset($toolID)) $toolIDs = ['z']; //safeguard for tampered IDs
+    if(!isset($toolID)) $toolIDs = ['z'];
     $db_handle = new DBController();
 
     $db_handle->prepareStatement(
@@ -572,55 +581,180 @@ function getEditToolQuestions($toolID = '')
     return $questions;
 }
 
-function getTranslations($toolID = '')
+function getTranslations($type = 'EditAssessmentQuestions', $itemID = '')
 # Author: Laranjo, Sam Paul L.
-# Last Modified: 12-08-17
+# Last Modified: 01-10-18
 # Modified by: Laranjo, Sam Paul L.
 {
-    if(!isset($toolID)) $toolIDs = ['z']; //safeguard for tampered IDs
+    if(!isset($itemID)) $itemIDs = ['z'];
     $db_handle = new DBController();
 
-    $db_handle->prepareStatement(
-        "SELECT
-            translations.TranslationID,
-            translations.QuestionID,
-            translations.AssessmentToolID,
-            translations.Translation,
-            translations.Dialect
-         FROM translations
-         WHERE translations.AssessmentToolID = :toolID");
-    
-    $db_handle->bindVar(':toolID', $toolID, PDO::PARAM_INT,0);
-    $translations = $db_handle->runFetch();
+    if($type == 'EditAssessmentQuestions')
+    {
+        $db_handle->prepareStatement(
+            "SELECT
+                translations.TranslationID,
+                translations.QuestionID,
+                translations.AssessmentToolID,
+                translations.Translation,
+                translations.Dialect
+             FROM translations
+             WHERE translations.AssessmentToolID = :itemID");
+        
+        
+        $db_handle->bindVar(':itemID', $itemID, PDO::PARAM_INT,0);
+        $translations = $db_handle->runFetch();
+    } else if($type == 'Tool')
+    {
+        $itemIDs = $itemID;
+        $toolIDs = implode(',',$itemIDs);
+        $inQuery = implode(',', array_fill(0, count($itemIDs), '?'));
+        $query =
+            "SELECT
+                translations.TranslationID,
+                translations.QuestionID,
+                translations.AssessmentToolID,
+                translations.Translation,
+                translations.Dialect
+            FROM translations
+            WHERE AssessmentToolID IN (".$inQuery.")
+            ORDER BY FIELD (AssessmentToolID, ?)";
+        #die($query);
+        $db_handle->prepareStatement($query);
+
+        $itemID[] = $toolIDs;
+        #die(print_r($qIDs));
+        $translations = $db_handle->fetchWithIn($itemID);
+    }
 
     if(!isset($translations))$translations = '';
+    #die(print_r($translations));
     return $translations;
+    
+    
 }
 
-function getTranslationsArray($toolID = '')
+function getTranslationsArray($type = 'Questions', $itemID = '')
 # Author: Laranjo, Sam Paul L.
-# Last Modified: 12-08-17
+# Last Modified: 01-10-18
 # Modified by: Laranjo, Sam Paul L.
 {
-    $translationsData = getTranslations($toolID);
-    $translationsArray = array();
-    
-    foreach($translationsData as $translation)
+    if($type == 'Questions')
     {
-        if(!isset($translationsArray[$translation['QuestionID']]))
+        $translationsData = getTranslations('EditAssessmentQuestions' ,$itemID);
+        $translationsArray = array();
+
+        if(!empty($translationsData))
         {
-            $translationsArray[$translation['QuestionID']] = [];
-            $translationsArray[$translation['QuestionID']][$translation['Dialect']] = $translation['Translation'];
+            foreach($translationsData as $translation)
+            {
+                if(!isset($translationsArray[$translation['QuestionID']]))
+                {
+                    $translationsArray[$translation['QuestionID']] = [];
+                    $translationsArray[$translation['QuestionID']][$translation['Dialect']] = $translation['Translation'];
+                } else
+                {
+                    if(!isset($translationsArray[$translation['QuestionID']][$translation['Dialect']]))
+                    {
+                        $translationsArray[$translation['QuestionID']][$translation['Dialect']] = $translation['Translation'];
+                    }
+                }
+            }
+            #die(print_r($translationsArray));
+            return $translationsArray;
         } else
         {
-            if(!isset($translationsArray[$translation['QuestionID']][$translation['Dialect']]))
+            return null;
+        }
+    } else if($type == 'Tool')
+    {
+        $translationsData = getTranslations('Tool' ,$itemID);
+        #die(print_r($translationsData));
+        $translationsArray = array();
+
+        if(!empty($translationsData))
+        {
+            foreach($translationsData as $translation)
             {
-                $translationsArray[$translation['QuestionID']][$translation['Dialect']] = $translation['Translation'];
+                if(!isset($translationsArray[$translation['AssessmentToolID'].'-'.$translation['QuestionID']]))
+                {
+                    $translationsArray[$translation['AssessmentToolID'].'-'.$translation['QuestionID']] = [];
+                    $translationsArray[$translation['AssessmentToolID'].'-'.$translation['QuestionID']][$translation['Dialect']] = $translation['Translation'];
+                } else
+                {
+                    if(!isset($translationsArray[$translation['AssessmentToolID'].'-'.$translation['QuestionID']][$translation['Dialect']]))
+                    {
+                        $translationsArray[$translation['AssessmentToolID'].'-'.$translation['QuestionID']][$translation['Dialect']] = $translation['Translation'];
+                    }
+                }
+            }
+            #die(print_r($translationsArray));
+            return $translationsArray;
+        } else
+        {
+            return null;
+        }
+    } else
+    {
+        return null;
+    }
+}
+
+function getLanguages($type='EditAssessmentQuestions', $translationsArray = [])
+# Author: Laranjo, Sam Paul L.
+# Last Modified: 01-11-18
+# Modified by: Laranjo, Sam Paul L.
+{
+    if($type === 'EditAssessmentQuestions')
+    {
+        $languages = ['Original'];
+        if(!empty($translationsArray))
+        {
+            foreach($translationsArray as $translationEntry)
+            {
+                foreach($translationEntry as $language => $translation)
+                {
+                    if(!in_array($language, $languages))
+                    {
+                        $languages[] = $language;
+                    }
+                }
             }
         }
+        #die(print_r($languages));
+        return $languages;
+    } else if ($type === 'Tool')
+    {
+        #die(print_r($translationsArray));
+        $languagesArray = [];
+        $languages = [];
+        if(!empty($translationsArray))
+        {
+            foreach($translationsArray as $key => $translationEntry)
+            {
+                if(!isset($languagesArray[explode('-',$key)[0]]))
+                {
+                    $languagesArray[explode('-',$key)[0]] = [];
+                    
+                }
+                foreach($translationEntry as $language => $translation)
+                {
+                    if(!in_array($language, $languages))
+                    {
+                        $languages[] = $language;
+                    }
+                }
+                if(!in_array($languages, $languagesArray[explode('-',$key)[0]]))
+                {
+                    $languagesArray[explode('-',$key)[0]] = $languages;
+                }
+                $languages = [];
+            }
+        }
+        
+        #die(print_r($languagesArray));
+        return $languagesArray;
     }
-    #die(print_r($translationsArray));
-    return $translationsArray;
 }
 
 function getIntakeInfo($id = '')
@@ -630,16 +764,8 @@ function getIntakeInfo($id = '')
 {
     $db_handle = new DBController();
     $db_handle->prepareStatement(
-        "SELECT
-            IntakeID as FormID,
-            (CASE
-                WHEN (AgeGroup = 2) THEN 'Intake for Adults'
-                ELSE 'Intake for Children'
-                END
-            ) AS FormType,
-            DISASTER_DisasterID,
-            AgeGroup
-        FROM `intake` WHERE IntakeID = :id");
+        "SELECT *
+        FROM `intakeforms` WHERE IntakeFormID = :id");
     
     $db_handle->bindVar(':id', $id, PDO::PARAM_INT,0);
     $intakeInfo = $db_handle->runFetch();
@@ -694,7 +820,7 @@ function getIntakeCount($idpID = '')
 
 function getAnswerInfo($faID='', $type='')
 # Author: Laranjo, Sam Paul L.
-# Last Modified: 12-08-17
+# Last Modified: 01-12-18
 # Modified by: Laranjo, Sam Paul L.
 {
     $db_handle = new DBController();
@@ -702,7 +828,7 @@ function getAnswerInfo($faID='', $type='')
     {
         $db_handle->prepareStatement(
             "SELECT
-                IntakeFormAnswerID,
+                intakeformanswers.IntakeFormAnswerID,
                 CONCAT(students.Lname,', ',students.Fname,' ',students.Mname) as StudentName,
                 CONCAT(users.Lname,', ', users.Fname, ' ', users.Mname) as UserResponsible,
                 intakeformanswers.DateTaken
@@ -711,39 +837,40 @@ function getAnswerInfo($faID='', $type='')
                 ON intakeformanswers.StudentID = students.StudentID
              JOIN users
                 ON intakeformanswers.ActiveUserID = users.UserID
-             JOIN intake
+             JOIN intakeforms
                 ON intakeforms.IntakeFormID = intakeformanswers.IntakeFormID
-             WHERE intakeformanswers.IntakeFormAnswerID = :faID");
+             WHERE intakeformanswers.IntakeFormAnswerID = :AssessmentToolAnswerID");
     } else if($type == 'tool')
     {
         $db_handle->prepareStatement(
             "SELECT
-                FORM_ANSWERS_ID,
-                form.FormID,
-                form.FormType,
-                form.Instructions,
-                CONCAT(idp.Lname,', ',idp.Fname,' ',idp.Mname) as IDPName,
-                CONCAT(user.Lname,', ', user.Fname, ' ', user.Mname) as UserResponsible,
-                form_answers.UnansweredItems, form_answers.DateTaken
-             FROM form_answers
-             JOIN idp
-                ON IDP_IDP_ID = idp.IDP_ID
-             JOIN user
-                ON form_answers.USER_UserID = user.UserID
-             JOIN form
-                ON form.FormID = form_answers.FORM_FormID
-             WHERE form_answers.FORM_ANSWERS_ID = :faID");
+                assessmenttoolanswers.AssessmentToolAnswerID,
+                assessmenttoolanswers.AssessmentToolID,
+                assessmenttools.Name,
+                assessmenttools.Instructions,
+                assessmenttoolanswers.StudentID,
+                CONCAT(students.Lname,', ',students.Fname,' ',students.Mname) AS StudentName,
+                CONCAT(users.Lname,', ', users.Fname, ' ', users.Mname) as ActiveUser,
+                assessmenttoolanswers.DateTaken
+                FROM assessmenttoolanswers
+                LEFT JOIN assessmenttools
+                    ON assessmenttools.AssessmentToolID = assessmenttoolanswers.AssessmentToolID
+                LEFT JOIN students
+                    ON students.StudentID = assessmenttoolanswers.StudentID
+                LEFT JOIN users
+                    ON users.UserID = assessmenttoolanswers.ActiveUserID
+                WHERE assessmenttoolanswers.AssessmentToolAnswerID = :AssessmentToolAnswerID");
     }
     
-    $db_handle->bindVar(':faID', $faID, PDO::PARAM_INT,0);
-    $answerInfo = $db_handle->runFetch();
+    $db_handle->bindVar(':AssessmentToolAnswerID', $faID, PDO::PARAM_INT,0);
+    $answersInfo = $db_handle->runFetch();
     
-    return $answerInfo;
+    return $answersInfo;
 }
 
 function getAnswers($faID='', $type='')
 # Author: Laranjo, Sam Paul L.
-# Last Modified: 12-06-17
+# Last Modified: 01-05-18
 # Modified by: Laranjo, Sam Paul L.
 {
     $db_handle = new DBController();
@@ -751,92 +878,91 @@ function getAnswers($faID='', $type='')
     {
         $db_handle->prepareStatement(
             "SELECT
-                intake_answers.INTAKE_ANSWERS_ID,
-                questions.QuestionsID,
+                intakeformanswers.IntakeFormAnswerID,
+                questions.QuestionID,
                 questions.Question,
-                html_form.HTML_FORM_TYPE AS FormType,
-                html_form.HTML_FORM_INPUT_QUANTITY AS AnswerRange,
+                htmlforms.Type AS FormType,
+                htmlforms.Range AS AnswerRange,
                 AnswersTable.AnswerID,
                 AnswersTable.Answer
-            FROM intake_answers
+            FROM intakeformanswers
             LEFT JOIN questions
-                ON intake_answers.INTAKE_IntakeID = questions.INTAKE_IntakeID
+                ON intakeformanswers.IntakeFormID = questions.IntakeFormID
             LEFT JOIN
                 (SELECT
-                    answers_quanti.INTAKE_ANSWERS_INTAKE_ANSWERS_ID,
-                    answers_quanti.ANSWERS_QUANTI_ID AS AnswerID,
-                    answers_quanti.QUESTIONS_QuestionsID,
-                    answers_quanti.Answer
-                 FROM answers_quanti
+                    quantitativeanswers.IntakeFormAnswerID,
+                    quantitativeanswers.QuantitativeAnswerID AS AnswerID,
+                    quantitativeanswers.QuestionID,
+                    quantitativeanswers.Answer
+                 FROM quantitativeanswers
                  UNION
                  SELECT
-                    answers_quali.INTAKE_ANSWERS_INTAKE_ANSWERS_ID,
-                    answers_quali.ANSWERS_QUALI_ID,
-                    answers_quali.QUESTIONS_QuestionsID,
-                    answers_quali.Answer FROM answers_quali
+                    qualitativeanswers.IntakeFormAnswerID,
+                    qualitativeanswers.QualitativeAnswerID,
+                    qualitativeanswers.QuestionID,
+                    qualitativeanswers.Answer
+                FROM qualitativeanswers
                 ) AnswersTable
                 ON
-                    questions.QuestionsID = AnswersTable.QUESTIONS_QuestionsID
+                    questions.QuestionID = AnswersTable.QuestionID
                 AND
-                    intake_answers.INTAKE_ANSWERS_ID = AnswersTable.INTAKE_ANSWERS_INTAKE_ANSWERS_ID
-            LEFT JOIN html_form 
-                ON questions.HTML_FORM_HTML_FORM_ID = html_form.HTML_FORM_ID
-            WHERE intake_answers.INTAKE_ANSWERS_ID = :faID");   
+                    intakeformanswers.IntakeFormAnswerID = AnswersTable.IntakeFormAnswerID
+            LEFT JOIN htmlforms 
+                ON questions.HtmlFormID = htmlforms.HtmlFormID
+            WHERE intakeformanswers.IntakeFormAnswerID = :AssessmentToolAnswerID");   
     } else if($type == 'tool')
     {
         $db_handle->prepareStatement(
             "SELECT
-                form_answers.FORM_ANSWERS_ID,
-                form_answers.FORM_FormID,
-                questions.QuestionsID,
+                assessmenttoolanswers.AssessmentToolAnswerID,
+                assessmenttoolanswers.AssessmentToolID,
+                questions.QuestionID,
                 questions.Question,
-                html_form.HTML_FORM_TYPE AS FormType,
-                html_form.HTML_FORM_INPUT_QUANTITY AS AnswerRange,
+                questions.AnswerType,
+                questions.ItemNumber,
+                htmlforms.Type,
+                htmlforms.Range,
                 AnswersTable.AnswerID,
                 AnswersTable.Answer
-            FROM form_answers
+            FROM assessmenttoolanswers
             LEFT JOIN questions
-                ON form_answers.FORM_FormID = questions.FORM_FormID
+                ON assessmenttoolanswers.AssessmentToolID = questions.AssessmentToolID
             LEFT JOIN
                 (SELECT
-                    answers_quanti.FORM_ANWERS_FORM_ANSWERS_ID,
-                    answers_quanti.ANSWERS_QUANTI_ID AS AnswerID,
-                    answers_quanti.QUESTIONS_QuestionsID,
-                    answers_quanti.Answer
-                FROM answers_quanti
+                    quantitativeanswers.AssessmentToolAnswerID,
+                    quantitativeanswers.QuantitativeAnswerID AS AnswerID,
+                    quantitativeanswers.QuestionID,
+                    quantitativeanswers.Answer
+                FROM quantitativeanswers
                 UNION
                 SELECT
-                    answers_quali.FORM_ANSWERS_FORM_ANSWERS_ID,
-                    answers_quali.ANSWERS_QUALI_ID,
-                    answers_quali.QUESTIONS_QuestionsID,
-                    answers_quali.Answer FROM answers_quali
+                    qualitativeanswers.AssessmentToolAnswerID,
+                    qualitativeanswers.QualitativeAnswerID,
+                    qualitativeanswers.QuestionID,
+                    qualitativeanswers.Answer
+                FROM qualitativeanswers
                 ) AnswersTable
                 ON
-                    questions.QuestionsID = AnswersTable.QUESTIONS_QuestionsID
+                    questions.QuestionID = AnswersTable.QuestionID
                 AND
-                    form_answers.FORM_ANSWERS_ID = AnswersTable.FORM_ANWERS_FORM_ANSWERS_ID
-            LEFT JOIN html_form
-                ON questions.HTML_FORM_HTML_FORM_ID = html_form.HTML_FORM_ID
-            WHERE form_answers.FORM_ANSWERS_ID = :faID");
+                    assessmenttoolanswers.AssessmentToolAnswerID = AnswersTable.AssessmentToolAnswerID
+            LEFT JOIN htmlforms
+                ON htmlforms.HtmlFormID = questions.HtmlFormID
+            WHERE assessmenttoolanswers.AssessmentToolAnswerID = :AssessmentToolAnswerID");
     }
     
-    $db_handle->bindVar(':faID', $faID, PDO::PARAM_INT,0);
+    $db_handle->bindVar(':AssessmentToolAnswerID', $faID, PDO::PARAM_INT,0);
     $answers = $db_handle->runFetch();
     
     return $answers;
 }
 
-function getIntakeID($idpID = '', $ag = '')
+function getIntakeID($ag = '')
 # Author: Laranjo, Sam Paul L.
 # Last Modified: 12-06-17
 # Modified by: Laranjo, Sam Paul L.
 {
     $formID = 0;
-    if(!filter_var($idpID, FILTER_VALIDATE_INT) === false) {
-        $ag = $_GET['ag'];
-    } else {
-        $ag = 0;
-    }
     if($ag == 1) {
         //children
         $formID = 1;
@@ -848,6 +974,24 @@ function getIntakeID($idpID = '', $ag = '')
     }
 
     return $formID;
+}
+
+function getAutoAssessmentItems($assessmentToolID = '')
+{
+    $db_handle = new DBController();
+    
+    $query =
+        "SELECT
+            Items
+        FROM `autoassessments`
+        WHERE AssessmentToolID = :AssessmentToolID";
+    
+    $db_handle->prepareStatement($query);
+    $db_handle->bindVar(":AssessmentToolID", $assessmentToolID, PDO::PARAM_INT, 0);
+    
+    $result = $db_handle->runFetch();
+    
+    return $result[0]['Items'];
 }
 #---- db fetch functions end ----
 
@@ -883,12 +1027,85 @@ function updateEditHistory($formID, $message)
     $db_handle->bindVar(':edit', $message, PDO::PARAM_STR, 0);
     $db_handle->runUpdate();
 }
+
+function insertAnswer($type = 'intake', $answerType = '1', $answer = '', $questionID = '0', $formAnswerID = '0')
+# Author: Laranjo, Sam Paul L.
+# Last Modified: 01-11-18
+# Modified by: Laranjo, Sam Paul L.
+{
+    $db_handle = new DBController();
+    $query = "";
+    
+    if($answerType == '1')
+    {
+        $query =
+            "INSERT INTO `quantitativeanswers` (
+                `QuantitativeAnswerID`,
+                `Answer`,
+                `QuestionID`,
+                `AssessmentToolAnswerID`,
+                `IntakeFormAnswerID`)
+            VALUES (
+                NULL,
+                :Answer,
+                :QuestionID,";
+        if($type == 'intake')
+        {
+            $query .= 
+                "NULL,
+                :formAnswerID)";
+        } else if($type == 'tool')
+        {
+            $query .= 
+                ":formAnswerID,
+                NULL)";
+        }
+    } else if($answerType == '2')
+    {
+        $query =
+            "INSERT INTO `qualitativeanswers` (
+                `QualitativeAnswerID`,
+                `Answer`,
+                `QuestionID`,
+                `AssessmentToolAnswerID`,
+                `IntakeFormAnswerID`)
+            VALUES (
+                NULL,
+                :Answer,
+                :QuestionID,
+                ";
+        if($type == 'intake')
+        {
+            $query .= 
+                "NULL,
+                :formAnswerID)";
+        } else if($type == 'tool')
+        {
+            $query .= 
+                ":formAnswerID,
+                NULL)";
+        }
+    }
+    
+    $db_handle->prepareStatement($query);
+    if($answerType == '1')
+    {
+        $db_handle->bindVar(":Answer", $answer, PDO::PARAM_INT, 0);
+    } else if($answerType == '2')
+    {
+        $db_handle->bindVar(":Answer", $answer, PDO::PARAM_STR, 0);
+    }
+    $db_handle->bindVar(":QuestionID", $questionID, PDO::PARAM_INT, 0);
+    $db_handle->bindVar(":formAnswerID", $formAnswerID, PDO::PARAM_INT, 0);
+    
+    $db_handle->runUpdate();
+}
 #---- db insert functions end ----
 
 #---- assessment functions ----
-function getList($data, $listType = 'IDP', $listTarget = '')
+function getList($data, $listType = 'Student', $listTarget = '')
 # Author: Laranjo, Sam Paul L.
-# Last Modified: 12-06-17
+# Last Modified: 01-04-18
 # Modified by: Laranjo, Sam Paul L.
 {
     global $db_handle;
@@ -914,16 +1131,13 @@ function getList($data, $listType = 'IDP', $listTarget = '')
     {
         $query .=
             "SELECT
-                CONCAT(Lname, ', ', Fname, ' ', Mname) AS StudentName,
+                i.Lname,
+                i.Fname,
+                i.Mname,
                 i.StudentID,
-                i.Course,
+                i.CourseYear,
                 Bdate,
-                (CASE
-                    WHEN (Gender = 1) THEN 'Male'
-                    WHEN (Gender = 2) THEN 'Female'
-                    ELSE 'unspecified'
-                    END
-                ) AS Gender,
+                Gender,
                 Age,
                 colleges.CollegeName,
                 departments.DepartmentName,
@@ -961,7 +1175,7 @@ function getList($data, $listType = 'IDP', $listTarget = '')
                 $query .=
                     "GROUP BY
                         i.StudentID,
-                        StudentName
+                        i.Lname
                      ORDER BY :orderColumn ASC ";
             }
             else
@@ -969,7 +1183,7 @@ function getList($data, $listType = 'IDP', $listTarget = '')
                 $query .=
                     "GROUP BY
                         i.StudentID,
-                        StudentName
+                        i.Lname
                     ORDER BY :orderColumn DESC ";
             }
 
@@ -979,7 +1193,7 @@ function getList($data, $listType = 'IDP', $listTarget = '')
             $query .=
                 "GROUP BY
                     i.StudentID,
-                    StudentName
+                    i.Lname
                 ORDER BY 1 ASC ";
         }
     } else if($listType === 'Users')
@@ -1087,31 +1301,33 @@ function getList($data, $listType = 'IDP', $listTarget = '')
             $query .= 'ORDER BY 1 ASC ';
         }
     }
-    else if($listType === 'Assessment_taken')
+    else if($listType === 'AssessmentTaken')
     {
         $query .=
-            "SELECT assessmenttoolanswers.DateTaken,
-                assessmenttools.Name AS FormID,
-                assessmenttoolanswers.Score,
-                autoassessments.Assessment,
-                assessmenttoolanswers.IDP_IDP_ID AS IDP,
-                assessmenttoolanswers.FORM_ANSWERS_ID,
-                CONCAT(user.Lname, ', ', user.Fname, ' ', user.Mname) as User,
-                assessmenttoolanswers.UnansweredItems,
+            "SELECT
+                assessmenttoolanswers.AssessmentToolAnswerID,
+                assessmenttoolanswers.AssessmentToolID,
+                assessmenttoolanswers.DateTaken,
+                assessmenttoolanswers.StudentID,
+                assessmenttools.Name AS ToolName,
+                scores.Score,
                 autoassessments.Cutoff,
-                assessmenttoolanswers.FORM_FormID
-             FROM assessmenttoolanswers
-             LEFT JOIN assessmenttools
-                ON assessmenttoolanswers.FORM_FormID = assessmenttools.AssessmentToolID
-             LEFT JOIN auto_assmt
-                ON assessmenttoolanswers.FORM_FormID = autoassessments.AssessmentToolID
-             LEFT JOIN user
-                ON assessmenttoolanswers.USER_UserID = user.UserID
-             WHERE assessmenttoolanswers.IDP_IDP_ID = :idpID ";
+                autoassessments.Assessment,
+                CONCAT(users.Lname, ', ', users.Fname, ' ', users.Mname) AS ActiveUser
+            FROM assessmenttoolanswers
+            LEFT JOIN assessmenttools
+                ON assessmenttools.AssessmentToolID = assessmenttoolanswers.AssessmentToolID
+            LEFT JOIN scores
+                ON scores.AssessmentToolAnswerID = assessmenttoolanswers.AssessmentToolAnswerID
+            LEFT JOIN autoassessments
+                ON autoassessments.AssessmentToolID = assessmenttoolanswers.AssessmentToolID
+            LEFT JOIN users
+                ON users.UserID = assessmenttoolanswers.ActiveUserID
+            WHERE assessmenttoolanswers.StudentID = :StudentID ";
 
         if($keyword != '')
         {
-            $query .= " AND form.FormType LIKE :keyword ";
+            $query .= " AND assessmenttools.Name LIKE :keyword ";
         }
 
         if($order != '')
@@ -1127,14 +1343,16 @@ function getList($data, $listType = 'IDP', $listTarget = '')
         }
         else
         {
-            $query .= 'ORDER BY DateTaken DESC, FormType ASC ';
+            $query .= 'ORDER BY DateTaken DESC, ToolName ASC ';
         }
     }
     else if($listType === 'Intake')
     {
         $query =
-            "SELECT intakeformanswers.StudentID, intakeformanswers.IntakeFormAnswerID,
-                IF(intakeformanswers.IntakeFormID = 2, 'Intake for Adults', 'Intake for Children') as FormID,
+            "SELECT
+                intakeformanswers.StudentID,
+                intakeformanswers.IntakeFormAnswerID,
+                intakeforms.IntakeFormName as FormID,
                 CONCAT(users.Lname, ', ', users.Fname, ' ', users.Mname) AS User,
                 intakeformanswers.DateTaken
              FROM intakeformanswers
@@ -1314,9 +1532,9 @@ function getList($data, $listType = 'IDP', $listTarget = '')
         $db_handle->bindVar(':orderColumn', ($order['0']['column'] + 1), PDO::PARAM_INT, 0);
     }
 
-    if($listType === 'Assessment_taken')
+    if($listType === 'AssessmentTaken')
     {
-        $db_handle->bindVar(':idpID', $listTarget, PDO::PARAM_INT,0);
+        $db_handle->bindVar(':StudentID', $listTarget, PDO::PARAM_INT,0);
     }
 
     $result = $db_handle->runFetch();
@@ -1331,9 +1549,9 @@ function getList($data, $listType = 'IDP', $listTarget = '')
                 $recordsFiltered = get_total_all_records('Student', 0);
 
                 $subArray["DT_RowId"] = $row["StudentID"];
-                $subArray[] = $row["StudentName"];
+                $subArray[] = $row["Lname"].", ".$row["Fname"]." ".$row["Mname"];
                 $subArray[] = $row["StudentID"];
-                $subArray[] = $row["CollegeName"]." - ".$row["Course"];
+                $subArray[] = $row["CollegeName"]." - ".$row["CourseYear"];
                 $subArray[] = $row["Gender"];
                 $age = calculateAge($row["Bdate"]);
                 if($age == 'N/A')
@@ -1370,7 +1588,7 @@ function getList($data, $listType = 'IDP', $listTarget = '')
                          <a href="assessment.informed.consent.php?id='.$row["StudentID"].'&ag='.$ageGroup.'&from=intake" class="btn btn-success btn-xs btn-block">
                             <i class="icon_check_alt"></i>Apply Intake
                          </a>
-                         <a href="assessment.select.forms.php?id='.$row["StudentID"].'" class="btn btn-primary btn-xs btn-block">
+                         <a href="assessment.select.tools.php?id='.$row["StudentID"].'" class="btn btn-primary btn-xs btn-block">
                                 Apply Assessment Tool
                          </a>';
                 }
@@ -1394,7 +1612,7 @@ function getList($data, $listType = 'IDP', $listTarget = '')
                 $subArray["DT_RowId"] = $row["AssessmentToolID"];
                 $subArray[] = $row["Name"];
                 $subArray[] = 
-                    '<a class="btn btn-info btn-xs center-block" href="forms.edit.tool.php?form_id='.$row["AssessmentToolID"].'">
+                    '<a class="btn btn-info btn-xs center-block" href="forms.edit.tool.php?id='.$row["AssessmentToolID"].'">
                         <i class="fa fa-pencil-square-o"></i>Edit Tool
                      </a>';
             }
@@ -1413,21 +1631,16 @@ function getList($data, $listType = 'IDP', $listTarget = '')
                      </a>';
                 }
             }
-            else if($listType === 'Assessment_taken')
+            else if($listType === 'AssessmentTaken')
             {
-                $recordsFiltered = get_total_all_records('Assessment_taken', $listTarget);
+                $recordsFiltered = get_total_all_records('AssessmentTaken', $listTarget);
 
-                $subArray["DT_RowId"] = $row["FORM_ANSWERS_ID"];
+                $subArray["DT_RowId"] = $row["AssessmentToolAnswerID"];
 
                 $phpdate = strtotime($row['DateTaken']);
                 $subArray[] = date('M d, Y <\b\r> h:i a', $phpdate);
-                $subArray[] = $row["FormID"];
-
-                if(!isset($row['UnansweredItems']) || $row['UnansweredItems'] == '') {
-                    $subArray[] = $row["Score"];
-                } else {
-                    $subArray[] = $row["Score"]; //'partial: '.
-                }
+                $subArray[] = $row["ToolName"];
+                $subArray[] = $row["Score"];
 
                 if(isset($row['Assessment'])) {
                     if($row['Score'] >= $row['Cutoff']) {
@@ -1438,7 +1651,7 @@ function getList($data, $listType = 'IDP', $listTarget = '')
                 } else {
                     $subArray[] = 'No auto-assessment available for this tool.';
                 }
-                $subArray[] = $row["User"];
+                $subArray[] = $row["ActiveUser"];
             }
 
             $tmp[] = $subArray;
@@ -1492,9 +1705,9 @@ function get_total_all_records($type, $target = '')
         $db_handle->bindVar(':id', $target, PDO::PARAM_INT, 0);
         $result = $db_handle->runFetch();
     }
-    else if($type === 'Assessment_taken')
+    else if($type === 'AssessmentTaken')
     {
-        $db_handle->prepareStatement("SELECT COUNT(*) AS total FROM form_answers WHERE form_answers.IDP_IDP_ID = :id");
+        $db_handle->prepareStatement("SELECT COUNT(*) AS total FROM assessmenttoolanswers WHERE assessmenttoolanswers.StudentID = :id");
         $db_handle->bindVar(':id', $target, PDO::PARAM_INT, 0);
         $result = $db_handle->runFetch();
     }

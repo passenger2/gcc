@@ -3,11 +3,6 @@ include("../initialize.php");
 includeCore();
 
 $_SESSION['loc'] = $_SERVER['PHP_SELF'];
-
-$provinces = getProvinces();
-$cities = getCities();
-$barangays = getBarangays();
-$evac_centers = getEvacuationCenters();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -57,25 +52,40 @@ $evac_centers = getEvacuationCenters();
                     <div class="col-md-12">
                         <div class="panel panel-default">
                             <div class="panel-heading">
-                                <h4 class="title">&nbsp;IDP Enrollment</h4>  
+                                <h4 class="title">&nbsp;Demographic Profile</h4>  
                             </div>
-                            <form method="POST" action="/includes/actions/idp.process.enrollment.php">
+                            <form method="POST" action="/includes/actions/student.process.enrollment.php">
                                 <div class="panel-body">
                                     <div class="col-md-12">
+                                        
+                                        <div id="name_div" class="col-md-12">
+                                            <h5><b>Student's Name</b></h5>
+                                            <div class="form-group col-md-4">
+                                                <input class="form-control" id = 'Lname' name='Lname' placeholder="Last name">
+                                            </div>
+
+                                            <div class="form-group col-md-4">
+                                                <input class="form-control" name='Fname' placeholder="First name">
+                                            </div>
+
+                                            <div class="form-group col-md-4">
+                                                <input class="form-control" name='Mname' placeholder="Middle Name">
+                                            </div>
+                                        </div>
+                                        
                                         <div  id = "personal_info_div" class="col-lg-6">
                                             <h5><b>Personal Information</b></h5>
-                                            <!-- <div class="panel-body panel-collapse collapse in" id="collapseOne"> -->
-
+                                            
                                             <div class="form-group col-md-6">
-                                                <input class="form-control" id = 'Lname' name='Lname' placeholder="Enter Last name">
+                                                <input class="form-control" name='Nickname' placeholder="Nickname">           
                                             </div>
 
                                             <div class="form-group col-md-6">
-                                                <input class="form-control" name='Fname' placeholder="Enter First name">
-                                            </div>
-
-                                            <div class="form-group col-md-6">
-                                                <input class="form-control" name='Mname' placeholder="Enter Middle Name">
+                                                <select name='Gender' class="form-control">
+                                                    <option selected disabled>Sex</option>
+                                                    <option value="Male">Male</option>
+                                                    <option value="Female">Female</option>
+                                                </select>             
                                             </div>
 
                                             <div class="form-group col-md-6">
@@ -83,214 +93,196 @@ $evac_centers = getEvacuationCenters();
                                             </div>
 
                                             <div class="form-group col-md-6">
-                                                <input class="form-control" name='Age' placeholder="Enter age" type="number" min="0">
+                                                <input class="form-control" name='Age' placeholder="Age" type="number" min="0">
+                                            </div>
+
+                                            <div class="form-group col-md-12">
+                                                <input class="form-control" id='PlaceOfBirth' placeholder="Place of birth (type barangay first)">
+                                                <input name='PlaceOfBirth' type="hidden" value="">
                                             </div>
 
                                             <div class="form-group col-md-6">
-                                                <select name='Gender' class="form-control">
-                                                    <option selected disabled>Gender</option>
-                                                    <option value="1">Male</option>
-                                                    <option value="2">Female</option>
-                                                    <option>Not specified</option>
-                                                </select>             
+                                                <input class="form-control" name='OrdinalPosition' placeholder="Ordinal Position (number)">
+                                            </div>
+
+                                            <!--<div class="form-group col-md-6">
+                                                <input class="form-control" name='Ethnicity' placeholder="Ethnicity">           
+                                            </div>-->
+
+                                            <div class="form-group col-md-6">
+                                                <input class="form-control" name='Citizenship' placeholder="Citizenship">           
                                             </div>
 
                                             <div class="form-group col-md-6">
-                                                <select name='MaritalStatus' class="form-control">
-                                                    <option selected disabled>Marital Status</option>
-                                                    <option value="1">Single</option>
-                                                    <option value="2">Married</option>
-                                                    <option value="3">Annulled</option>
-                                                    <option value="4">Widowed</option>
-
-                                                </select>             
+                                                <input class="form-control" name='Religion' placeholder="Religious Affiliation">        
                                             </div>
 
                                             <div class="form-group col-md-6">
-                                                <input class="form-control" name='Ethnicity' placeholder="Enter Ethnicity">           
-                                            </div>
-
-                                            <div class="form-group col-md-6">
-                                                <input class="form-control" name='Religion' placeholder="Enter Religion">        
-                                            </div>
-
-                                            <div class="form-group col-md-6">
-                                                <input class="form-control" name="Occupation" placeholder="Enter occupation">
-                                            </div>
-
-                                            <div class="form-group col-md-6">
-                                                <input class="form-control" name='PhoneNum' placeholder="Enter phone number" id = "PhoneNum">
+                                                <input class="form-control" name='PhoneNum' placeholder="Phone Number" id="PhoneNum">
                                             </div>
 
                                             <div class="form-group col-md-6">
                                                 <input class="form-control" id='Email' name='Email' placeholder="your@mail.com">
                                             </div>
+                                                
+                                            <div class="form-group col-md-6">
+                                                <select name='LivingWith' id='LivingWith' class="form-control">
+                                                    <option selected disabled>Currently Living with: </option>
+                                                    <option value="Parents">Parents</option>
+                                                    <option value="Relatives">Relatives</option>
+                                                    <option value="Boarding House">Boarding House</option>
+                                                    <option value="Others">Others (specify)</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="form-group col-md-6" id="SpecLivingWith" style="display:none">
+                                                <input class="form-control" name="SpecLivingWith" placeholder="Currently living with">
+                                            </div>
 
                                             <div class="form-group col-md-12">
-                                                <div class="row">
+                                                <input class="form-control" id="Address" placeholder="Address (type barangay first)">
+                                                <input name='Address' type="hidden" value="">
 
-                                                    <div class="col-md-6">
-                                                        <select class="form-control" id="Education" name="Education">
-                                                            <option selected disabled>Educational Attainment</option>
-                                                            <option value="20">Elementary</option>
-                                                            <option value="21">Highschool</option>
-                                                            <option value="22">College</option>
-                                                            <option>Not Specified</option>
-                                                        </select>
-                                                    </div>
-
-                                                    <div class="col-md-6">
-
-                                                        <select class="form-control" name='education' id="elementary1" style="display: none;">
-                                                            <option selected disabled>Level</option>
-                                                            <option value="1">Grade 1</option>
-                                                            <option value="2">Grade 2</option>
-                                                            <option value="3">Grade 3</option>
-                                                            <option value="4">Grade 4</option>
-                                                            <option value="5">Grade 5</option>
-                                                            <option value="6">Grade 6</option>
-                                                            <option value="7">Elementary Graduate</option>
-                                                            <option>Not Specified</option>
-                                                        </select>
-
-                                                        <select class="form-control" name='education' id="highschool1" style="display: none;">
-                                                            <option selected disabled>Level</option>
-                                                            <option value="8">Grade 7</option>
-                                                            <option value="9">Grade 8</option>
-                                                            <option value="10">Grade 9</option>
-                                                            <option value="11">Grade 10</option>
-                                                            <option value="12">Grade 11</option>
-                                                            <option value="13">Grade 12</option>
-                                                            <option value="14">High School Graduate</option>
-                                                            <option>Not Specified</option>
-                                                        </select>
-
-                                                        <select class="form-control" name='education' id="college1" style="display: none;">
-                                                            <option selected disabled>Level</option>
-                                                            <option value="15">1st year</option>
-                                                            <option value="16">2nd year</option>
-                                                            <option value="17">3rd year</option>
-                                                            <option value="18">4th year</option>      
-                                                            <option value="19">College Graduate</option>
-                                                            <option>Not Specified</option>
-                                                        </select>
-
-                                                    </div>
-
-                                                </div>
                                             </div>
 
-                                            <div class="form-group col-md-6">
-                                                <input class="form-control" name="net_income" placeholder="Enter Monthly Income ">
+                                            <div class="form-group col-md-12">
+                                                <input class="form-control" name="SpecAddress" placeholder="Specific Address">
                                             </div>
-                                            
                                         </div>
 
-                                        <div id = "home_address_div">
+                                        <div id = "school_details_div">
                                             <div class="col-lg-6">
-                                                <h5><b>Home Address</b></h5>
+                                                <h5><b>School Details</b></h5>
+                                                
                                                 <div class="form-group col-md-6">
-                                                    <select name='province' id='province' class="form-control">
-                                                        <option selected disabled>Province</option>
-                                                        <?php
-                                                        foreach ($provinces as $result) {
-                                                        ?>
-                                                        <option value="<?= $result['ProvinceID']; ?>"><?= $result['ProvinceName']; ?></option>
-                                                        <?php } ?>
+                                                    <input class="form-control" id='IDNo' name='IDNo' placeholder="ID Number" required>
+                                                </div>
+                                                
+                                                <div class="form-group col-md-6">
+                                                    <select name='Departtment' id='Department' class="form-control">
+                                                        <option selected disabled>Department</option>
+                                                        <option value="01">Information Technology</option>
+                                                        <option value="01">Psychology</option>
+                                                    </select>
+                                                </div>
+                                                
+                                                <div class="form-group col-md-6">
+                                                    <input class="form-control" id='Course' name='Course' placeholder="Course">
+                                                </div>
+
+                                                <div class="form-group col-md-6">
+                                                    <select class="form-control" name='YearLevel' id="YearLevel">
+                                                        <option selected disabled>Level</option>
+                                                        <option value="1st year">1st year</option>
+                                                        <option value="2nd year">2nd year</option>
+                                                        <option value="3rd year">3rd year</option>
+                                                        <option value="4th year">4th year</option>
+                                                    </select>
+                                                </div>
+                                                
+                                                <div class="form-group col-md-6">
+                                                    <input class="form-control" id='PrevGPA' name='PrevGPA' placeholder="GPA (Previous Sem)">
+                                                </div>
+                                                
+                                                <div class="form-group col-md-6">
+                                                    <select name='ScholarshipType' id='ScholarshipType' class="form-control">
+                                                        <option selected disabled>Scholarship Grant</option>
+                                                        <option value="Regular Paying Student">Regular Paying Student</option>
+                                                        <option disabled>------------</option>
+                                                        <option value="Chancellor's List">Chancellor's List</option>
+                                                        <option value="CHED">CHED</option>
+                                                        <option value="Dean's List">Dean's List</option>
+                                                        <option value="DOST">DOST</option>
+                                                        <option value="ESGP-PA">ESGP-PA</option>
+                                                        <option value="Tunong Dunong">Tunong Dunong</option>
+                                                        <option value="Others">Others (specify)</option>
                                                     </select>
                                                 </div>
 
-                                                <div class="form-group col-md-6">
-                                                    <select name="city_mun" id="city_mun" class="form-control" style="display:none">
-                                                        <option selected disabled>City/Municipality</option>
-                                                        <?php
-                                                        foreach ($cities as $result) {
-                                                        ?>
-                                                        <option value="<?php echo($result['City_Mun_ID']); ?>" name="province-<?php echo($result['ProvinceID']); ?>"><?php echo($result['City_Mun_Name']); ?></option>
-                                                        <?php } ?>
-                                                    </select>  
+                                                <div class="form-group col-md-6" id="SpecScholarshipType" style="display:none">
+                                                    <input class="form-control" name="SpecScholarshipType" placeholder="Scholarship Grant">
                                                 </div>
 
-                                                <div class="form-group col-md-6">
-                                                    <select name="barangay1" id="barangay1" class="form-control" style="display:none">
-                                                        <option selected disabled>Barangay</option>
-                                                        <?php
-                                                        foreach ($barangays as $result) {
-                                                        ?>
-                                                        <option value="<?php echo($result['BarangayID']); ?>" name="city-<?php echo($result['City_CityID']) ?>"><?php echo($result['BarangayName']); ?></option>
-                                                        <?php } ?>
-                                                    </select> 
+                                                <div class="form-group col-md-12">
+                                                    <input class="form-control" name="SchoolLastAttended" placeholder="School last attended">
                                                 </div>
 
+                                                <div class="form-group col-md-12">
+                                                    <input class="form-control" id="SchoolLastAttendedAddress" placeholder="Address of school last attended (type barangay first)">
+                                                    <input name='SchoolLastAttendedAddress' type="hidden" value="">
+                                                </div>
+                                                
+                                            </div>
+                                        </div>
+                                        
+                                        <div id="parents_div" class="col-md-12">
+                                            <h5><b>Parents/Guardians</b></h5>
+                                            
+                                            <div  id="parents_div" class="col-md-6">
+                                                <div class="form-group">
+                                                    <input class="form-control" name="FathersName" placeholder="Father's name">
+                                                    
+                                                    <label class="checkbox-inline">
+                                                        <input type="checkbox" name="FathersStatus" value='Deceased'>
+                                                        Deceased
+                                                    </label>
+                                                </div>
+                                                
+                                                <div class="form-group">
+                                                    <input class="form-control" name="FathersOccupation" placeholder="Father's occupation">
+                                                </div>
+                                                
+                                                <div class="form-group">
+                                                    <input class="form-control" name="MothersName" placeholder="Mother's name">
+                                                    
+                                                    <label class="checkbox-inline">
+                                                        <input type="checkbox" name="MothersStatus" value='Deceased'>
+                                                        Deceased
+                                                    </label>
+                                                </div>
+                                                
+                                                <div class="form-group">
+                                                    <input class="form-control" name="MothersOccupation" placeholder="Mother's occupation">
+                                                </div>
+                                            </div>
+                                            
+                                            <div  id="parents_details_div" class="col-md-6">
                                                 <div class="form-group col-md-6">
-                                                    <input id="specAdd" class="form-control" name="SpecificAddress" placeholder="Specific address (optional)" type="textbox" style="display:none"/>
+                                                    <select name='MaritalStatus' id='MaritalStatus' class="form-control">
+                                                        <option selected disabled>Parent's Marital Status</option>
+                                                        <option value="Legally married">Legally married</option>
+                                                        <option value="Not legally married">Not legally married</option>
+                                                        <option value="Legally separated">Legally separated</option>
+                                                        <option value="Not legally separated">Not legally separated</option>
+                                                        <option value="One parent remarried">One parent remarried</option>
+                                                        <option value="Both parent remarried">Both parent remarried</option>
+                                                        <option value="Others">Others (specify)</option>
+                                                    </select>
+                                                </div>
+                                                
+                                                <div class="form-group col-md-6">
+                                                    <select name='NetIncome' class="form-control">
+                                                        <option selected disabled>Family's Monthly Income</option>
+                                                        <option value="Below 3,000">Below 3,000</option>
+                                                        <option value="3,001-5,000">3,001-5,000</option>
+                                                        <option value="5,001-8,000">5,001-8,000</option>
+                                                        <option value="8,001-10,000">8,001-10,000</option>
+                                                        <option value="10,001-15,000">10,001-15,000</option>
+                                                        <option value="15,001-20,000">15,001-20,000</option>
+                                                        <option value="Above 20,001">Above 20,001</option>
+                                                    </select>
+                                                </div>
+
+                                                <div class="form-group col-md-12" id="SpecMaritalStatus" style="display:none">
+                                                    <input class="form-control" name="SpecMaritalStatus" placeholder="Parent's Marital Status">
+                                                </div>
+
+                                                <div class="form-group col-md-12">
+                                                    <input class="form-control" name="ParentsContact" placeholder="Parent's/Guardian's Contact Number">
                                                 </div>
                                             </div>
                                         </div>
-
-                                        <div id = "relocation_div">
-                                            <div class="col-lg-6">
-                                                <h5><b>Relocation Address</b></h5>
-                                                <div class="form-group col-md-6">
-                                                    <select class="form-control" name="EvacType" id="EvacType" >
-                                                        <option selected disabled>Relocation Type</option>
-                                                        <option value="1">Evacuation Center</option>
-                                                        <option value="2">Home-based</option>
-                                                    </select> 
-                                                </div> 
-
-                                                <div id="EvacName" class="form-group col-md-6" style="display:none">
-                                                    <select name="EvacName" class="form-control">
-                                                        <?php
-                                                        foreach ($evac_centers as $result) {
-                                                        ?>
-                                                        <option value="<?php echo($result['EvacuationCentersID']); ?>"><?= $result['EvacName']; ?></option>
-                                                        <?php } ?>
-                                                    </select> 
-                                                </div>
-
-                                                <div id = "home_based_div" style="display:none">
-
-                                                    <div class="form-group col-md-6">
-                                                        <select name='province2' id='province2' class="form-control">
-                                                            <option selected disabled>Province</option>
-                                                            <?php
-                                                            foreach ($provinces as $result) {
-                                                            ?>
-                                                            <option value="<?php echo($result['ProvinceID']); ?>"><?= $result['ProvinceName']; ?></option>
-                                                            <?php } ?>
-                                                        </select>
-                                                    </div>
-
-                                                    <div class="form-group col-md-6">
-                                                        <select name="city_mun2" id="city_mun2" class="form-control" style="display:none">
-                                                            <option selected disabled>City/Municipality</option>
-                                                            <?php
-                                                            foreach ($cities as $result) {
-                                                            ?>
-                                                            <option value="<?php echo($result['City_Mun_ID']); ?>" name="province2-<?php echo($result['ProvinceID']); ?>"><?php echo($result['City_Mun_Name']); ?></option>
-                                                            <?php } ?>
-                                                        </select>  
-                                                    </div>
-
-                                                    <div class="form-group col-md-6">
-                                                        <select name="barangay2" id="barangay2" class="form-control" style="display:none">
-                                                            <option selected disabled>Barangay</option>
-                                                            <?php
-                                                            foreach ($barangays as $result) {
-                                                            ?>
-                                                            <option value="<?php echo($result['BarangayID']); ?>" name="city2-<?php echo($result['City_CityID']) ?>"><?php echo($result['BarangayName']); ?></option>
-                                                            <?php } ?>
-                                                        </select> 
-                                                    </div>
-
-                                                    <div class="form-group col-md-6">
-                                                        <input id="specAdd2" class="form-control" name="SpecificAddress2" placeholder="Specific address (optional)" type="textbox" style="display:none"/>
-                                                    </div>
-
-                                                </div>
-                                            </div>
-                                        </div>
+                                        
                                     </div>
                                 </div><!-- panel body -->
                                 <div class="panel-footer" style="background-color: #fff;">
@@ -310,57 +302,51 @@ $evac_centers = getEvacuationCenters();
 
     <script type='text/javascript'>
         $(document).ready(function(){
-            $('#Education').change(function(){
-                if ($(this).val() == '20') {
-                    $('#elementary1').show();
-                    $('#highschool1').hide();
-                    $('#college1').hide();
-                } else if ($(this).val() == '21') {
-                    $('#elementary1').hide();
-                    $('#highschool1').show();
-                    $('#college1').hide();       
-                } else if ($(this).val() == '22') {
-                    $('#elementary1').hide();
-                    $('#highschool1').hide();
-                    $('#college1').show();       
-                } else {
-                    $('#elementary1').hide();
-                    $('#highschool1').hide();
-                    $('#college1').hide(); 
+            $('#LivingWith').change(function(){
+                if ($(this).val() == 'Others') {
+                    $('#SpecLivingWith').show();
                 }
             });
-            $('#province').change(function(){
-                $("#city_mun").show();
-                $("#city_mun option[name*='province-']").hide();
-                $("#city_mun option[name='province-"+$(this).val()+"']").show();
-            });
-            $('#city_mun').change(function(){
-                $("#barangay1").show();
-                $("#barangay1 option[name*='city-']").hide();
-                $("#barangay1 option[name='city-"+$(this).val()+"']").show();
-                $("#specAdd").show();
-            });
-            $('#EvacType').change(function(){
-                if ($(this).val() == '1') {
-                    $('#EvacName').show();
-                    $('#home_based_div').hide();
-                } else if ($(this).val() == '2') {
-                    $('#EvacName').hide();
-                    $('#home_based_div').show();       
+            $('#ScholarshipType').change(function(){
+                if ($(this).val() == 'Others') {
+                    $('#SpecScholarshipType').show();
                 }
             });
-            $('#province2').change(function(){
-                $("#city_mun2").show();
-                $("#city_mun2 option[name*='province2-']").hide();
-                $("#city_mun2 option[name='province2-"+$(this).val()+"']").show();
-            });
-            $('#city_mun2').change(function(){
-                $("#barangay2").show();
-                $("#barangay2 option[name*='city2-']").hide();
-                $("#barangay2 option[name='city2-"+$(this).val()+"']").show();
-                $("#specAdd2").show();
+            $('#MaritalStatus').change(function(){
+                if ($(this).val() == 'Others') {
+                    $('#SpecMaritalStatus').show();
+                }
             });
         });
+        $( function() {
+            $( "#PlaceOfBirth" ).autocomplete({
+                source: "/includes/actions/student.autocomplete.address.php",
+                minLength: 2,
+                select: function( event, ui ) {
+                    event.preventDefault();
+                    $("#PlaceOfBirth").val(ui.item.label);
+                    $("input[name=PlaceOfBirth]").val(ui.item.value);
+                }
+            });
+            $( "#Address" ).autocomplete({
+                source: "/includes/actions/student.autocomplete.address.php",
+                minLength: 2,
+                select: function( event, ui ) {
+                    event.preventDefault();
+                    $("#Address").val(ui.item.label);
+                    $("input[name=Address]").val(ui.item.value);
+                }
+            });
+            $( "#SchoolLastAttendedAddress" ).autocomplete({
+                source: "/includes/actions/student.autocomplete.address.php",
+                minLength: 2,
+                select: function( event, ui ) {
+                    event.preventDefault();
+                    $("#SchoolLastAttendedAddress").val(ui.item.label);
+                    $("input[name=SchoolLastAttendedAddress]").val(ui.item.value);
+                }
+            });
+        } );
     </script>
 
 </html>
