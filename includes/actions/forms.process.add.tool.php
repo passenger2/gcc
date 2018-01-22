@@ -77,27 +77,6 @@ foreach($post as $key => $result)
 $db_handle->runUpdate();
 
 if($db_handle->getUpdateStatus()) {
-    $db_handle->prepareStatement(
-        "INSERT INTO `edithistories`(
-            `EditHistoryID`,
-            `ActiveUserID`,
-            `EditDate`,
-            `EditType`,
-            `EditItemID`,
-            `EditDescription`)
-         VALUES(
-            NULL,
-            :usr,
-            NOW(),
-            :editType,
-            :formID,
-            :edit)");
-    $db_handle->bindVar(':usr', $_SESSION['UserID'], PDO::PARAM_INT, 0);
-    $db_handle->bindVar(':formID', $formID, PDO::PARAM_INT, 0);
-    $db_handle->bindVar(':editType', 'AssessmentTool', PDO::PARAM_STR, 0);
-    $db_handle->bindVar(':edit', 'added assessment tool : '.$formTitle, PDO::PARAM_STR, 0);
-    $db_handle->runUpdate();
-    
     header("location: /pages/forms.manage.tools.php?status=formsuccess");
 } else {
     header("location: /pages/forms.manage.tools.php?status=formerror");

@@ -480,20 +480,28 @@ function getAllAssessmentTools()
     return $tools;
 }
 
-function getMultipleAssessmentTools($toolIDs = '')
+function getMultipleAssessmentTools($formIDs = '')
 # Author: Laranjo, Sam Paul L.
-# Last Modified: 12-08-17
+# Last Modified: 01-21-18
 # Modified by: Laranjo, Sam Paul L.
 {
-    if(!isset($toolIDs)) $toolIDs = ['z'];
+    if(!isset($formIDs)) $formIDs = ['z'];
+    sort($formIDs);
+    #die(print_r($formIDs));
     $db_handle = new DBController();
-    $inQuery = implode(',', array_fill(0, count($toolIDs), '?'));
-    $db_handle->prepareStatement(
+    $toolIDs = implode(',',$formIDs);
+    $inQuery = implode(',', array_fill(0, count($formIDs), '?'));
+    $query =
         "SELECT *
          FROM `assessmenttools`
-         WHERE AssessmentToolID IN (".$inQuery .")");
+         WHERE AssessmentToolID IN (".$inQuery.")
+         ORDER BY FIELD(AssessmentToolID,".$toolIDs.")";
+    #die($query);
+    $db_handle->prepareStatement($query);
     
-    $formInfo = $db_handle->fetchWithIn($toolIDs);
+    #$formIDs[] = $toolIDs;
+    #die(print_r($formIDs));
+    $formInfo = $db_handle->fetchWithIn($formIDs);
 
     return $formInfo;
 }
@@ -518,27 +526,28 @@ function getAssessmentTool($toolID)
     return $formInfo;
 }
 
-function getAssessmentQuestions($type = '',$qIDs = '')
+function getAssessmentQuestions($type = '',$formIDs = '')
 # Author: Laranjo, Sam Paul L.
 # Last Modified: 01-10-18
 # Modified by: Laranjo, Sam Paul L.
 {
-    if(!isset($qIDs)) $qIDs = ['z'];
+    if(!isset($formIDs)) $formIDs = ['z'];
     $db_handle = new DBController();
     if($type == 'Tool')
     {
-        $toolIDs = implode(',',$qIDs);
-        $inQuery = implode(',', array_fill(0, count($qIDs), '?'));
-        $db_handle->prepareStatement(
+        $toolIDs = implode(',',$formIDs);
+        $inQuery = implode(',', array_fill(0, count($formIDs), '?'));
+        $query =
             "SELECT *
             FROM `questions`
             LEFT JOIN htmlforms
                 ON htmlforms.HtmlFormID = questions.HtmlFormID
             WHERE AssessmentToolID IN (".$inQuery.")
-            ORDER BY FIELD(AssessmentToolID, ?)");
-
-        $qIDs[] = $toolIDs;#die(print_r($qIDs));
-        $questionsResult = $db_handle->fetchWithIn($qIDs);
+            ORDER BY FIELD(AssessmentToolID,?)";
+        $db_handle->prepareStatement($query);
+        #die($query);
+        $formIDs[] = $toolIDs;#die(print_r($formIDs));
+        $questionsResult = $db_handle->fetchWithIn($formIDs);
     }
     else if($type == 'Intake')
     {
@@ -1030,7 +1039,7 @@ function updateEditHistory($formID, $message)
 
 function insertAnswer($type = 'intake', $answerType = '1', $answer = '', $questionID = '0', $formAnswerID = '0')
 # Author: Laranjo, Sam Paul L.
-# Last Modified: 01-11-18
+# Last Modified: 01-21-18
 # Modified by: Laranjo, Sam Paul L.
 {
     $db_handle = new DBController();
@@ -1086,12 +1095,12 @@ function insertAnswer($type = 'intake', $answerType = '1', $answer = '', $questi
                 NULL)";
         }
     }
-    
+    #die($query);
     $db_handle->prepareStatement($query);
     if($answerType == '1')
     {
         $db_handle->bindVar(":Answer", $answer, PDO::PARAM_INT, 0);
-    } else if($answerType == '2')
+    } else if($answerType == '2' && !empty($answer))
     {
         $db_handle->bindVar(":Answer", $answer, PDO::PARAM_STR, 0);
     }

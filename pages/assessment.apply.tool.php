@@ -10,7 +10,7 @@ $formInfo = getMultipleAssessmentTools($toolIDs);
 $questions = getAssessmentQuestions('Tool',$toolIDs);
 $translations = getTranslationsArray('Tool', $toolIDs);
 $languages = getLanguages('Tool', $translations);
-#die(print_r($languages));
+#die(print_r($formInfo));
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -65,11 +65,6 @@ $languages = getLanguages('Tool', $translations);
                                             <h5>
                                                 <?php if(!empty($assessmentTool)) echo($assessmentTool['Instructions']); ?>
                                             </h5>
-                                        </div>
-                                        <div class="col-md-12">
-                                            <h4>
-                                                Questions
-                                            </h4>
                                         </div>
                                         <?php
                                 if(!empty($questions))
