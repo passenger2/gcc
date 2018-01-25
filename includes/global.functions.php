@@ -1141,13 +1141,15 @@ function getList($data, $listType = 'Student', $listTarget = '')
         $query .=
             "SELECT
                 i.Lname,
-                i.Fname,
-                i.Mname,
                 i.StudentID,
-                i.CourseYear,
-                Bdate,
+                colleges.CollegeName,
                 Gender,
                 Age,
+                i.Fname,
+                i.Mname,
+                i.CourseYear,
+                i.GccCode,
+                Bdate,
                 colleges.CollegeName,
                 departments.DepartmentName,
                 COALESCE(
@@ -1558,7 +1560,13 @@ function getList($data, $listType = 'Student', $listTarget = '')
                 $recordsFiltered = get_total_all_records('Student', 0);
 
                 $subArray["DT_RowId"] = $row["StudentID"];
-                $subArray[] = $row["Lname"].", ".$row["Fname"]." ".$row["Mname"];
+                if($_SESSION['account_type'] == '77')
+                {
+                    $subArray[] = $row["Lname"].", ".$row["Fname"]." ".$row["Mname"];
+                } else
+                {
+                    $subArray[] = $row["GccCode"];
+                }
                 $subArray[] = $row["StudentID"];
                 $subArray[] = $row["CollegeName"]." - ".$row["CourseYear"];
                 $subArray[] = $row["Gender"];
