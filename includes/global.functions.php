@@ -92,6 +92,7 @@ function getStudentExtensiveDetails($id = '')
     $db_handle->prepareStatement(
         "SELECT
             StudentID,
+            GccCode,
             CONCAT(Lname, ', ', Fname, ' ', Mname) AS StudentName,
             students.Lname,
             students.Fname,
@@ -473,7 +474,7 @@ function getAllAssessmentTools()
     $db_handle->prepareStatement(
         "SELECT *
          FROM `assessmenttools`
-         ORDER BY Name");
+         ORDER BY AssessmentToolID");
     
     $tools = $db_handle->runFetch();
 
@@ -1316,15 +1317,15 @@ function getList($data, $listType = 'Student', $listTarget = '')
     {
         $query .=
             "SELECT
-                assessmenttoolanswers.AssessmentToolAnswerID,
-                assessmenttoolanswers.AssessmentToolID,
                 assessmenttoolanswers.DateTaken,
-                assessmenttoolanswers.StudentID,
                 assessmenttools.Name AS ToolName,
                 scores.Score,
+                assessmenttoolanswers.AssessmentToolAnswerID,
+                CONCAT(users.Lname, ', ', users.Fname, ' ', users.Mname) AS ActiveUser,
+                assessmenttoolanswers.AssessmentToolID,
+                assessmenttoolanswers.StudentID,
                 autoassessments.Cutoff,
-                autoassessments.Assessment,
-                CONCAT(users.Lname, ', ', users.Fname, ' ', users.Mname) AS ActiveUser
+                autoassessments.Assessment
             FROM assessmenttoolanswers
             LEFT JOIN assessmenttools
                 ON assessmenttools.AssessmentToolID = assessmenttoolanswers.AssessmentToolID

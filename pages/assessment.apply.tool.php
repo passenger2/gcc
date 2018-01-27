@@ -27,7 +27,7 @@ $languages = getLanguages('Tool', $translations);
             <?php includeNav(); ?>
             <div id="page-wrapper">
                 <div id="exam-wrapper">
-                    <form action="/includes/actions/assessment.process.answers.tool.php?id=<?php echo($idpID); ?>" method="post">
+                    <form onsubmit="return confirm('Please double check before submitting. Are you sure to submit?');" action="/includes/actions/assessment.process.answers.tool.php?id=<?php echo($idpID); ?>" method="post">
 
                         <div class="row">
                             <?php
@@ -79,7 +79,7 @@ $languages = getLanguages('Tool', $translations);
                                             <hr>
                                             <div name="question">
                                                 <div name="<?php echo($assessmentTool['AssessmentToolID']); ?>-Original">
-                                                    <?php echo(nl2br($question['Question'])); ?>
+                                                    <?php echo(nl2br($question['ItemNumber'].".) ".$question['Question'])); ?>
                                                 </div>
                                                 <?php
                                             if(isset($translations[$assessmentTool['AssessmentToolID']."-".$question['QuestionID']]))

@@ -16,7 +16,7 @@ $intakeCount = getIntakeCount($id);
     <head>
 
         <?php 
-        includeHead($studentInfo[0]['StudentName']." - Assessment History");
+        includeHead("Assessment History");
         if($_SESSION['account_type'] == '77')
         {
             includeDataTables('advanced');
@@ -88,20 +88,26 @@ $intakeCount = getIntakeCount($id);
                 ?>
                 <div class="row">
                     <div class="header">
+                        <?php
+                        if($_SESSION['account_type'] == '77')
+                        {
+                        ?>
                         <h3 class="title"><?php echo($studentInfo[0]['StudentName']); ?>&nbsp;
-                            <?php
-                            if($_SESSION['account_type'] == '77')
-                            {
-                            ?>
                             <sup>
-                                <!--<a type="button" class="btn btn-info btn-xs" href="student.details.php?id=<?php echo($id); ?>">
+                                <!--<a type="button" class="btn btn-info btn-xs" href="student.details.php?id=<?php //echo($id); ?>">
                                     <i class="fa fa-info-circle"></i>&nbsp;Student Details
                                 </a>-->
                             </sup>
-                            <?php
-                            }
-                            ?>
                         </h3>
+                        <?php
+                        } else
+                        {
+                        ?>
+                        <h3 class="title"><?php echo($studentInfo[0]['GccCode']); ?>&nbsp;
+                        </h3>
+                        <?php
+                        }
+                        ?>
                     </div>
                 </div>
                 <div class="row">

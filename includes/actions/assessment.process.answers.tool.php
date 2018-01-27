@@ -1,5 +1,5 @@
 <?php
-die(print_r($_POST));
+#die(print_r($_POST));
 include("../../initialize.php");
 includeCore();
 $studentID = $_GET['id'];
@@ -16,8 +16,7 @@ foreach($post as $key => $answer)
     #$keys[1] => answer type
     #$keys[2] => question ID
     #$keys[3] => question item number
-
-    if($keys[0] != 'end')
+    if($keys[0] != 'end' && $keys[0] != 9)
     {
         if(!in_array($keys[0], $assessmentToolIDs))
         {
@@ -68,7 +67,69 @@ foreach($post as $key => $answer)
             if(!empty($answer))
             insertAnswer('tool', $keys[1], $answer, $keys[2], $assessmentToolAnswerID);
         }
-    } else {
+    } else if ($keys[0] == 9)
+    {
+        if(!in_array($keys[0], $assessmentToolIDs))
+        {
+            $query =
+                "INSERT INTO `assessmenttoolanswers` (
+                `AssessmentToolAnswerID`,
+                `ActiveUserID`,
+                `AssessmentToolID`,
+                `DateTaken`,
+                `StudentID`)
+            VALUES (
+                NULL,
+                :ActiveUserID,
+                :AssessmentToolID,
+                CURRENT_TIMESTAMP,
+                :StudentID)";
+
+            $db_handle->prepareStatement($query);
+            $db_handle->bindVar(":ActiveUserID", $_SESSION['UserID'], PDO::PARAM_INT, 0);
+            $db_handle->bindVar(":AssessmentToolID", $keys[0], PDO::PARAM_INT, 0);
+            $db_handle->bindVar(":StudentID", $studentID, PDO::PARAM_STR, 0);
+
+            $db_handle->runUpdate();
+            $assessmentToolAnswerID = $db_handle->getLastInsertID();
+
+            #get 'autoAssessments' Items for score calculation check
+            $itemsString = getAutoAssessmentItems($keys[0]);
+            $itemGroup = explode("-", $itemsString);
+
+            $nonReverseItems = explode(",", $itemGroup[0]);
+            $reverseItems = explode(",", $itemGroup[1]);
+            
+            #if questionID is in $nonReverseItems list, increment score by answer
+            if(in_array($keys[2], $nonReverseItems))
+            {
+                $tempScore += $answer;
+            #else if questionID is in $reverseItems list, increment score by reverse of item answer
+            } else if (in_array($keys[2], $reverseItems))
+            {
+                $tempScore += abs($answer-3);
+            }
+            
+            if(!empty($answer))
+            insertAnswer('tool', $keys[1], $answer, $keys[2], $assessmentToolAnswerID);
+            $assessmentToolIDs[] = $keys[0];
+        } else
+        {
+            #if questionID is in $nonReverseItems list, increment score by answer
+            if(in_array($keys[2], $nonReverseItems))
+            {
+                $tempScore += $answer;
+            #else if questionID is in $reverseItems list, increment score by reverse of item answer
+            } else if (in_array($keys[2], $reverseItems))
+            {
+                $tempScore += abs($answer-3);
+            }
+            
+            if(!empty($answer))
+            insertAnswer('tool', $keys[1], $answer, $keys[2], $assessmentToolAnswerID);
+        }
+    }
+    else {
         if(!empty($assessmentToolAnswerID))
         {
             $db_handle->prepareStatement(

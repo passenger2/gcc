@@ -7,7 +7,8 @@ $userID = $_SESSION['UserID'];
 
 $idp = getStudentDetails($idpID);
 $toolsList = getAllAssessmentTools();
-#die(print_r($toolsList));
+$toolsSize = sizeof($toolsList);
+#die();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -36,17 +37,24 @@ $toolsList = getAllAssessmentTools();
                             <h4>Current IDP: 
                                 <?php
                                 if(!empty($idp)) {
-                                    foreach ($idp as $result) {
                                 ?>
-                                <b><?php echo($result['Lname'].', '.$result['Fname'].' '.$result['Mname']); ?></b>
+                                <b>
+                                    <?php
+                                    $studentName = $idp[0]['Lname'].', '.$idp[0]['Fname'].' '.$idp[0]['Mname'];
+                                    if($_SESSION['account_type'] == '77')
+                                    {
+                                        echo($studentName);
+                                    } else
+                                    {
+                                        echo($idp[0]['GccCode']);
+                                    }
+                                    ?>
+                                </b>
                                 <?php
-                                        $idp_name = $result['Lname'].', '.$result['Fname'].' '.$result['Mname'];
-                                        if($result['Age'] < 18) {
-                                            $idp_age_group = 2;
-                                        } else {
-                                            $idp_age_group = 1;
-                                        }
-
+                                    if($idp[0]['Age'] < 18) {
+                                        $idp_age_group = 2;
+                                    } else {
+                                        $idp_age_group = 1;
                                     }
                                 }
                                 ?>
@@ -55,23 +63,59 @@ $toolsList = getAllAssessmentTools();
                     </div>
                     <div class="row">
                         <div class="col-md-12">
+                            <div class="col-md-12">
+                                <button id="selectAll" class="btn btn-fill btn-xs">Select all tools</button>
+                            </div>
                             <form action="assessment.informed.consent.php?from=tools" method="post">
                                 <div class="form-group">
                                     <div class="col-md-12"><p>Select Tool(s):</p></div>
                                     <div class="col-md-12">
-                                        <?php
-                                        if(!empty($toolsList)) {
-                                            foreach ($toolsList as $form) {
-                                        ?>
                                         <div class="col-md-6">
-                                            <label>
-                                            <input id="<?php echo($form["AssessmentToolID"]); ?>" type="checkbox" name="form-<?php echo($form["AssessmentToolID"]); ?>" value="<?php echo($form["AssessmentToolID"]); ?>">&nbsp;
-                                            <?php echo($form["Name"]) ?></label>
-                                        </div>
-                                        <?php
+                                            <?php
+                                            if(!empty($toolsList)) {
+                                                $x = 0;
+                                                foreach ($toolsList as $form) {
+                                                    $x++;
+                                                    if($x <= $toolsSize/2)
+                                                    {
+                                            ?>
+                                            <div class="col-md-12">
+                                                <label>
+                                                    <input id="<?php echo($form["AssessmentToolID"]); ?>" type="checkbox" name="form-<?php echo($form["AssessmentToolID"]); ?>" value="<?php echo($form["AssessmentToolID"]); ?>">&nbsp;
+                                                    <?php echo($form["Name"]) ?></label>
+                                            </div>
+                                            <?php
+                                                    } else
+                                                    {
+                                                        break;
+                                                    }
+                                                }
                                             }
-                                        }
-                                        ?>
+                                            ?>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <?php
+                                            if(!empty($toolsList)) {
+                                                $x = 0;
+                                                foreach ($toolsList as $form) {
+                                                    $x++;
+                                                    if($x > $toolsSize/2)
+                                                    {
+                                            ?>
+                                            <div class="col-md-12">
+                                                <label>
+                                                    <input id="<?php echo($form["AssessmentToolID"]); ?>" type="checkbox" name="form-<?php echo($form["AssessmentToolID"]); ?>" value="<?php echo($form["AssessmentToolID"]); ?>">&nbsp;
+                                                    <?php echo($form["Name"]) ?></label>
+                                            </div>
+                                            <?php
+                                                    } else
+                                                    {
+                                                        continue;
+                                                    }
+                                                }
+                                            }
+                                            ?>
+                                        </div>
                                         <input type="hidden" name="idpID" value="<?php echo($idpID); ?>">
                                         <input type="hidden" name="idp_name" value="<?php echo($idp_name); ?>">
                                     </div>
@@ -89,6 +133,18 @@ $toolsList = getAllAssessmentTools();
         </div>
 
         <?php includeCommonJS(); ?>
+        <script>
+            $(document).ready(function () {
+                $('body').on('click', '#selectAll', function () {
+                    if ($(this).hasClass('allChecked')) {
+                        $('input[type="checkbox"]').prop('checked', false);
+                    } else {
+                        $('input[type="checkbox"]').prop('checked', true);
+                    }
+                    $(this).toggleClass('allChecked');
+                })
+            });
+        </script>
 
     </body>
 
