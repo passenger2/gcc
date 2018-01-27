@@ -4,7 +4,7 @@ includeCore();
 #die(print_r($_POST));
 
 $toolIDs = json_decode($_POST["toolID"]);
-$idpName = $_POST['idpName'];
+#die(print_r($toolIDs));
 $idpID = $_POST['idpID'];
 $formInfo = getMultipleAssessmentTools($toolIDs);
 $questions = getAssessmentQuestions('Tool',$toolIDs);

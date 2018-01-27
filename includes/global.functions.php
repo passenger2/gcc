@@ -891,6 +891,7 @@ function getAnswers($faID='', $type='')
                 intakeformanswers.IntakeFormAnswerID,
                 questions.QuestionID,
                 questions.Question,
+                questions.ItemNumber,
                 htmlforms.Type AS FormType,
                 htmlforms.Range AS AnswerRange,
                 AnswersTable.AnswerID,
@@ -1070,7 +1071,7 @@ function insertAnswer($type = 'intake', $answerType = '1', $answer = '', $questi
                 ":formAnswerID,
                 NULL)";
         }
-    } else if($answerType == '2')
+    } else if($answerType == '2' && strlen($answer) != 0)
     {
         $query =
             "INSERT INTO `qualitativeanswers` (
@@ -1101,14 +1102,22 @@ function insertAnswer($type = 'intake', $answerType = '1', $answer = '', $questi
     if($answerType == '1')
     {
         $db_handle->bindVar(":Answer", $answer, PDO::PARAM_INT, 0);
-    } else if($answerType == '2' && !empty($answer))
+        
+        
+        $db_handle->bindVar(":QuestionID", $questionID, PDO::PARAM_INT, 0);
+        $db_handle->bindVar(":formAnswerID", $formAnswerID, PDO::PARAM_INT, 0);
+
+        $db_handle->runUpdate();
+    } else if($answerType == '2' && strlen($answer) != 0)
     {
         $db_handle->bindVar(":Answer", $answer, PDO::PARAM_STR, 0);
+        
+        
+        $db_handle->bindVar(":QuestionID", $questionID, PDO::PARAM_INT, 0);
+        $db_handle->bindVar(":formAnswerID", $formAnswerID, PDO::PARAM_INT, 0);
+
+        $db_handle->runUpdate();
     }
-    $db_handle->bindVar(":QuestionID", $questionID, PDO::PARAM_INT, 0);
-    $db_handle->bindVar(":formAnswerID", $formAnswerID, PDO::PARAM_INT, 0);
-    
-    $db_handle->runUpdate();
 }
 #---- db insert functions end ----
 
@@ -1141,15 +1150,15 @@ function getList($data, $listType = 'Student', $listTarget = '')
     {
         $query .=
             "SELECT
-                i.Lname,
+                i.GccCode,
                 i.StudentID,
                 colleges.CollegeName,
                 Gender,
                 Age,
+                i.Lname,
                 i.Fname,
                 i.Mname,
                 i.CourseYear,
-                i.GccCode,
                 Bdate,
                 colleges.CollegeName,
                 departments.DepartmentName,
@@ -1174,12 +1183,13 @@ function getList($data, $listType = 'Student', $listTarget = '')
         {
             $query .=
                 " WHERE i.Lname LIKE :keyword
-                  OR i.Fname LIKE :keyword
-                  OR i.Mname LIKE :keyword
-                  OR i.Fname LIKE :keyword
+                  OR i.GccCode LIKE :keyword
                   OR i.StudentID LIKE :keyword ";
         }
 
+                  /*OR i.Fname LIKE :keyword
+                  OR i.Mname LIKE :keyword
+                  OR i.Fname LIKE :keyword*/
         if($order != '')
         {
             if($order['0']['dir'] == 'asc')

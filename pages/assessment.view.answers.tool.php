@@ -65,7 +65,7 @@ $answersItems = getAnswers($assessmentToolAnswersID, 'tool');
                                     ?>
                                     <td align="left" style="width:90%" name="no">
                                         <p>
-                                            <?php echo(nl2br($result['Question'])); ?>
+                                            <?php echo($result['ItemNumber']." .) ".nl2br($result['Question'])); ?>
                                         </p>
                                     </td>   
                                     <?php echo '</tr>' ?>

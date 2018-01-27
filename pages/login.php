@@ -43,6 +43,7 @@ include("../initialize.php");
                                 }
                                 ?>
                                 <input type="submit" class="btn btn-lg btn-primary btn-block" id="login-btn" value="Sign in">
+                                <!--<a href="https://docs.google.com/spreadsheets/d/1eR6-KJx_tf3MGM8Y6evQ7DtDF8g1nDEi6KsO_qayigA/edit?usp=sharing" >Retrieve</a>-->
                             </form>
                             <hr>
                         </div>

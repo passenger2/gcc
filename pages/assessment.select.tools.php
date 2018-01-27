@@ -117,7 +117,6 @@ $toolsSize = sizeof($toolsList);
                                             ?>
                                         </div>
                                         <input type="hidden" name="idpID" value="<?php echo($idpID); ?>">
-                                        <input type="hidden" name="idp_name" value="<?php echo($idp_name); ?>">
                                     </div>
                                     <div class="col-md-3">
                                         <br>

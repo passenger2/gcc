@@ -23,6 +23,12 @@ includeCore();
                     <label for="birds">Birds: </label>
                     <input id="birds" class="form-control">
                 </div>-->
+                <?php
+                /*for($i = 1; $i <= 50; $i++)
+                {
+                    echo(password_hash("encoder".$i, PASSWORD_DEFAULT)."<br>");
+                }*/
+                ?>
             </div>
             <!-- /#wrapper -->
 

@@ -9,7 +9,6 @@ if($_GET['from'] == 'intake')
 } else
 {
     $idpID = $_POST['idpID'];
-    $idpName = $_POST['idp_name'];
 
     foreach($_POST as $key => $value) {
         if(substr($key,0,5) === "form-") {
@@ -50,7 +49,6 @@ if($_GET['from'] == 'intake')
                                 {
                                 ?>
                                     <input type="hidden" name="idpID" value="<?php echo($idpID); ?>">
-                                    <input type="hidden" name="idpName" value="<?php echo($idpName); ?>">
                                     <input type="hidden" name="toolID" value='<?php echo(json_encode($ids)); ?>'>
                                 <?php
                                 }

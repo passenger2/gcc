@@ -6,6 +6,7 @@ $studentID = $_GET['id'];
 $db_handle = new DBController();
 $post = $_POST;
 $assessmentToolIDs = [];
+#die(print_r($assessmentToolIDs));
 $assessmentToolAnswerID = '';
 $tempScore = 0;
 
@@ -47,24 +48,22 @@ foreach($post as $key => $answer)
             $items = explode(",", $itemsString);
 
             #if questionID is in Items list, increment score by answer
-            if(in_array($keys[2], $items))
+            if(in_array($keys[2], $items) && $keys[1] == '1')
             {
                 $tempScore += $answer;
             }
             
-            if(!empty($answer))
             insertAnswer('tool', $keys[1], $answer, $keys[2], $assessmentToolAnswerID);
 
             $assessmentToolIDs[] = $keys[0];
         } else
         {
             #if questionID is in Items list, increment score by answer
-            if(in_array($keys[2], $items))
+            if(in_array($keys[2], $items) && $keys[1] == '1')
             {
                 $tempScore += $answer;
             }
             
-            if(!empty($answer))
             insertAnswer('tool', $keys[1], $answer, $keys[2], $assessmentToolAnswerID);
         }
     } else if ($keys[0] == 9)
@@ -101,31 +100,29 @@ foreach($post as $key => $answer)
             $reverseItems = explode(",", $itemGroup[1]);
             
             #if questionID is in $nonReverseItems list, increment score by answer
-            if(in_array($keys[2], $nonReverseItems))
+            if(in_array($keys[2], $nonReverseItems) && $keys[1] == '1')
             {
                 $tempScore += $answer;
             #else if questionID is in $reverseItems list, increment score by reverse of item answer
-            } else if (in_array($keys[2], $reverseItems))
+            } else if (in_array($keys[2], $reverseItems) && $keys[1] == '1')
             {
                 $tempScore += abs($answer-3);
             }
             
-            if(!empty($answer))
             insertAnswer('tool', $keys[1], $answer, $keys[2], $assessmentToolAnswerID);
             $assessmentToolIDs[] = $keys[0];
         } else
         {
             #if questionID is in $nonReverseItems list, increment score by answer
-            if(in_array($keys[2], $nonReverseItems))
+            if(in_array($keys[2], $nonReverseItems) && $keys[1] == '1')
             {
                 $tempScore += $answer;
             #else if questionID is in $reverseItems list, increment score by reverse of item answer
-            } else if (in_array($keys[2], $reverseItems))
+            } else if (in_array($keys[2], $reverseItems) && $keys[1] == '1')
             {
                 $tempScore += abs($answer-3);
             }
             
-            if(!empty($answer))
             insertAnswer('tool', $keys[1], $answer, $keys[2], $assessmentToolAnswerID);
         }
     }
@@ -153,6 +150,8 @@ foreach($post as $key => $answer)
             $tempScore = 0;
         }
         
+        #$keys[0] = end
+        #$keys[1] = assessment tool ID
         if(!in_array($keys[1], $assessmentToolIDs))
         {
             $query =

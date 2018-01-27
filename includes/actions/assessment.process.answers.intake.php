@@ -31,6 +31,7 @@ $db_handle->bindVar(':studentID', $studentID, PDO::PARAM_STR,0);
 $db_handle->bindVar(':userID', $_SESSION['UserID'], PDO::PARAM_INT,0);
 $db_handle->runUpdate();
 
+/*
 $intakeAnswersID = $db_handle->getLastInsertID();
 
 foreach($post as $key => $answers)
@@ -121,6 +122,7 @@ foreach($parameters as $param)
 }
 
 $db_handle->runUpdate();
+*/
 
 if($db_handle->getUpdateStatus())
 {
