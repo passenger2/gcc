@@ -20,46 +20,90 @@ foreach($post as $key => $answer)
     
     $itemsString = getAutoAssessmentItems($keys[0]);
     $items = explode(",", $itemsString);
-    
+    $answers = explode(",", $answer);
+    $answerIDs = explode(",", $keys[4]);
     if(!empty($keys[4]))
     {
-        if($keys[1] == '1')
+        if(sizeof($answers) < sizeof($answerIDs))
         {
-            $query =
-                "UPDATE `quantitativeanswers`
-        SET `Answer` = :answer
-        WHERE `quantitativeanswers`.`QuantitativeAnswerID` = :answerID";
-        } else if($keys[1] == '2')
-        {
-            $query =
-                "UPDATE `qualitativeanswers`
-        SET `Answer` = :answer
-        WHERE `qualitativeanswers`.`QualitativeAnswerID` = :answerID";
-        }
-
-        $db_handle->prepareStatement($query);
-        if($keys[1] == '1')
-        {
-            $db_handle->bindVar(":answer", $answer, PDO::PARAM_INT, 0);
-            if(in_array($keys[2], $items))
+            for($i = 0; $i < sizeof($answerIDs); $i++)
             {
-                $score += $answer;
+                if($keys[1] == '1' && $i < sizeof($answers))
+                {
+                    #updateAnswers($answerType = '1', $answer = '', $answerID = '0')
+                    updateAnswers('1', $answer, $answerIDs[$i]);
+                    if(in_array($keys[2], $items))
+                    {
+                        $score += $answer;
+                    }
+                } else if($keys[1] == '2' && $i < sizeof($answers))
+                {
+                    #updateAnswers($answerType = '1', $answer = '', $answerID = '0')
+                    updateAnswers('2', $answer, $answerIDs[$i]);
+                } else
+                {
+                    #function deleteAnswers($answerType = '1', $answerID = '0')
+                    deleteAnswers('1', $answerIDs[$i]);
+                }
             }
-        } else if($keys[1] == '2')
+            
+        } else if(sizeof($answers) > sizeof($answerIDs))
         {
-            $db_handle->bindVar(":answer", $answer, PDO::PARAM_STR, 0);
+            for($i = 0; $i < sizeof($answers); $i++)
+            {
+                if($keys[1] == '1' && $i < sizeof($answerIDs))
+                {
+                    #updateAnswers($answerType = '1', $answer = '', $answerID = '0')
+                    updateAnswers('1', $answer, $answerIDs[$i]);
+                    if(in_array($keys[2], $items))
+                    {
+                        $score += $answer;
+                    }
+                } else if($keys[1] == '2' && $i < sizeof($answerIDs))
+                {
+                    #updateAnswers($answerType = '1', $answer = '', $answerID = '0')
+                    updateAnswers('2', $answer, $answerIDs[$i]);
+                } else
+                {
+                    #insertAnswer($type = 'intake', $answerType = '1', $answer = '', $questionID = '0', $formAnswerID = '0')
+                    insertAnswer('tool', $keys[1], $answer, $keys[2], $assessmentToolAnswerID);
+                    if(in_array($keys[2], $items) && $keys[1] == '1')
+                    {
+                        $score += $answer;
+                    }
+                }
+            }
+        } else 
+        {
+            for($i = 0; $i < sizeof($answers); $i++)
+            {
+                if($keys[1] == '1')
+                {
+                    #updateAnswers($answerType = '1', $answer = '', $answerID = '0')
+                    updateAnswers(1, $answer, $keys[$i]);
+                    if(in_array($keys[2], $items))
+                    {
+                        $score += $answer;
+                    }
+                } else if($keys[1] == '2')
+                {
+                    #updateAnswers($answerType = '1', $answer = '', $answerID = '0')
+                    updateAnswers(2, $answer, $keys[$i]);
+                }
+            }
         }
-        $db_handle->bindVar(":answerID", $keys[4], PDO::PARAM_INT, 0);
-
-        $db_handle->runUpdate();
     } else
     {
         insertAnswer('tool', $keys[1], $answer, $keys[2], $assessmentToolAnswerID);
-        if(in_array($keys[2], $items))
+        if(in_array($keys[2], $items) && $keys[1] == '1')
         {
             $score += $answer;
         }
     }
+    /*
+    Note:
+    deleted tanan lol.
+    */
 }
 
 $db_handle->prepareStatement(

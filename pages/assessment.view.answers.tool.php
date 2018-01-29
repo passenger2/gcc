@@ -9,8 +9,13 @@ $answersInfo = getAnswerInfo($assessmentToolAnswersID, 'tool');
 #die(print_r($answersInfo));
 $answersItems = getAnswers($assessmentToolAnswersID, 'tool');
 #die(print_r($answersItems));
+$questionIDs = [];
 
-#die(print_r($answersItems));
+/*foreach($answersItems as $answers)
+{
+    echo($answers['QuestionID']." - ".$answers['Answer']."<br>");
+}
+die();*/
 ?>
 
 <!DOCTYPE html>
@@ -41,7 +46,7 @@ $answersItems = getAnswers($assessmentToolAnswersID, 'tool');
                         <div class="panel-heading"><h4><?php echo ($answersInfo[0]['Name']); ?></h4></div>
                         <div class="panel-body" style="padding: 20px; 50px;">
                             <p style="margin: 10px 40px;">
-                                Current IDP: <b><?php echo ($answersInfo[0]['StudentName']); ?></b><br>
+                                Current Student: <b><?php echo ($answersInfo[0]['StudentName']); ?></b><br>
                             </p>
                             <p style="margin: 10px 40px;">
                                 Date taken: <b><?php echo(date('M d, Y', strtotime($answersInfo[0]['DateTaken']))); ?></b><br>
@@ -54,10 +59,14 @@ $answersItems = getAnswers($assessmentToolAnswersID, 'tool');
                                 <?php
                                 if(!empty($answersItems)) {
                                     foreach ($answersItems as $result) {
+                                        if(!in_array($result, $questionIDs))
+                                        {
+                                            $questionIDs[] = $result;
+                                        }
                                 ?>
                                 <table align="center" cellspacing="3" cellpadding="3" width="90%" class=" table-responsive">
                                     <?php
-                                        if(!isset($result['Answer']) || $result['Answer'] == "(blank)") {
+                                        if(!isset($result['Answer']) || strlen($result['Answer']) == 0) {
                                             echo '<tr class="bg-warning">';
                                         } else {
                                             echo '<tr>';
@@ -80,16 +89,27 @@ $answersItems = getAnswers($assessmentToolAnswersID, 'tool');
                                         <div class="col-md-12" name="acontainer<?php echo($result['QuestionID']); ?>">
                                             <div name="answerField">
                                                 <?php
-                                        $itemStart = (!isset($assessmentTool['ItemsStartAt']) ? 0 : $assessmentTool['ItemsStartAt']);
+                                        $itemStart = (isset($answersInfo[0]['ItemsStartAt']) ? $answersInfo[0]['ItemsStartAt'] : 0);
                                         if($result['AnswerType'] == '1')
                                         {
                                             for($i = $itemStart; $i <= $result['Range']; $i++)
                                             {
+                                                if($result['Type'] == "checkbox")
+                                                {
+                                                    $answers = explode(",", $result['Answer']);
+                                                ?>
+                                                <label class="<?php echo($result['Type']); ?>-inline">
+                                                    <input name="<?php echo($result['AssessmentToolID']."-1-".$result['QuestionID']."-".$result['ItemNumber']."-".$result['AnswerID']); ?>[]" type="<?php echo($result['Type']); ?>" value="<?php echo($i); ?>" <?php if(in_array($i, $answers)) echo('checked="checked"');?>><?php echo($i); ?>
+                                                </label>
+                                                <?php
+                                                } else
+                                                {
                                                 ?>
                                                 <label class="<?php echo($result['Type']); ?>-inline">
                                                     <input name="<?php echo($result['AssessmentToolID']."-1-".$result['QuestionID']."-".$result['ItemNumber']."-".$result['AnswerID']); ?>" type="<?php echo($result['Type']); ?>" value="<?php echo($i); ?>" <?php if(isset($result['Answer']) && $result['Answer'] == $i) echo('checked="checked"');?>><?php echo($i); ?>
                                                 </label>
                                                 <?php
+                                                }
                                             }
                                         } else if($result['AnswerType'] == '2')
                                         {
@@ -113,7 +133,9 @@ $answersItems = getAnswers($assessmentToolAnswersID, 'tool');
                                 </table>
                                 <?php
                                     }
-                                } else { ?>
+                                } else
+                                {
+                                ?>
                                 <table align="center" cellspacing="3" cellpadding="3" width="90%" class="table-responsive">
                                     <tr>
 

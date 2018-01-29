@@ -858,9 +858,10 @@ function getAnswerInfo($faID='', $type='')
                 assessmenttoolanswers.AssessmentToolID,
                 assessmenttools.Name,
                 assessmenttools.Instructions,
+                assessmenttools.ItemsStartAt,
                 assessmenttoolanswers.StudentID,
                 CONCAT(students.Lname,', ',students.Fname,' ',students.Mname) AS StudentName,
-                CONCAT(users.Lname,', ', users.Fname, ' ', users.Mname) as ActiveUser,
+                CONCAT(COALESCE(users.Lname, ''),', ', COALESCE(users.Fname, ''), ' ', COALESCE(users.Mname, '')) as ActiveUser,
                 assessmenttoolanswers.DateTaken
                 FROM assessmenttoolanswers
                 LEFT JOIN assessmenttools
@@ -880,7 +881,7 @@ function getAnswerInfo($faID='', $type='')
 
 function getAnswers($faID='', $type='')
 # Author: Laranjo, Sam Paul L.
-# Last Modified: 01-05-18
+# Last Modified: 01-29-18
 # Modified by: Laranjo, Sam Paul L.
 {
     $db_handle = new DBController();
@@ -963,7 +964,8 @@ function getAnswers($faID='', $type='')
     }
     
     $db_handle->bindVar(':AssessmentToolAnswerID', $faID, PDO::PARAM_INT,0);
-    $answers = $db_handle->runFetch();
+    #die(print_r($db_handle->runFetch()));
+    $answers = processAnswers($db_handle->runFetch());
     
     return $answers;
 }
@@ -1120,6 +1122,83 @@ function insertAnswer($type = 'intake', $answerType = '1', $answer = '', $questi
     }
 }
 #---- db insert functions end ----
+
+#---- db update functions----
+function updateAnswers($answerType = '1', $answer = '', $answerID = '0')
+# Author: Laranjo, Sam Paul L.
+# Last Modified: 01-29-18
+# Modified by: Laranjo, Sam Paul L.
+{
+    $db_handle = new DBController();
+    $query = "";
+    if($answerType == '1')
+    {
+        $query =
+            "UPDATE
+                `quantitativeanswers`
+            SET `Answer` = :answer
+            WHERE `quantitativeanswers`.`QuantitativeAnswerID` = :answerID";
+        
+    } else if($answerType == '2')
+    {
+        $query =
+            "UPDATE
+                `qualitativeanswers`
+            SET `Answer` = :answer
+            WHERE `qualitativeanswers`.`QualitativeAnswerID` = :answerID";
+    }
+    #die($query);
+    $db_handle->prepareStatement($query);
+    if($answerType == '1')
+    {
+        $db_handle->bindVar(":answer", $answer, PDO::PARAM_INT, 0);
+        $db_handle->bindVar(":answerID", $answerID, PDO::PARAM_INT, 0);
+
+        $db_handle->runUpdate();
+    } else if($answerType == '2' && strlen($answer) != 0)
+    {
+        $db_handle->bindVar(":answer", $answer, PDO::PARAM_STR, 0);
+        $db_handle->bindVar(":answerID", $answerID, PDO::PARAM_INT, 0);
+
+        $db_handle->runUpdate();
+    }
+}
+#---- db update functions end ----
+
+#---- db delete functions----
+function deleteAnswers($answerType = '1', $answerID = '0')
+# Author: Laranjo, Sam Paul L.
+# Last Modified: 01-29-18
+# Modified by: Laranjo, Sam Paul L.
+{
+    $db_handle = new DBController();
+    $query = "";
+    if($answerType == '1')
+    {
+        $query =
+            "DELETE FROM `quantitativeanswers`
+            WHERE `quantitativeanswers`.`QuantitativeAnswerID` = :answerID";
+        
+    } else if($answerType == '2')
+    {
+        $query =
+            "DELETE FROM `qualitativeanswers` WHERE `qualitativeanswers`.`QualitativeAnswerID` = :answerID";
+    }
+    #die($query);
+    $db_handle->prepareStatement($query);
+    if($answerType == '1')
+    {
+        $db_handle->bindVar(":answerID", $answerID, PDO::PARAM_INT, 0);
+
+        $db_handle->runUpdate();
+    } else if($answerType == '2')
+    {
+        $db_handle->bindVar(":answerID", $answerID, PDO::PARAM_INT, 0);
+
+        $db_handle->runUpdate();
+    }
+}
+#---- db delete functions end ----
 
 #---- assessment functions ----
 function getList($data, $listType = 'Student', $listTarget = '')
@@ -1479,7 +1558,7 @@ function getList($data, $listType = 'Student', $listTarget = '')
                 {
                     foreach($result as $row)
                     {
-                        $recordsFiltered = get_total_all_records('Intake', $listTarget);
+                        $recordsFiltered = getTotalRecords('Intake', $listTarget);
 
                         $subArray["DT_RowId"] = $forms["IntakeFormAnswerID"];
                         $phpdate = strtotime($row['DateTaken']);
@@ -1568,7 +1647,7 @@ function getList($data, $listType = 'Student', $listTarget = '')
         {
             if($listType === 'Student')
             {
-                $recordsFiltered = get_total_all_records('Student', 0);
+                $recordsFiltered = getTotalRecords('Student', 0);
 
                 $subArray["DT_RowId"] = $row["StudentID"];
                 if($_SESSION['account_type'] == '77')
@@ -1622,7 +1701,7 @@ function getList($data, $listType = 'Student', $listTarget = '')
                 }
             } else if($listType === 'Users')
             {
-                $recordsFiltered = get_total_all_records('Users', 0);
+                $recordsFiltered = getTotalRecords('Users', 0);
 
                 $subArray["DT_RowId"] = $row["UserID"];
                 $subArray[] = $row["User"];
@@ -1635,7 +1714,7 @@ function getList($data, $listType = 'Student', $listTarget = '')
             }
             else if($listType === 'Tool')
             {
-                $recordsFiltered = get_total_all_records('Tool', 0);
+                $recordsFiltered = getTotalRecords('Tool', 0);
 
                 $subArray["DT_RowId"] = $row["AssessmentToolID"];
                 $subArray[] = $row["Name"];
@@ -1646,7 +1725,7 @@ function getList($data, $listType = 'Student', $listTarget = '')
             }
             else if($listType === 'Evac')
             {
-                $recordsFiltered = get_total_all_records('Evac', 0);
+                $recordsFiltered = getTotalRecords('Evac', 0);
                 $subArray["DT_RowId"] = $row["EvacuationCentersID"];
                 $subArray[] = $row["EvacName"];
                 //$subArray[] = getFullAddress($row["EvacAddress"]);
@@ -1661,7 +1740,7 @@ function getList($data, $listType = 'Student', $listTarget = '')
             }
             else if($listType === 'AssessmentTaken')
             {
-                $recordsFiltered = get_total_all_records('AssessmentTaken', $listTarget);
+                $recordsFiltered = getTotalRecords('AssessmentTaken', $listTarget);
 
                 $subArray["DT_RowId"] = $row["AssessmentToolAnswerID"];
 
@@ -1703,7 +1782,7 @@ function getList($data, $listType = 'Student', $listTarget = '')
     return $output;
 }
 
-function get_total_all_records($type, $target = '')
+function getTotalRecords($type, $target = '')
 {
     $db_handle = new DBController();
 
@@ -1740,7 +1819,38 @@ function get_total_all_records($type, $target = '')
         $result = $db_handle->runFetch();
     }
 
-
     return $result[0]['total'];
+}
+
+function processAnswers($data)
+# Author: Laranjo, Sam Paul L.
+# Last Modified: 01-29-18
+# Modified by: Laranjo, Sam Paul L.
+{
+    #die(print_r($data));
+    $processedData = [];
+    $questionIDLog = [];
+
+    foreach($data as $entries)
+    {
+        #die(print_r($entry));
+        $tempArray = [];
+        if(!in_array($entries['QuestionID'], $questionIDLog))
+        {
+            $questionIDLog[] = $entries['QuestionID'];
+            foreach($entries as $key => $entry)
+            {
+                $tempArray[$key] = $entry;
+            }
+
+            $processedData[$entries['QuestionID']] = $tempArray;
+        } else
+        {
+            $processedData[$entries['QuestionID']]['Answer'] .= ",".$entries['Answer'];
+            $processedData[$entries['QuestionID']]['AnswerID'] .= ",".$entries['AnswerID'];
+        }
+    }
+    
+    return $processedData;
 }
 ?>

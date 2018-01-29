@@ -102,11 +102,12 @@ $languages = getLanguages('Tool', $translations);
                                             $itemStart = (!isset($assessmentTool['ItemsStartAt']) ? 0 : $assessmentTool['ItemsStartAt']);
                                             if($question['AnswerType'] == '1')
                                             {
+                                                $inputName = ($question['Type'] == 'checkbox'? $question['AssessmentToolID']."-1-".$question['QuestionID']."-".$question['ItemNumber']."[]" : $question['AssessmentToolID']."-1-".$question['QuestionID']."-".$question['ItemNumber']);
                                                 for($i = $itemStart; $i <= $question['Range']; $i++)
                                                 {
                                                 ?>
                                                 <label class="<?php echo($question['Type']); ?>-inline">
-                                                    <input name="<?php echo($question['AssessmentToolID']."-1-".$question['QuestionID']."-".$question['ItemNumber']); ?>" type="<?php echo($question['Type']); ?>" value="<?php echo($i); ?>"><?php echo($i); ?>
+                                                    <input name="<?php echo($inputName); ?>" type="<?php echo($question['Type']); ?>" value="<?php echo($i); ?>"><?php echo($i); ?>
                                                 </label>
                                                 <?php
                                                 }
