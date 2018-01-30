@@ -9,6 +9,7 @@ $studentID = $_GET['sid'];
 $post = $_POST;
 $score = 0;
 $query = "";
+$count = 0;
 foreach($post as $key => $answer)
 {
     $keys = explode("-", $key);
@@ -20,26 +21,21 @@ foreach($post as $key => $answer)
     
     $itemsString = getAutoAssessmentItems($keys[0]);
     $items = explode(",", $itemsString);
-    $answers = explode(",", $answer);
-    $answerIDs = explode(",", $keys[4]);
     if(!empty($keys[4]))
     {
-        if(sizeof($answers) < sizeof($answerIDs))
+        $answerIDs = explode(",", $keys[4]);
+        if(sizeof($answer) < sizeof($answerIDs))
         {
             for($i = 0; $i < sizeof($answerIDs); $i++)
             {
-                if($keys[1] == '1' && $i < sizeof($answers))
+                if($keys[1] == '1' && $i < sizeof($answer))
                 {
                     #updateAnswers($answerType = '1', $answer = '', $answerID = '0')
-                    updateAnswers('1', $answer, $answerIDs[$i]);
+                    updateAnswers('1', $answer[$i], $answerIDs[$i]);
                     if(in_array($keys[2], $items))
                     {
-                        $score += $answer;
+                        $score += $answer[$i];
                     }
-                } else if($keys[1] == '2' && $i < sizeof($answers))
-                {
-                    #updateAnswers($answerType = '1', $answer = '', $answerID = '0')
-                    updateAnswers('2', $answer, $answerIDs[$i]);
                 } else
                 {
                     #function deleteAnswers($answerType = '1', $answerID = '0')
@@ -47,63 +43,79 @@ foreach($post as $key => $answer)
                 }
             }
             
-        } else if(sizeof($answers) > sizeof($answerIDs))
+        } else if(sizeof($answer) > sizeof($answerIDs))
         {
-            for($i = 0; $i < sizeof($answers); $i++)
+            for($i = 0; $i < sizeof($answer); $i++)
             {
                 if($keys[1] == '1' && $i < sizeof($answerIDs))
                 {
                     #updateAnswers($answerType = '1', $answer = '', $answerID = '0')
-                    updateAnswers('1', $answer, $answerIDs[$i]);
+                    updateAnswers('1', $answer[$i], $answerIDs[$i]);
                     if(in_array($keys[2], $items))
                     {
-                        $score += $answer;
+                        $score += $answer[$i];
                     }
-                } else if($keys[1] == '2' && $i < sizeof($answerIDs))
-                {
-                    #updateAnswers($answerType = '1', $answer = '', $answerID = '0')
-                    updateAnswers('2', $answer, $answerIDs[$i]);
                 } else
                 {
                     #insertAnswer($type = 'intake', $answerType = '1', $answer = '', $questionID = '0', $formAnswerID = '0')
-                    insertAnswer('tool', $keys[1], $answer, $keys[2], $assessmentToolAnswerID);
+                    insertAnswer('tool', $keys[1], $answer[$i], $keys[2], $assessmentToolAnswerID);
                     if(in_array($keys[2], $items) && $keys[1] == '1')
                     {
-                        $score += $answer;
+                        $score += $answer[$i];
                     }
                 }
             }
         } else 
         {
-            for($i = 0; $i < sizeof($answers); $i++)
+            if($keys[1] == '1')
             {
-                if($keys[1] == '1')
+                if(is_array($answer))
+                {
+                    for($i = 0; $i < sizeof($answer); $i++)
+                    {
+                        #updateAnswers($answerType = '1', $answer = '', $answerID = '0')
+                        updateAnswers(1, $answer[$i], $answerIDs[$i]);
+                        if(in_array($keys[2], $items))
+                        {
+                            $score += $answer[$i];
+                        }
+                    }
+                } else
                 {
                     #updateAnswers($answerType = '1', $answer = '', $answerID = '0')
-                    updateAnswers(1, $answer, $keys[$i]);
+                    updateAnswers(1, $answer, $answerIDs[$i]);
                     if(in_array($keys[2], $items))
                     {
                         $score += $answer;
                     }
-                } else if($keys[1] == '2')
-                {
-                    #updateAnswers($answerType = '1', $answer = '', $answerID = '0')
-                    updateAnswers(2, $answer, $keys[$i]);
                 }
+            } else if($keys[1] == '2')
+            {
+                #updateAnswers($answerType = '1', $answer = '', $answerID = '0')
+                updateAnswers(2, $answer, $answerIDs[$i]);
             }
         }
     } else
     {
-        insertAnswer('tool', $keys[1], $answer, $keys[2], $assessmentToolAnswerID);
-        if(in_array($keys[2], $items) && $keys[1] == '1')
+        if(is_array($answer))
         {
-            $score += $answer;
+            foreach($answer as $answer_)
+            {
+                insertAnswer('tool', $keys[1], $answer_, $keys[2], $assessmentToolAnswerID);
+                if(in_array($keys[2], $items) && $keys[1] == '1')
+                {
+                    $score += $answer_;
+                }
+            }
+        } else
+        {
+            insertAnswer('tool', $keys[1], $answer, $keys[2], $assessmentToolAnswerID);
+            if(in_array($keys[2], $items) && $keys[1] == '1')
+            {
+                $score += $answer;
+            }
         }
     }
-    /*
-    Note:
-    deleted tanan lol.
-    */
 }
 
 $db_handle->prepareStatement(

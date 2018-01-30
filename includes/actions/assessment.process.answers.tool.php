@@ -48,29 +48,53 @@ foreach($post as $key => $answer)
             $itemsString = getAutoAssessmentItems($keys[0]);
             $items = explode(",", $itemsString);
 
-            foreach($answer as $answer_)
+            if(is_array($answer))
+            {
+                foreach($answer as $answer_)
+                {
+                    #if questionID is in Items list, increment score by answer
+                    if(in_array($keys[2], $items) && $keys[1] == '1')
+                    {
+                        $tempScore += $answer_;
+                    }
+
+                    insertAnswer('tool', $keys[1], $answer_, $keys[2], $assessmentToolAnswerID);
+                }
+            } else
             {
                 #if questionID is in Items list, increment score by answer
                 if(in_array($keys[2], $items) && $keys[1] == '1')
                 {
-                    $tempScore += $answer_;
+                    $tempScore += $answer;
                 }
 
-                insertAnswer('tool', $keys[1], $answer_, $keys[2], $assessmentToolAnswerID);
+                insertAnswer('tool', $keys[1], $answer, $keys[2], $assessmentToolAnswerID);
             }
 
             $assessmentToolIDs[] = $keys[0];
         } else
         {
-            foreach($answer as $answer_)
+            if(is_array($answer))
+            {
+                foreach($answer as $answer_)
+                {
+                    #if questionID is in Items list, increment score by answer
+                    if(in_array($keys[2], $items) && $keys[1] == '1')
+                    {
+                        $tempScore += $answer_;
+                    }
+
+                    insertAnswer('tool', $keys[1], $answer_, $keys[2], $assessmentToolAnswerID);
+                }
+            } else
             {
                 #if questionID is in Items list, increment score by answer
                 if(in_array($keys[2], $items) && $keys[1] == '1')
                 {
-                    $tempScore += $answer_;
+                    $tempScore += $answer;
                 }
 
-                insertAnswer('tool', $keys[1], $answer_, $keys[2], $assessmentToolAnswerID);
+                insertAnswer('tool', $keys[1], $answer, $keys[2], $assessmentToolAnswerID);
             }
         }
     } else if ($keys[0] == 9)
