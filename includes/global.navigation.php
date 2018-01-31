@@ -32,6 +32,9 @@
     <div class="sidebar" role="navigation">
         <div class="sidebar-nav navbar-collapse">
             <ul class="nav" id="side-menu">
+                <?php
+                if($_SESSION["account_type"] == '77') {
+                ?>
                 <li>
                     <a href="index.php"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
                 </li>
@@ -39,25 +42,23 @@
                     <a href="student.list.php" id="idpMenu"><i class="fa fa-address-card-o fa-fw"></i> Students</a>
                     <!-- /.nav-second-level -->
                 </li>
-                <?php
-                if($_SESSION["account_type"] == '77') {
-                ?>
                 <li>
                     <a href="forms.manage.tools.php"><i class="fa fa-file-text-o fa-fw"></i> Assessment Tools</a>
                 </li>
-                <?php
-                } ?>
-                <!--<li>
-                    <a href="evac.manage.centers.php"><i class="fa fa-home fa-fw"></i> Evacuation Centers</a>
-                </li>-->
-                <?php
-                if($_SESSION["account_type"] == '77') {
-                ?>
                 <li>
                     <a href="user.list.php"><i class="fa fa-key fa-fw"></i> Account Management</a>
                 </li>
                 <?php
-                } ?>
+                } else
+                {
+                ?>
+                <li>
+                    <a href="student.list.php" id="idpMenu"><i class="fa fa-address-card-o fa-fw"></i> Students</a>
+                    <!-- /.nav-second-level -->
+                </li>
+                <?php
+                }
+                ?>
             </ul>
         </div>
         <!-- /.sidebar-collapse -->

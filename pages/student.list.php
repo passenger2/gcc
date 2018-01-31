@@ -44,12 +44,27 @@ includeCore();
                                 <table width="100%" class="table table-bordered table-hover" id="table-student-list">
                                     <thead>
                                         <tr>
+                                            <?php
+                                            if($_SESSION["account_type"] == "77")
+                                            {
+                                            ?>
                                             <th align="left"><b>Name</b></th>
+                                            <th align="left"><b>GCC Code</b></th>
                                             <th align="left"><b>Student ID</b></th>
                                             <th align="left"><b>College - Course</b></th>
-                                            <th align="left"><b>Gender</b></th>
-                                            <th align="left"><b>Age</b></th>
+                                            <th align="left"><b>Status</b></th>
                                             <th align="left"><b>Action</b></th>
+                                            <?php
+                                            } else
+                                            {
+                                            ?>
+                                            <th align="left"><b>GCC Code</b></th>
+                                            <th align="left"><b>College - Course</b></th>
+                                            <th align="left"><b>Action</b></th>
+                                            <?php
+                                            }
+                                            ?>
+                                            
                                         </tr>
                                     </thead>
                                 </table>
@@ -82,8 +97,21 @@ includeCore();
                 },
                 "columnDefs":[
                     {
-                        "targets": [4],
+                        <?php
+                        if($_SESSION["account_type"] == "77")
+                        {
+                        ?>
+                        "targets": [5],
                         "orderable":false
+                        <?php
+                        } else
+                        {
+                        ?>
+                        "targets": [2],
+                        "orderable":false
+                        <?php
+                        }
+                        ?>
                     }
                 ]
                 <?php

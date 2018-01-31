@@ -34,7 +34,24 @@ $languages = getLanguages('Tool', $translations);
                             foreach($formInfo as $assessmentTool)
                             {
                             ?>
-                            <div class="col-md-12">
+                            <?php
+                                if(isset($assessmentTool['PartNo']))
+                                {
+                                    if($assessmentTool['PartNo'] == 1)
+                                    {
+                                        echo('<div class="col-md-6" style="float:left">');
+                                    } else
+                                    {
+                                        echo('<div class="col-md-6" style="float:right">');
+
+                                    }
+                                } else
+                                {
+                            ?>
+                                <div class="col-md-12">
+                            <?php
+                                }
+                            ?>
                                 <div class="panel panel-default">
                                     <div class="panel-heading">
                                         <h3>

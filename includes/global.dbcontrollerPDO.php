@@ -66,6 +66,14 @@ class DBController {
             $this->lastID = $this->conn->lastInsertId(); //ID of recently inserted value
         }
     }
+    
+    function getUnlimitedRowCount()
+    {
+        $temp = $this->conn->query("SELECT FOUND_ROWS();");
+        $result = (int) $temp->fetchColumn(); 
+        
+        return $result;
+    }
 
     function getUpdateStatus() {
         return $this->update_status;

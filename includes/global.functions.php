@@ -1216,7 +1216,7 @@ function getList($data, $listType = 'Student', $listTarget = '')
     $subArray = [];
     $draw = 0;
     $rowCount = 0;
-    $recordsFiltered = 0;
+    $recordsTotal = 0;
     $type = $listType;
     $idpID = $listTarget;
 
@@ -1227,43 +1227,89 @@ function getList($data, $listType = 'Student', $listTarget = '')
 
     if($listType === 'Student')
     {
-        $query .=
-            "SELECT
-                i.GccCode,
-                i.StudentID,
-                colleges.CollegeName,
-                Gender,
-                Age,
-                i.Lname,
-                i.Fname,
-                i.Mname,
-                i.CourseYear,
-                Bdate,
-                colleges.CollegeName,
-                departments.DepartmentName,
-                COALESCE(
-                    MIN(j.IntakeFormAnswerID),
-                    0
-                ) AS NumOfIntakes,
-                (CASE
-                    WHEN (Age > 18) THEN 2
-                    ELSE 1
-                    END
-                ) AS AgeGroup 
-            FROM `students` i 
-            LEFT JOIN intakeformanswers j
-                ON i.StudentID = j.StudentID
-            LEFT JOIN departments
-                ON i.DepartmentID = departments.DepartmentID
-            LEFT JOIN colleges
-                ON colleges.CollegeID = departments.CollegeID ";
+        if($_SESSION["account_type"] == "77")
+        {
+            $query .=
+                "SELECT SQL_CALC_FOUND_ROWS
+                    CONCAT(COALESCE(i.Lname, ''),', ', COALESCE(i.Fname, ''), ' ', COALESCE(i.Mname, '')) AS StudentName,
+                    i.GccCode,
+                    i.StudentID,
+                    colleges.CollegeName,
+                    COUNT(scores.ScoreID) AS ProblematicScores,
+                    COALESCE(
+                        MIN(j.IntakeFormAnswerID),
+                        0
+                    ) AS NumOfIntakes,
+                    Age,
+                    i.CourseYear,
+                    Gender,
+                    Bdate,
+                    colleges.CollegeName,
+                    departments.DepartmentName,
+                    (CASE
+                        WHEN (Age > 18) THEN 2
+                        ELSE 1
+                        END
+                    ) AS AgeGroup 
+                FROM `students` i 
+                LEFT JOIN intakeformanswers j
+                    ON i.StudentID = j.StudentID
+                LEFT JOIN departments
+                    ON i.DepartmentID = departments.DepartmentID
+                LEFT JOIN colleges
+                    ON colleges.CollegeID = departments.CollegeID
+                LEFT JOIN assessmenttoolanswers
+                    ON assessmenttoolanswers.StudentID = i.StudentID
+                LEFT JOIN assessmenttools
+                    ON assessmenttools.AssessmentToolID = assessmenttoolanswers.AssessmentToolID
+                LEFT JOIN autoassessments
+                    ON autoassessments.AssessmentToolID = assessmenttools.AssessmentToolID
+                LEFT JOIN scores
+                    ON scores.AssessmentToolAnswerID = assessmenttoolanswers.AssessmentToolAnswerID
+                    AND scores.Score >= autoassessments.Cutoff ";
+        } else
+        {
+            $query .=
+                "SELECT SQL_CALC_FOUND_ROWS
+                    i.GccCode,
+                    i.StudentID,
+                    colleges.CollegeName,
+                    COALESCE(
+                        MIN(j.IntakeFormAnswerID),
+                        0
+                    ) AS NumOfIntakes,
+                    i.CourseYear,
+                    colleges.CollegeName,
+                    departments.DepartmentName,
+                    (CASE
+                        WHEN (Age > 18) THEN 2
+                        ELSE 1
+                        END
+                    ) AS AgeGroup 
+                FROM `students` i 
+                LEFT JOIN intakeformanswers j
+                    ON i.StudentID = j.StudentID
+                LEFT JOIN departments
+                    ON i.DepartmentID = departments.DepartmentID
+                LEFT JOIN colleges
+                    ON colleges.CollegeID = departments.CollegeID ";
+        }
 
         if($keyword != '')
         {
-            $query .=
-                " WHERE i.Lname LIKE :keyword
-                  OR i.GccCode LIKE :keyword
-                  OR i.StudentID LIKE :keyword ";
+            if($_SESSION["account_type"] == "77")
+            {
+                $query .=
+                    " WHERE CONCAT(COALESCE(i.Lname, ''),', ', COALESCE(i.Fname, ''), ' ', COALESCE(i.Mname, '')) LIKE :keyword
+                      OR i.GccCode LIKE :keyword
+                      OR i.StudentID LIKE :keyword 
+                      OR colleges.CollegeName LIKE :keyword ";
+            } else
+            {
+                $query .=
+                    " WHERE i.GccCode LIKE :keyword ";
+            }
+            
         }
 
                   /*OR i.Fname LIKE :keyword
@@ -1300,7 +1346,7 @@ function getList($data, $listType = 'Student', $listTarget = '')
     } else if($listType === 'Users')
     {
         $query .=
-            "SELECT account.AccountID, user.UserID,
+            "SELECT SQL_CALC_FOUND_ROWS account.AccountID, user.UserID,
                 CONCAT(user.Lname,', ', user.Fname, ' ', user.Mname) as User,
                 user.PhoneNum,
                 agency.AgencyName AS Agency,
@@ -1341,7 +1387,7 @@ function getList($data, $listType = 'Student', $listTarget = '')
     else if($listType === 'Evac')
     {
         $query .=
-            "SELECT *
+            "SELECT SQL_CALC_FOUND_ROWS *
              FROM `evacuation_centers`  ";
 
         if($keyword != '')
@@ -1374,7 +1420,7 @@ function getList($data, $listType = 'Student', $listTarget = '')
     else if($listType === 'Tool')
     {
         $query .=
-            "SELECT
+            "SELECT SQL_CALC_FOUND_ROWS
                 Name,
                 AssessmentToolID
              FROM `assessmenttools`  ";
@@ -1405,7 +1451,7 @@ function getList($data, $listType = 'Student', $listTarget = '')
     else if($listType === 'AssessmentTaken')
     {
         $query .=
-            "SELECT
+            "SELECT SQL_CALC_FOUND_ROWS
                 assessmenttoolanswers.DateTaken,
                 assessmenttools.Name AS ToolName,
                 scores.Score,
@@ -1558,7 +1604,7 @@ function getList($data, $listType = 'Student', $listTarget = '')
                 {
                     foreach($result as $row)
                     {
-                        $recordsFiltered = getTotalRecords('Intake', $listTarget);
+                        $recordsTotal = getTotalRecords('Intake', $listTarget);
 
                         $subArray["DT_RowId"] = $forms["IntakeFormAnswerID"];
                         $phpdate = strtotime($row['DateTaken']);
@@ -1608,8 +1654,8 @@ function getList($data, $listType = 'Student', $listTarget = '')
 
         $output = array(
             "draw" => intval($draw),
-            "recordsTotal" => $rowCount,
-            "recordsFiltered" => $recordsFiltered,
+            "recordsTotal" => $recordsTotal,
+            "recordsFiltered" => $rowCount,
             "data" => $tmp
         );
 
@@ -1639,7 +1685,7 @@ function getList($data, $listType = 'Student', $listTarget = '')
     }
 
     $result = $db_handle->runFetch();
-    $rowCount = $db_handle->getFetchCount();
+    $rowCount = $db_handle->getUnlimitedRowCount();
 
     if($rowCount != 0)
     {
@@ -1647,20 +1693,28 @@ function getList($data, $listType = 'Student', $listTarget = '')
         {
             if($listType === 'Student')
             {
-                $recordsFiltered = getTotalRecords('Student', 0);
+                $recordsTotal = getTotalRecords('Student', 0);
 
                 $subArray["DT_RowId"] = $row["StudentID"];
                 if($_SESSION['account_type'] == '77')
                 {
-                    $subArray[] = $row["Lname"].", ".$row["Fname"]." ".$row["Mname"];
+                    $subArray[] = $row["StudentName"];
+                    $subArray[] = $row["GccCode"];
+                    $subArray[] = $row["StudentID"];
+                    $subArray[] = $row["CollegeName"]." - ".$row["CourseYear"];
+                    if($row["ProblematicScores"] > 0)
+                    {
+                        $subArray[] = $row["ProblematicScores"].'<i class="fa fa-warning fa-fw"></i>';
+                    } else
+                    {
+                        $subArray[] = '<i class="fa fa-check fa-fw"></i>';
+                    }
                 } else
                 {
                     $subArray[] = $row["GccCode"];
+                    $subArray[] = $row["CollegeName"]." - ".$row["CourseYear"];
                 }
-                $subArray[] = $row["StudentID"];
-                $subArray[] = $row["CollegeName"]." - ".$row["CourseYear"];
-                $subArray[] = $row["Gender"];
-                $age = calculateAge($row["Bdate"]);
+                /*$age = calculateAge($row["Bdate"]);
                 if($age == 'N/A')
                 {
                     if(isset($row["Age"]))
@@ -1674,7 +1728,7 @@ function getList($data, $listType = 'Student', $listTarget = '')
                 } else
                 {
                     $subArray[] = $age;
-                }
+                }*/
                 
                 $ageGroup = getAgeGroup($row["StudentID"]);
                 if($row['NumOfIntakes'] == 0) {
@@ -1701,7 +1755,7 @@ function getList($data, $listType = 'Student', $listTarget = '')
                 }
             } else if($listType === 'Users')
             {
-                $recordsFiltered = getTotalRecords('Users', 0);
+                $recordsTotal = getTotalRecords('Users', 0);
 
                 $subArray["DT_RowId"] = $row["UserID"];
                 $subArray[] = $row["User"];
@@ -1714,7 +1768,7 @@ function getList($data, $listType = 'Student', $listTarget = '')
             }
             else if($listType === 'Tool')
             {
-                $recordsFiltered = getTotalRecords('Tool', 0);
+                $recordsTotal = getTotalRecords('Tool', 0);
 
                 $subArray["DT_RowId"] = $row["AssessmentToolID"];
                 $subArray[] = $row["Name"];
@@ -1725,7 +1779,7 @@ function getList($data, $listType = 'Student', $listTarget = '')
             }
             else if($listType === 'Evac')
             {
-                $recordsFiltered = getTotalRecords('Evac', 0);
+                $recordsTotal = getTotalRecords('Evac', 0);
                 $subArray["DT_RowId"] = $row["EvacuationCentersID"];
                 $subArray[] = $row["EvacName"];
                 //$subArray[] = getFullAddress($row["EvacAddress"]);
@@ -1740,7 +1794,7 @@ function getList($data, $listType = 'Student', $listTarget = '')
             }
             else if($listType === 'AssessmentTaken')
             {
-                $recordsFiltered = getTotalRecords('AssessmentTaken', $listTarget);
+                $recordsTotal = getTotalRecords('AssessmentTaken', $listTarget);
 
                 $subArray["DT_RowId"] = $row["AssessmentToolAnswerID"];
 
@@ -1774,8 +1828,8 @@ function getList($data, $listType = 'Student', $listTarget = '')
 
     $output = array(
         "draw" => intval($draw),
-        "recordsTotal" => $rowCount,
-        "recordsFiltered" => $recordsFiltered,
+        "recordsTotal" => $recordsTotal,
+        "recordsFiltered" => $rowCount,
         "data" => $tmp
     );
 

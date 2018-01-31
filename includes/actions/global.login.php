@@ -16,7 +16,13 @@ if(isset($_SESSION["UserID"])) {
     if (password_verify($_POST['pwd'], $result[0]['Password'])) {
         $_SESSION["UserID"] = $result[0]['UserID'];
         $_SESSION["account_type"] = $result[0]['Type'];
-        header("Location: /pages/index.php");
+        if($_SESSION["account_type"] == '77')
+        {
+            header("Location: /pages/index.php");
+        } else
+        {
+            header("Location: /pages/student.list.php");
+        }
     } else {
         header("location: /pages/login.php?err=2");
     }

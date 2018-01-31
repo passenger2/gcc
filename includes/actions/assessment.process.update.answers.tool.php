@@ -83,7 +83,7 @@ foreach($post as $key => $answer)
                 } else
                 {
                     #updateAnswers($answerType = '1', $answer = '', $answerID = '0')
-                    updateAnswers(1, $answer, $answerIDs[$i]);
+                    updateAnswers(1, $answer, $keys[4]);
                     if(in_array($keys[2], $items))
                     {
                         $score += $answer;
@@ -92,7 +92,7 @@ foreach($post as $key => $answer)
             } else if($keys[1] == '2')
             {
                 #updateAnswers($answerType = '1', $answer = '', $answerID = '0')
-                updateAnswers(2, $answer, $answerIDs[$i]);
+                updateAnswers(2, $answer, $keys[4]);
             }
         }
     } else
