@@ -8,6 +8,7 @@ $query = "";
 $query .=
     "INSERT INTO `students` (
         `StudentID`,
+        `GccCode`,
         `Lname`,
         `Fname`,
         `Mname`,
@@ -44,6 +45,7 @@ $query .=
         `SchoolLastAttendedAddress`)
     VALUES (
         :StudentID,
+        :GccCode,
         :Lname,
         :Fname,
         :Mname,
@@ -87,6 +89,12 @@ if(isset($_POST['IDNo']))
     $db_handle->bindVar(':StudentID', $_POST['IDNo'], PDO::PARAM_STR,0);
 else
     header("location: ".$_SESSION['loc']."?status=emptyID");
+
+#GccCode
+if(isset($_POST['GccCode'])) 
+    $db_handle->bindVar(':GccCode', $_POST['GccCode'], PDO::PARAM_STR,0);
+else
+    $db_handle->bindNull(':GccCode');
 
 #Lname
 if(isset($_POST['Lname'])) 

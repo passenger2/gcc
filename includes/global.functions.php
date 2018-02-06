@@ -225,58 +225,6 @@ function getGender($genderID = '')
     }
 }
 
-function getProvinces()
-# Author: Laranjo, Sam Paul L.
-# Last Modified: 12-06-17
-# Modified by: Laranjo, Sam Paul L.
-{
-    $db_handle = new DBController();
-    $db_handle->prepareStatement(
-        "SELECT * FROM `province`
-         ORDER BY ProvinceName
-         LIMIT 10");
-    
-    $provinces = $db_handle->runFetch();
-
-    return $provinces;
-}
-
-function getCities()
-# Author: Laranjo, Sam Paul L.
-# Last Modified: 12-06-17
-# Modified by: Laranjo, Sam Paul L.
-{
-    $db_handle = new DBController();
-    $db_handle->prepareStatement(
-        "SELECT * FROM city_mun
-        JOIN province
-            ON city_mun.PROVINCE_ProvinceID = province.ProvinceID
-        ORDER BY `City_Mun_Name`
-        LIMIT 10");
-    
-    $cities = $db_handle->runFetch();
-
-    return $cities;
-}
-
-function getBarangays()
-# Author: Laranjo, Sam Paul L.
-# Last Modified: 12-06-17
-# Modified by: Laranjo, Sam Paul L.
-{
-    $db_handle = new DBController();
-    $db_handle->prepareStatement(
-        "SELECT * FROM `barangay`
-        JOIN city_mun
-            ON barangay.City_CityID = city_mun.City_Mun_ID
-        ORDER BY `BarangayName`
-        LIMIT 10");
-    
-    $barangays = $db_handle->runFetch();
-
-    return $barangays;
-}
-
 function getFullAddress($barangayID='', $idpID='')
 # Author: Laranjo, Sam Paul L.
 # Last Modified: 12-06-17
@@ -359,16 +307,28 @@ function getAddressIDs($barangayID)
     return $addressIDs;
 }
 
-function getEvacuationCenters()
+function getColleges()
 # Author: Laranjo, Sam Paul L.
-# Last Modified: 12-06-17
+# Last Modified: 02-06-18
 # Modified by: Laranjo, Sam Paul L.
 {
     $db_handle = new DBController();
-    $db_handle->prepareStatement("SELECT * FROM evacuation_centers");
-    $evac_centers = $db_handle->runFetch();
+    $db_handle->prepareStatement("SELECT * FROM colleges ORDER BY CollegeName");
+    $colleges = $db_handle->runFetch();
 
-    return $evac_centers;
+    return $colleges;
+}
+
+function getDepartments()
+# Author: Laranjo, Sam Paul L.
+# Last Modified: 02-06-18
+# Modified by: Laranjo, Sam Paul L.
+{
+    $db_handle = new DBController();
+    $db_handle->prepareStatement("SELECT * FROM departments ORDER BY DepartmentName");
+    $departments = $db_handle->runFetch();
+
+    return $departments;
 }
 
 function getEvacDetails($evacID = '')

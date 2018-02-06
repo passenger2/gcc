@@ -3,6 +3,7 @@ include("../initialize.php");
 includeCore();
 
 $_SESSION['loc'] = $_SERVER['PHP_SELF'];
+$colleges = getColleges();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -57,7 +58,7 @@ $_SESSION['loc'] = $_SERVER['PHP_SELF'];
                             <form method="POST" action="/includes/actions/student.process.enrollment.php">
                                 <div class="panel-body">
                                     <div class="col-md-12">
-                                        
+
                                         <div id="name_div" class="col-md-12">
                                             <h5><b>Student's Name</b></h5>
                                             <div class="form-group col-md-4">
@@ -72,10 +73,10 @@ $_SESSION['loc'] = $_SERVER['PHP_SELF'];
                                                 <input class="form-control" name='Mname' placeholder="Middle Name">
                                             </div>
                                         </div>
-                                        
+
                                         <div  id = "personal_info_div" class="col-lg-6">
                                             <h5><b>Personal Information</b></h5>
-                                            
+
                                             <div class="form-group col-md-6">
                                                 <input class="form-control" name='Nickname' placeholder="Nickname">           
                                             </div>
@@ -106,8 +107,8 @@ $_SESSION['loc'] = $_SERVER['PHP_SELF'];
                                             </div>
 
                                             <!--<div class="form-group col-md-6">
-                                                <input class="form-control" name='Ethnicity' placeholder="Ethnicity">           
-                                            </div>-->
+<input class="form-control" name='Ethnicity' placeholder="Ethnicity">           
+</div>-->
 
                                             <div class="form-group col-md-6">
                                                 <input class="form-control" name='Citizenship' placeholder="Citizenship">           
@@ -124,7 +125,7 @@ $_SESSION['loc'] = $_SERVER['PHP_SELF'];
                                             <div class="form-group col-md-6">
                                                 <input class="form-control" id='Email' name='Email' placeholder="your@mail.com">
                                             </div>
-                                                
+
                                             <div class="form-group col-md-6">
                                                 <select name='LivingWith' id='LivingWith' class="form-control">
                                                     <option selected disabled>Currently Living with: </option>
@@ -153,19 +154,35 @@ $_SESSION['loc'] = $_SERVER['PHP_SELF'];
                                         <div id = "school_details_div">
                                             <div class="col-lg-6">
                                                 <h5><b>School Details</b></h5>
-                                                
+
+                                                <div class="form-group col-md-6">
+                                                    <input class="form-control" id='GCCCode' name='GCCCode' placeholder="GCC Code" required>
+                                                </div>
+
                                                 <div class="form-group col-md-6">
                                                     <input class="form-control" id='IDNo' name='IDNo' placeholder="ID Number" required>
                                                 </div>
-                                                
+
+                                                <div class="form-group col-md-6">
+                                                    <select id='College' class="form-control" onChange="getDept(this.value);">
+                                                        <option selected disabled>College</option>
+                                                        <?php
+                                                        foreach($colleges as $college)
+                                                        {
+                                                        ?>
+                                                        <option value="<?php echo($college['CollegeID']); ?>"><?php echo($college['CollegeName']); ?></option>
+                                                        <?php
+                                                        }
+                                                        ?>
+                                                    </select>
+                                                </div>
+
                                                 <div class="form-group col-md-6">
                                                     <select name='Departtment' id='Department' class="form-control">
                                                         <option selected disabled>Department</option>
-                                                        <option value="01">Information Technology</option>
-                                                        <option value="01">Psychology</option>
                                                     </select>
                                                 </div>
-                                                
+
                                                 <div class="form-group col-md-6">
                                                     <input class="form-control" id='Course' name='Course' placeholder="Course">
                                                 </div>
@@ -179,11 +196,11 @@ $_SESSION['loc'] = $_SERVER['PHP_SELF'];
                                                         <option value="4th year">4th year</option>
                                                     </select>
                                                 </div>
-                                                
+
                                                 <div class="form-group col-md-6">
                                                     <input class="form-control" id='PrevGPA' name='PrevGPA' placeholder="GPA (Previous Sem)">
                                                 </div>
-                                                
+
                                                 <div class="form-group col-md-6">
                                                     <select name='ScholarshipType' id='ScholarshipType' class="form-control">
                                                         <option selected disabled>Scholarship Grant</option>
@@ -211,41 +228,41 @@ $_SESSION['loc'] = $_SERVER['PHP_SELF'];
                                                     <input class="form-control" id="SchoolLastAttendedAddress" placeholder="Address of school last attended (type barangay first)">
                                                     <input name='SchoolLastAttendedAddress' type="hidden" value="">
                                                 </div>
-                                                
+
                                             </div>
                                         </div>
-                                        
+
                                         <div id="parents_div" class="col-md-12">
                                             <h5><b>Parents/Guardians</b></h5>
-                                            
+
                                             <div  id="parents_div" class="col-md-6">
                                                 <div class="form-group">
                                                     <input class="form-control" name="FathersName" placeholder="Father's name">
-                                                    
+
                                                     <label class="checkbox-inline">
                                                         <input type="checkbox" name="FathersStatus" value='Deceased'>
                                                         Deceased
                                                     </label>
                                                 </div>
-                                                
+
                                                 <div class="form-group">
                                                     <input class="form-control" name="FathersOccupation" placeholder="Father's occupation">
                                                 </div>
-                                                
+
                                                 <div class="form-group">
                                                     <input class="form-control" name="MothersName" placeholder="Mother's name">
-                                                    
+
                                                     <label class="checkbox-inline">
                                                         <input type="checkbox" name="MothersStatus" value='Deceased'>
                                                         Deceased
                                                     </label>
                                                 </div>
-                                                
+
                                                 <div class="form-group">
                                                     <input class="form-control" name="MothersOccupation" placeholder="Mother's occupation">
                                                 </div>
                                             </div>
-                                            
+
                                             <div  id="parents_details_div" class="col-md-6">
                                                 <div class="form-group col-md-6">
                                                     <select name='MaritalStatus' id='MaritalStatus' class="form-control">
@@ -259,7 +276,7 @@ $_SESSION['loc'] = $_SERVER['PHP_SELF'];
                                                         <option value="Others">Others (specify)</option>
                                                     </select>
                                                 </div>
-                                                
+
                                                 <div class="form-group col-md-6">
                                                     <select name='NetIncome' class="form-control">
                                                         <option selected disabled>Family's Monthly Income</option>
@@ -282,7 +299,7 @@ $_SESSION['loc'] = $_SERVER['PHP_SELF'];
                                                 </div>
                                             </div>
                                         </div>
-                                        
+
                                     </div>
                                 </div><!-- panel body -->
                                 <div class="panel-footer" style="background-color: #fff;">
@@ -347,6 +364,16 @@ $_SESSION['loc'] = $_SERVER['PHP_SELF'];
                 }
             });
         } );
+        function getDept(val) {
+            $.ajax({
+                type: "POST",
+                url: "/includes/actions/student.get.dept.php",
+                data:'collegeID='+val,
+                success: function(data){
+                    $("#Department").html(data);
+                }
+            });
+        }
     </script>
 
 </html>

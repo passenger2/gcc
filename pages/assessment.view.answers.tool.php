@@ -73,7 +73,7 @@ die();*/
                             <p style="margin: 10px 40px;">
                                 Agent: <b><?php echo($answersInfo[0]['ActiveUser']); ?></b><br>
                             </p>
-                            <div style="margin: 30px 40px;" class="header"><p><b>Questions:</b><button onclick="location.href = '/includes/actions/assessment.delete.answers.php?id=<?php echo($assessmentToolAnswersID); ?>';" class="btn btn-info btn-xs">Delete all answers</button></p></div>
+                            <div style="margin: 30px 40px;" class="header"><p><b>Questions:</b><button onclick="deleteConfirm(); return false;" class="btn btn-info btn-xs">Delete all answers</button></p></div>
                             <form action="/includes/actions/assessment.process.update.answers.tool.php?atid=<?php echo($answersInfo[0]['AssessmentToolAnswerID']); ?>&sid=<?php echo($answersInfo[0]['StudentID']); ?>" method="post">
                                 <?php
                                 if(!empty($answersItems)) {
@@ -186,5 +186,13 @@ die();*/
         <?php includeCommonJS(); ?>
 
     </body>
+    <script>
+        function deleteConfirm() { 
+            if (window.confirm('This action is irreversible. Continue?'))
+            {
+                window.location.href = '/includes/actions/assessment.delete.answers.php?id=<?php echo($assessmentToolAnswersID); ?>';
+            }
+        }
+    </script>
 
 </html>

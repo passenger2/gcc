@@ -8,10 +8,13 @@ $db_handle = new DBController();
 
 $db_handle->prepareStatement(
     "DELETE FROM `quantitativeanswers`
-    WHERE AssessmentToolAnswerID = :assessmentAnswerID"
+    WHERE AssessmentToolAnswerID = :assessmentAnswerID1;
+    DELETE FROM `qualitativeanswers`
+    WHERE AssessmentToolAnswerID = :assessmentAnswerID2;"
 );
 
-$db_handle->bindVar(":assessmentAnswerID", $assessmentAnswerID, PDO::PARAM_INT, 0);
+$db_handle->bindVar(":assessmentAnswerID1", $assessmentAnswerID, PDO::PARAM_INT, 0);
+$db_handle->bindVar(":assessmentAnswerID2", $assessmentAnswerID, PDO::PARAM_INT, 0);
 $db_handle->runUpdate();
 
 
