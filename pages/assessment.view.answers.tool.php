@@ -41,6 +41,25 @@ die();*/
                         <li class="breadcrumb-item active">View Assessment Tool Answers</li>
                     </ol>
                 </div>
+                <?php
+                if(isset($_GET['status']) && $_GET['status'] == 'deleteanswerssuccess')
+                {
+                ?>
+                <div class="alert alert-success alert-dismissable">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                    All answers for this tool are now deleted!
+                </div>
+                <?php
+                } else if (isset($_GET['status']) && $_GET['status'] == 'deleteanswerserror')
+                {
+                ?>
+                <div class="alert alert-success alert-dismissable">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                    An error was encoutered, please approach the admin regarding this error.
+                </div>
+                <?php
+                }
+                ?>
                 <div class="row">
                     <div class="form-group">
                         <div class="panel-heading"><h4><?php echo ($answersInfo[0]['Name']); ?></h4></div>
@@ -54,7 +73,7 @@ die();*/
                             <p style="margin: 10px 40px;">
                                 Agent: <b><?php echo($answersInfo[0]['ActiveUser']); ?></b><br>
                             </p>
-                            <div style="margin: 30px 40px;" class="header"><p><b>Questions:</b></p></div>
+                            <div style="margin: 30px 40px;" class="header"><p><b>Questions:</b><button onclick="location.href = '/includes/actions/assessment.delete.answers.php?id=<?php echo($assessmentToolAnswersID); ?>';" class="btn btn-info btn-xs">Delete all answers</button></p></div>
                             <form action="/includes/actions/assessment.process.update.answers.tool.php?atid=<?php echo($answersInfo[0]['AssessmentToolAnswerID']); ?>&sid=<?php echo($answersInfo[0]['StudentID']); ?>" method="post">
                                 <?php
                                 if(!empty($answersItems)) {
