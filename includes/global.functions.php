@@ -1205,12 +1205,7 @@ function getList($data, $listType = 'Student', $listTarget = '')
                     Gender,
                     Bdate,
                     colleges.CollegeName,
-                    departments.DepartmentName,
-                    (CASE
-                        WHEN (Age > 18) THEN 2
-                        ELSE 1
-                        END
-                    ) AS AgeGroup 
+                    departments.DepartmentName
                 FROM `students` i 
                 LEFT JOIN intakeformanswers j
                     ON i.StudentID = j.StudentID
@@ -1220,10 +1215,8 @@ function getList($data, $listType = 'Student', $listTarget = '')
                     ON colleges.CollegeID = departments.CollegeID
                 LEFT JOIN assessmenttoolanswers
                     ON assessmenttoolanswers.StudentID = i.StudentID
-                LEFT JOIN assessmenttools
-                    ON assessmenttools.AssessmentToolID = assessmenttoolanswers.AssessmentToolID
                 LEFT JOIN autoassessments
-                    ON autoassessments.AssessmentToolID = assessmenttools.AssessmentToolID
+                    ON autoassessments.AssessmentToolID = assessmenttoolanswers.AssessmentToolID
                 LEFT JOIN scores
                     ON scores.AssessmentToolAnswerID = assessmenttoolanswers.AssessmentToolAnswerID
                     AND scores.Score >= autoassessments.Cutoff ";
@@ -1240,12 +1233,7 @@ function getList($data, $listType = 'Student', $listTarget = '')
                     ) AS NumOfIntakes,
                     i.CourseYear,
                     colleges.CollegeName,
-                    departments.DepartmentName,
-                    (CASE
-                        WHEN (Age > 18) THEN 2
-                        ELSE 1
-                        END
-                    ) AS AgeGroup 
+                    departments.DepartmentName
                 FROM `students` i 
                 LEFT JOIN intakeformanswers j
                     ON i.StudentID = j.StudentID

@@ -39,6 +39,9 @@
                     <a href="index.php"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
                 </li>
                 <li>
+                    <a href="reports.visualizations.php"><i class="fa fa-bar-chart-o fa-fw"></i> Visualizations</a>
+                </li>
+                <li>
                     <a href="student.list.php" id="idpMenu"><i class="fa fa-address-card-o fa-fw"></i> Students</a>
                     <!-- /.nav-second-level -->
                 </li>
