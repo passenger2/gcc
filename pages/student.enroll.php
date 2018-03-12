@@ -314,66 +314,65 @@ $colleges = getColleges();
         </div>
 
         <?php includeCommonJS(); ?>
+        <script type='text/javascript'>
+            $(document).ready(function(){
+                $('#LivingWith').change(function(){
+                    if ($(this).val() == 'Others') {
+                        $('#SpecLivingWith').show();
+                    }
+                });
+                $('#ScholarshipType').change(function(){
+                    if ($(this).val() == 'Others') {
+                        $('#SpecScholarshipType').show();
+                    }
+                });
+                $('#MaritalStatus').change(function(){
+                    if ($(this).val() == 'Others') {
+                        $('#SpecMaritalStatus').show();
+                    }
+                });
+            });
+            $( function() {
+                $( "#PlaceOfBirth" ).autocomplete({
+                    source: "/includes/actions/student.autocomplete.address.php",
+                    minLength: 2,
+                    select: function( event, ui ) {
+                        event.preventDefault();
+                        $("#PlaceOfBirth").val(ui.item.label);
+                        $("input[name=PlaceOfBirth]").val(ui.item.value);
+                    }
+                });
+                $( "#Address" ).autocomplete({
+                    source: "/includes/actions/student.autocomplete.address.php",
+                    minLength: 2,
+                    select: function( event, ui ) {
+                        event.preventDefault();
+                        $("#Address").val(ui.item.label);
+                        $("input[name=Address]").val(ui.item.value);
+                    }
+                });
+                $( "#SchoolLastAttendedAddress" ).autocomplete({
+                    source: "/includes/actions/student.autocomplete.address.php",
+                    minLength: 2,
+                    select: function( event, ui ) {
+                        event.preventDefault();
+                        $("#SchoolLastAttendedAddress").val(ui.item.label);
+                        $("input[name=SchoolLastAttendedAddress]").val(ui.item.value);
+                    }
+                });
+            } );
+            function getDept(val) {
+                $.ajax({
+                    type: "POST",
+                    url: "/includes/actions/student.get.dept.php",
+                    data:'collegeID='+val,
+                    success: function(data){
+                        $("#Department").html(data);
+                    }
+                });
+            }
+        </script>
 
     </body>
-
-    <script type='text/javascript'>
-        $(document).ready(function(){
-            $('#LivingWith').change(function(){
-                if ($(this).val() == 'Others') {
-                    $('#SpecLivingWith').show();
-                }
-            });
-            $('#ScholarshipType').change(function(){
-                if ($(this).val() == 'Others') {
-                    $('#SpecScholarshipType').show();
-                }
-            });
-            $('#MaritalStatus').change(function(){
-                if ($(this).val() == 'Others') {
-                    $('#SpecMaritalStatus').show();
-                }
-            });
-        });
-        $( function() {
-            $( "#PlaceOfBirth" ).autocomplete({
-                source: "/includes/actions/student.autocomplete.address.php",
-                minLength: 2,
-                select: function( event, ui ) {
-                    event.preventDefault();
-                    $("#PlaceOfBirth").val(ui.item.label);
-                    $("input[name=PlaceOfBirth]").val(ui.item.value);
-                }
-            });
-            $( "#Address" ).autocomplete({
-                source: "/includes/actions/student.autocomplete.address.php",
-                minLength: 2,
-                select: function( event, ui ) {
-                    event.preventDefault();
-                    $("#Address").val(ui.item.label);
-                    $("input[name=Address]").val(ui.item.value);
-                }
-            });
-            $( "#SchoolLastAttendedAddress" ).autocomplete({
-                source: "/includes/actions/student.autocomplete.address.php",
-                minLength: 2,
-                select: function( event, ui ) {
-                    event.preventDefault();
-                    $("#SchoolLastAttendedAddress").val(ui.item.label);
-                    $("input[name=SchoolLastAttendedAddress]").val(ui.item.value);
-                }
-            });
-        } );
-        function getDept(val) {
-            $.ajax({
-                type: "POST",
-                url: "/includes/actions/student.get.dept.php",
-                data:'collegeID='+val,
-                success: function(data){
-                    $("#Department").html(data);
-                }
-            });
-        }
-    </script>
 
 </html>

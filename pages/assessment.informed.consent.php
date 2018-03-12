@@ -48,8 +48,8 @@ if($_GET['from'] == 'intake')
                                 if($_GET['from'] == 'tools')
                                 {
                                 ?>
-                                    <input type="hidden" name="idpID" value="<?php echo($idpID); ?>">
-                                    <input type="hidden" name="toolID" value='<?php echo(json_encode($ids)); ?>'>
+                                <input type="hidden" name="idpID" value="<?php echo($idpID); ?>">
+                                <input type="hidden" name="toolID" value='<?php echo(json_encode($ids)); ?>'>
                                 <?php
                                 }
                                 ?>
@@ -86,17 +86,17 @@ if($_GET['from'] == 'intake')
         </div>
 
         <?php includeCommonJS(); ?>
+        <script type="text/javascript">
+            $('#consent').click(function(){
+                if($(this).is(':checked')){
+                    $('#submitButton').show();
+                    $('#returnButton').hide();
+                } else {
+                    $('#submitButton').hide();
+                    $('#returnButton').show();
+                }
+            });
+        </script>
 
     </body>
-    <script type="text/javascript">
-        $('#consent').click(function(){
-            if($(this).is(':checked')){
-                $('#submitButton').show();
-                $('#returnButton').hide();
-            } else {
-                $('#submitButton').hide();
-                $('#returnButton').show();
-            }
-        });
-    </script>
 </html>

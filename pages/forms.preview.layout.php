@@ -183,29 +183,28 @@ foreach($post as $key => $htmlForm)
         </div>
 
         <?php includeCommonJS(); ?>
+        <script>
+            $("div[name='Original']").show().siblings().hide();
+
+            <?php echo("var languages = ".json_encode($languages). ";\n"); ?>
+            function showTranslation(elem){
+                for(var i = 0; i < languages.length; i++) {
+                    if(elem.value == languages[i])
+                        $('div[name='+languages[i]+']').show().siblings().hide();
+                }
+            }
+
+            function ChangeTarget(loc) {
+                if(loc=="new") {
+                    document.getElementById('form-layout').target="_blank";
+                    document.getElementById('form-layout').action="forms.preview.layout.php?id=<?php echo($id); ?>&type=tool";
+                } else {
+                    document.getElementById('form-layout').target="";
+                    document.getElementById('form-layout').action="/includes/actions/forms.process.layout.php?id=<?php echo($id); ?>";
+                }
+            }
+        </script>
 
     </body>
-
-    <script>
-        $("div[name='Original']").show().siblings().hide();
-
-        <?php echo("var languages = ".json_encode($languages). ";\n"); ?>
-        function showTranslation(elem){
-            for(var i = 0; i < languages.length; i++) {
-                if(elem.value == languages[i])
-                    $('div[name='+languages[i]+']').show().siblings().hide();
-            }
-        }
-
-        function ChangeTarget(loc) {
-            if(loc=="new") {
-                document.getElementById('form-layout').target="_blank";
-                document.getElementById('form-layout').action="forms.preview.layout.php?id=<?php echo($id); ?>&type=tool";
-            } else {
-                document.getElementById('form-layout').target="";
-                document.getElementById('form-layout').action="/includes/actions/forms.process.layout.php?id=<?php echo($id); ?>";
-            }
-        }
-    </script>
 
 </html>

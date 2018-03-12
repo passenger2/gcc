@@ -16,7 +16,7 @@ includeCore();
     </head>
 
     <body>
-        
+
         <div id="wrapper">
             <?php includeNav(); ?>
             <div id="page-wrapper">
@@ -68,27 +68,27 @@ includeCore();
         <!-- /#wrapper -->
 
         <?php includeCommonJS(); ?>
+        <script>
+            $(document).ready(function() {
+                var dataTable = $('#table-tool-list').DataTable( {
+                    "responsive": true,
+                    "processing": true,
+                    "serverSide": true,
+                    "order":[],
+                    "ajax":{
+                        url :"/includes/actions/forms.generate.list.php",
+                        method: "POST",
+                    },
+                    "columnDefs":[
+                        {
+                            "targets": [1],
+                            "orderable":false
+                        },
+                    ]
+                } );
+            } );
+        </script>
 
     </body>
-    <script>
-        $(document).ready(function() {
-            var dataTable = $('#table-tool-list').DataTable( {
-                "responsive": true,
-                "processing": true,
-                "serverSide": true,
-                "order":[],
-                "ajax":{
-                    url :"/includes/actions/forms.generate.list.php",
-                    method: "POST",
-                },
-                "columnDefs":[
-                    {
-                        "targets": [1],
-                        "orderable":false
-                    },
-                ]
-            } );
-        } );
-    </script>
 
 </html>

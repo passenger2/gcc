@@ -64,7 +64,7 @@ includeCore();
                                             <?php
                                             }
                                             ?>
-                                            
+
                                         </tr>
                                     </thead>
                                 </table>
@@ -82,78 +82,78 @@ includeCore();
 
 
         <?php includeCommonJS(); ?>
+        <script>
+            $(document).ready(function() {
+                var dataTable = $('#table-student-list').DataTable( {
+                    "responsive": true,
+                    "processing": true,
+                    "serverSide": true,
+                    "order":[],
+                    "ajax":{
+                        url :"<?php echo(ROOT); ?>includes/actions/assessment.generate.list.php",
+                        method: "POST",
+                    },
+                    "columnDefs":[
+                        {
+                            <?php
+                            if($_SESSION["account_type"] == "77")
+                            {
+                            ?>
+                            "targets": [5],
+                            "orderable":false
+                            <?php
+                            } else
+                            {
+                            ?>
+                            "targets": [2],
+                            "orderable":false
+                            <?php
+                            }
+                            ?>
+                        }
+                    ]
+                    <?php
+                    if($_SESSION['account_type'] == '77')
+                    {
+                    ?>
+                    ,
+                    "dom": 'Blfrtip',
+                    "buttons": [
+                        {
+                            extend: 'print',
+                            exportOptions: {
+                                columns: [ 0, 1, 2, 3 ]
+                            }
+                        },
+                        {
+                            extend: 'pdf',
+                            exportOptions: {
+                                columns: [ 0, 1, 2, 3 ]
+                            }
+                        },
+                        {
+                            extend: 'csv',
+                            exportOptions: {
+                                columns: [ 0, 1, 2, 3 ]
+                            }
+                        },
+                        {
+                            extend: 'excel',
+                            exportOptions: {
+                                columns: [ 0, 1, 2, 3 ]
+                            }
+                        },
+                    ]
+                    <?php
+                    }
+                    ?>
+                } );
+            } );
+            $('#table-student-list').on('click', 'tbody tr', function() {
+                console.log('TD cell textContent : ', this.id);
+            })
+        </script>
 
     </body>
-    <script>
-        $(document).ready(function() {
-            var dataTable = $('#table-student-list').DataTable( {
-                "responsive": true,
-                "processing": true,
-                "serverSide": true,
-                "order":[],
-                "ajax":{
-                    url :"<?php echo(ROOT); ?>includes/actions/assessment.generate.list.php",
-                    method: "POST",
-                },
-                "columnDefs":[
-                    {
-                        <?php
-                        if($_SESSION["account_type"] == "77")
-                        {
-                        ?>
-                        "targets": [5],
-                        "orderable":false
-                        <?php
-                        } else
-                        {
-                        ?>
-                        "targets": [2],
-                        "orderable":false
-                        <?php
-                        }
-                        ?>
-                    }
-                ]
-                <?php
-                if($_SESSION['account_type'] == '77')
-                {
-                ?>
-                    ,
-                "dom": 'Blfrtip',
-                "buttons": [
-                    {
-                        extend: 'print',
-                        exportOptions: {
-                        columns: [ 0, 1, 2, 3 ]
-                        }
-                    },
-                    {
-                        extend: 'pdf',
-                        exportOptions: {
-                        columns: [ 0, 1, 2, 3 ]
-                        }
-                    },
-                    {
-                        extend: 'csv',
-                        exportOptions: {
-                        columns: [ 0, 1, 2, 3 ]
-                        }
-                    },
-                    {
-                        extend: 'excel',
-                        exportOptions: {
-                        columns: [ 0, 1, 2, 3 ]
-                        }
-                    },
-                ]
-                <?php
-                }
-                ?>
-            } );
-        } );
-        $('#table-student-list').on('click', 'tbody tr', function() {
-            console.log('TD cell textContent : ', this.id);
-        })
-    </script>
 
 </html>

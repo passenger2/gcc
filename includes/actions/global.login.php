@@ -16,6 +16,7 @@ if(isset($_SESSION["UserID"])) {
     if (password_verify($_POST['pwd'], $result[0]['Password'])) {
         $_SESSION["UserID"] = $result[0]['UserID'];
         $_SESSION["account_type"] = $result[0]['Type'];
+        $_SESSION["CollegeID"] = $result[0]['CollegeID'];
         if($_SESSION["account_type"] == '77')
         {
             header("Location: /pages/index.php");

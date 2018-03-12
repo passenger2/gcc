@@ -23,9 +23,9 @@ $agencies = getAgencies();
     <body>
 
         <div id="wrapper">
-            
+
             <?php includeNav(); ?>
-            
+
             <div id="page-wrapper">
                 <div class="row">
                     <ol class="breadcrumb">
@@ -74,7 +74,7 @@ $agencies = getAgencies();
                 </div>
 
                 <div class="row">
-                    
+
                     <div class="col-lg-12">
                         <div class="panel panel-default">
                             <div class="panel-body">
@@ -92,37 +92,36 @@ $agencies = getAgencies();
                             </div>
                         </div>
                     </div>
-                    
+
                 </div>
-                
+
             </div>
 
         </div>
         <!-- /#wrapper -->
 
         <?php includeCommonJS(); ?>
+        <script type='text/javascript'>
+            $(document).ready(function() {
+                var dataTable = $('#table-user-list').DataTable( {
+                    "responsive": true,
+                    "processing": true,
+                    "serverSide": true,
+                    "order":[],
+                    "ajax":{
+                        url :"<?php echo(ROOT); ?>includes/actions/user.generate.list.php",
+                        method: "POST",
+                    },
+                    "columnDefs":[
+                        {
+                            "targets": [4],
+                            "orderable":false
+                        },
+                    ]
+                } );
+            } );
+        </script>
 
     </body>
-    
-    <script type='text/javascript'>
-        $(document).ready(function() {
-            var dataTable = $('#table-user-list').DataTable( {
-                "responsive": true,
-                "processing": true,
-                "serverSide": true,
-                "order":[],
-                "ajax":{
-                    url :"<?php echo(ROOT); ?>includes/actions/user.generate.list.php",
-                    method: "POST",
-                },
-                "columnDefs":[
-                    {
-                        "targets": [4],
-                        "orderable":false
-                    },
-                ]
-            } );
-        } );
-    </script>
-    
+
 </html>

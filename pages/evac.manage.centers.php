@@ -57,10 +57,10 @@ $Cities = getCities();
                 <div class="row">
                     <div class="header">
                         <h3 class="title">&nbsp;Evacuation Centers <a href="/pages/evac.enroll.php" class="btn btn-success btn-xs">Add Evacuation Center</a></h3>
-                    
+
                     </div>
                     <div class="panel-body">
-                        
+
                     </div>
                     <div class="col-lg-12">
                         <div class="panel panel-default">
@@ -94,27 +94,27 @@ $Cities = getCities();
         <!-- /#wrapper -->
 
         <?php includeCommonJS(); ?>
+        <script>
+            $(document).ready(function() {
+                var dataTable = $('#table-evac-list').DataTable( {
+                    "responsive": true,
+                    "processing": true,
+                    "serverSide": true,
+                    "order":[],
+                    "ajax":{
+                        url :"/includes/actions/evac.generate.list.php",
+                        method: "POST",
+                    },
+                    "columnDefs":[
+                        {
+                            "targets": [3],
+                            "orderable":false
+                        },
+                    ]
+                } );
+            } );
+        </script>
 
     </body>
-    <script>
-        $(document).ready(function() {
-            var dataTable = $('#table-evac-list').DataTable( {
-                "responsive": true,
-                "processing": true,
-                "serverSide": true,
-                "order":[],
-                "ajax":{
-                    url :"/includes/actions/evac.generate.list.php",
-                    method: "POST",
-                },
-                "columnDefs":[
-                    {
-                        "targets": [3],
-                        "orderable":false
-                    },
-                ]
-            } );
-        } );
-    </script>
 
 </html>

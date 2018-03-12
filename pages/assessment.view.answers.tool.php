@@ -184,15 +184,15 @@ die();*/
         <!-- /#wrapper -->
 
         <?php includeCommonJS(); ?>
+        <script>
+            function deleteConfirm() { 
+                if (window.confirm('This action is irreversible. Continue?'))
+                {
+                    window.location.href = '/includes/actions/assessment.delete.answers.php?id=<?php echo($assessmentToolAnswersID); ?>';
+                }
+            }
+        </script>
 
     </body>
-    <script>
-        function deleteConfirm() { 
-            if (window.confirm('This action is irreversible. Continue?'))
-            {
-                window.location.href = '/includes/actions/assessment.delete.answers.php?id=<?php echo($assessmentToolAnswersID); ?>';
-            }
-        }
-    </script>
 
 </html>

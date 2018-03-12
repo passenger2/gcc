@@ -95,8 +95,8 @@ $intakeCount = getIntakeCount($id);
                         <h3 class="title"><?php echo($studentInfo[0]['StudentName']); ?>&nbsp;
                             <sup>
                                 <!--<a type="button" class="btn btn-info btn-xs" href="student.details.php?id=<?php //echo($id); ?>">
-                                    <i class="fa fa-info-circle"></i>&nbsp;Student Details
-                                </a>-->
+<i class="fa fa-info-circle"></i>&nbsp;Student Details
+</a>-->
                             </sup>
                         </h3>
                         <?php
@@ -170,74 +170,74 @@ $intakeCount = getIntakeCount($id);
         </div>
 
         <?php includeCommonJS(); ?>
+        <script>
+            $(document).ready(function() {
+                var intakeDataTable = $('#table-intake-list').DataTable( {
+                    "responsive": true,
+                    "processing": true,
+                    "serverSide": true,
+                    "searching": false,
+                    "order":[],
+                    "ajax":{
+                        url :"/includes/actions/assessment.generate.taken.intakes.php?id=<?php echo($id); ?>",
+                        method: "POST",
+                    },
+                    "columnDefs":[
+                        {
+                            "targets": [0,1,2,3,4,5],
+                            "orderable":false
+                        },
+                    ],
+                    "dom": 'Blfrtip',
+                    "buttons": [
+                        'copy', 'csv', 'excel', 'pdf', 'print'
+                    ],
+                } );
+            } );
+            $(document).ready(function() {
+                var assessmentDataTable = $('#table-assessment-list').DataTable( {
+                    "responsive": true,
+                    "processing": true,
+                    "serverSide": true,
+                    "order":[],
+                    "ajax":{
+                        url :"/includes/actions/assessment.generate.taken.tools.php?id=<?php echo($id); ?>",
+                        method: "POST",
+                    },
+                    "columnDefs":[
+                        {
+                            "targets": [3],
+                            "orderable":false
+                        },
+                    ],
+                    "dom": 'Blfrtip',
+                    "buttons": [
+                        'copy', 'csv', 'excel', 'pdf', 'print'
+                    ],
+                    "createdRow": function( row, data, dataIndex ) {
+                        if ( data[3] != "No auto-assessment available for this tool." && data[3] != "Below cutoff") {        
+                            $(row).addClass('danger');
+                        }
+                    }
+                } );
+            } );
+            <?php
+            if($_SESSION['account_type'] == '77')
+            {
+            ?>
+            $('#table-intake-list').on('click', 'tbody tr', function() {
+                console.log('TD cell textContent : ', this.id);
+                window.location.href = "/pages/assessment.view.answers.intake.php?id="+this.id;
+            })
+            $('#table-assessment-list').on('click', 'tbody tr', function() {
+                console.log('TD cell textContent : ', this.id);
+                window.location.href = "/pages/assessment.view.answers.tool.php?id="+this.id;
+            })
+            <?php
+            }
+                ?>
+        </script>
 
     </body>
-    <script>
-        $(document).ready(function() {
-            var intakeDataTable = $('#table-intake-list').DataTable( {
-                "responsive": true,
-                "processing": true,
-                "serverSide": true,
-                "searching": false,
-                "order":[],
-                "ajax":{
-                    url :"/includes/actions/assessment.generate.taken.intakes.php?id=<?php echo($id); ?>",
-                    method: "POST",
-                },
-                "columnDefs":[
-                    {
-                        "targets": [0,1,2,3,4,5],
-                        "orderable":false
-                    },
-                ],
-                "dom": 'Blfrtip',
-                "buttons": [
-                    'copy', 'csv', 'excel', 'pdf', 'print'
-                ],
-            } );
-        } );
-        $(document).ready(function() {
-            var assessmentDataTable = $('#table-assessment-list').DataTable( {
-                "responsive": true,
-                "processing": true,
-                "serverSide": true,
-                "order":[],
-                "ajax":{
-                    url :"/includes/actions/assessment.generate.taken.tools.php?id=<?php echo($id); ?>",
-                    method: "POST",
-                },
-                "columnDefs":[
-                    {
-                        "targets": [3],
-                        "orderable":false
-                    },
-                ],
-                "dom": 'Blfrtip',
-                "buttons": [
-                    'copy', 'csv', 'excel', 'pdf', 'print'
-                ],
-                "createdRow": function( row, data, dataIndex ) {
-                    if ( data[3] != "No auto-assessment available for this tool." && data[3] != "Below cutoff") {        
-                        $(row).addClass('danger');
-                    }
-                }
-            } );
-        } );
-        <?php
-        if($_SESSION['account_type'] == '77')
-        {
-        ?>
-        $('#table-intake-list').on('click', 'tbody tr', function() {
-            console.log('TD cell textContent : ', this.id);
-            window.location.href = "/pages/assessment.view.answers.intake.php?id="+this.id;
-        })
-        $('#table-assessment-list').on('click', 'tbody tr', function() {
-            console.log('TD cell textContent : ', this.id);
-            window.location.href = "/pages/assessment.view.answers.tool.php?id="+this.id;
-        })
-        <?php
-        }
-        ?>
-    </script>
 
 </html>

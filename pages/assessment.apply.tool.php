@@ -48,10 +48,10 @@ $languages = getLanguages('Tool', $translations);
                                 } else
                                 {
                             ?>
-                                <div class="col-md-12">
-                            <?php
+                            <div class="col-md-12">
+                                <?php
                                 }
-                            ?>
+                                ?>
                                 <div class="panel panel-default">
                                     <div class="panel-heading">
                                         <h3>
@@ -171,33 +171,32 @@ $languages = getLanguages('Tool', $translations);
         </div>
 
         <?php includeCommonJS(); ?>
+        <script>
+            $("div[name*='Original']").show().siblings().hide();
 
-    </body>
+            function showTranslation(element, toolID, languagesArray){
+                var languages = languagesArray;
+                console.log(languages);
 
-    <script>
-        $("div[name*='Original']").show().siblings().hide();
-
-        function showTranslation(element, toolID, languagesArray){
-            var languages = languagesArray;
-            console.log(languages);
-
-            for(var i = 0; i < languages.length; i++) {
-                //if selected option value is the same as language[i]
-                console.log(element.value);
-                if(element.value == languages[i])
-                    //display <div> with a name languages[i]-fID. Hide others
-                    $('div[name='+toolID+'-'+languages[i]+']').show().siblings().hide();
-            }
-        }
-
-        var radios = document.getElementsByTagName('input');
-        for(i=0; i<radios.length; i++ ) {
-            radios[i].onclick = function(e) {
-                if(e.ctrlKey) {
-                    this.checked = false;
+                for(var i = 0; i < languages.length; i++) {
+                    //if selected option value is the same as language[i]
+                    console.log(element.value);
+                    if(element.value == languages[i])
+                        //display <div> with a name languages[i]-fID. Hide others
+                        $('div[name='+toolID+'-'+languages[i]+']').show().siblings().hide();
                 }
             }
-        }
-    </script>
+
+            var radios = document.getElementsByTagName('input');
+            for(i=0; i<radios.length; i++ ) {
+                radios[i].onclick = function(e) {
+                    if(e.ctrlKey) {
+                        this.checked = false;
+                    }
+                }
+            }
+        </script>
+
+    </body>
 
 </html>

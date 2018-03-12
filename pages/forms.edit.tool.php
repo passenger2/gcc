@@ -192,7 +192,7 @@ if(!empty($questions)) {
                                             <div name="question">
                                                 <div name="Original">
                                                     <?php echo($question['Question']); ?>
-                                                    
+
                                                     <button type="button" class="btn btn-info btn-fill btn-xs" onClick ="load_modal('quest<?php echo($question['QuestionID']); ?>')"><span class="fa fa-pencil"></span>Edit Question</button>
                                                     <!-- this button is for a workaround in triggering the edit modal -->
                                                     <!-- without this workaround, button needs to be clicked twice before modal shows -->
@@ -290,53 +290,52 @@ if(!empty($questions)) {
         </div>
 
         <?php includeCommonJS(); ?>
+        <script>
+            $("div[name='Original']").show().siblings().hide();
+
+            <?php echo("var languages = ".json_encode($languages). ";\n"); ?>
+            function showTranslation(elem){
+                for(var i = 0; i < languages.length; i++) {
+                    if(elem.value == languages[i])
+                        $('div[name='+languages[i]+']').show().siblings().hide();
+                }
+            }
+
+            window.load_modal = function(clicked_id) {
+                $("#modal-container").load("/includes/fragments/forms.modal.edit.php?editing="+clicked_id.substring(0,5)+"&id="+clicked_id.substring(5), function() {
+                    if(clicked_id.substring(0,5) === "title") {
+                        $('#titleTrigger'+clicked_id.substring(5)).click();
+                    } else if(clicked_id.substring(0,5) === "instr") {
+                        $('#instrTrigger'+clicked_id.substring(5)).click();
+                    } else if(clicked_id.substring(0,5) === "quest") {
+                        $('#questTrigger'+clicked_id.substring(5)).click();
+                    } else if(clicked_id.substring(0,5) === "trans") {
+                        $('#transTrigger'+clicked_id.substring(5)).click();
+                    }
+                });
+            }
+
+            function ChangeTarget(loc) {
+                if(loc=="new") {
+                    document.getElementById('form-layout').target="_blank";
+                    document.getElementById('form-layout').action="forms.preview.layout.php";
+                } else {
+                    document.getElementById('form-layout').target="";
+                    document.getElementById('form-layout').action="/includes/actions/forms.process.layout.php";
+                }
+            }
+
+            function ChangeTarget(loc) {
+                if(loc=="new") {
+                    document.getElementById('form-layout').target="_blank";
+                    document.getElementById('form-layout').action="forms.preview.layout.php?id=<?php echo($id); ?>&type=tool";
+                } else {
+                    document.getElementById('form-layout').target="";
+                    document.getElementById('form-layout').action="/includes/actions/forms.process.layout.php?id=<?php echo($id); ?>";
+                }
+            }
+        </script>
 
     </body>
-
-    <script>
-        $("div[name='Original']").show().siblings().hide();
-
-        <?php echo("var languages = ".json_encode($languages). ";\n"); ?>
-        function showTranslation(elem){
-            for(var i = 0; i < languages.length; i++) {
-                if(elem.value == languages[i])
-                    $('div[name='+languages[i]+']').show().siblings().hide();
-            }
-        }
-        
-        window.load_modal = function(clicked_id) {
-            $("#modal-container").load("/includes/fragments/forms.modal.edit.php?editing="+clicked_id.substring(0,5)+"&id="+clicked_id.substring(5), function() {
-                if(clicked_id.substring(0,5) === "title") {
-                    $('#titleTrigger'+clicked_id.substring(5)).click();
-                } else if(clicked_id.substring(0,5) === "instr") {
-                    $('#instrTrigger'+clicked_id.substring(5)).click();
-                } else if(clicked_id.substring(0,5) === "quest") {
-                    $('#questTrigger'+clicked_id.substring(5)).click();
-                } else if(clicked_id.substring(0,5) === "trans") {
-                    $('#transTrigger'+clicked_id.substring(5)).click();
-                }
-            });
-        }
-        
-        function ChangeTarget(loc) {
-            if(loc=="new") {
-                document.getElementById('form-layout').target="_blank";
-                document.getElementById('form-layout').action="forms.preview.layout.php";
-            } else {
-                document.getElementById('form-layout').target="";
-                document.getElementById('form-layout').action="/includes/actions/forms.process.layout.php";
-            }
-        }
-        
-        function ChangeTarget(loc) {
-            if(loc=="new") {
-                document.getElementById('form-layout').target="_blank";
-                document.getElementById('form-layout').action="forms.preview.layout.php?id=<?php echo($id); ?>&type=tool";
-            } else {
-                document.getElementById('form-layout').target="";
-                document.getElementById('form-layout').action="/includes/actions/forms.process.layout.php?id=<?php echo($id); ?>";
-            }
-        }
-    </script>
 
 </html>

@@ -74,54 +74,54 @@ $_SESSION['loc'] = $_SERVER['PHP_SELF'];
         </div>
 
         <?php includeCommonJS(); ?>
+        <script type="text/javascript">
+            var i = 0;
+            function add_more_questions() {
+                var $div = $('div[id^="question-field-container-"]:last');
+
+                var num = parseInt( $div.prop("id").match(/\d+/g), 10 ) +1;
+
+                var $klon = $div.clone().prop('id', 'question-field-container-'+num );
+
+                $($klon.find("[name='question_add"+(num-1)+"']")).attr("name","question_add"+num);
+                $($klon.find("[name='answerType"+(num-1)+"']")[0]).attr("name","answerType"+num);
+                $($klon.find("[name='answerType"+(num-1)+"']")[0]).attr("name","answerType"+num);
+                $div.after( $klon );
+            }
+
+            function check_empty() {
+                var flag_radio = true;
+                var flag_textarea = true;
+
+                //check if a radio button is unticked
+                $('input:radio').each(function () {
+                    name = $(this).attr('name');
+                    if (flag_radio && !$(':radio[name="' + name + '"]:checked').length) {
+                        flag_radio = false;
+                    }
+                });
+
+                //check if a textarea is empty
+                $('textarea').each(function() {
+                    if (!$.trim($(this).val())) {
+                        flag_textarea = false; 
+                    }
+                });
+
+                //if nothing is empty
+                if(flag_radio && flag_textarea) {
+                    return true;
+                } else {
+                    alert("Please do not leave any empty field before submitting.");
+                    return false;
+                }
+            }
+            $('.tooltipped').tooltip({
+                selector: "[data-toggle=tooltip]",
+                container: "body"
+            })
+        </script>
 
     </body>
-    <script type="text/javascript">
-        var i = 0;
-        function add_more_questions() {
-            var $div = $('div[id^="question-field-container-"]:last');
-
-            var num = parseInt( $div.prop("id").match(/\d+/g), 10 ) +1;
-
-            var $klon = $div.clone().prop('id', 'question-field-container-'+num );
-
-            $($klon.find("[name='question_add"+(num-1)+"']")).attr("name","question_add"+num);
-            $($klon.find("[name='answerType"+(num-1)+"']")[0]).attr("name","answerType"+num);
-            $($klon.find("[name='answerType"+(num-1)+"']")[0]).attr("name","answerType"+num);
-            $div.after( $klon );
-        }
-
-        function check_empty() {
-            var flag_radio = true;
-            var flag_textarea = true;
-
-            //check if a radio button is unticked
-            $('input:radio').each(function () {
-                name = $(this).attr('name');
-                if (flag_radio && !$(':radio[name="' + name + '"]:checked').length) {
-                    flag_radio = false;
-                }
-            });
-
-            //check if a textarea is empty
-            $('textarea').each(function() {
-                if (!$.trim($(this).val())) {
-                    flag_textarea = false; 
-                }
-            });
-
-            //if nothing is empty
-            if(flag_radio && flag_textarea) {
-                return true;
-            } else {
-                alert("Please do not leave any empty field before submitting.");
-                return false;
-            }
-        }
-        $('.tooltipped').tooltip({
-            selector: "[data-toggle=tooltip]",
-            container: "body"
-        })
-    </script>
 
 </html>

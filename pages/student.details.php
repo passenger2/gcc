@@ -68,7 +68,7 @@ $idpDetails = getIDPExtensiveDetails($id);
                             <b>Birth Date:&nbsp;</b>
                             <u><?php
                                 echo(translateDate($idpDetails[0]['Bdate']));
-                            ?></u>
+                                ?></u>
                             &nbsp;
                             <a onClick="load_modal(<?php echo($id); ?>, 'bdate')"><i class="fa fa-edit"></i></a>
                             <button type="button" id="bdateTrigger" data-toggle="modal" data-target="#myModal" style="display:none"></button>
@@ -76,21 +76,21 @@ $idpDetails = getIDPExtensiveDetails($id);
                         <p>
                             <b>Age:&nbsp;</b>
                             <?php
-                                $age = calculateAge($idpDetails[0]['Bdate']);
-                                if($age == 'N/A')
+                            $age = calculateAge($idpDetails[0]['Bdate']);
+                            if($age == 'N/A')
+                            {
+                                if(isset($idpDetails[0]['Age']))
                                 {
-                                    if(isset($idpDetails[0]['Age']))
-                                    {
-                                        echo($idpDetails[0]['Age']);
-                                    }
-                                    else
-                                    {
-                                        echo('<abbr title="no birthdate or age specified">N/A</abbr>');
-                                    }
-                                } else
-                                {
-                                    echo('<abbr title="automatically generated">'.$age.'</abbr>');
+                                    echo($idpDetails[0]['Age']);
                                 }
+                                else
+                                {
+                                    echo('<abbr title="no birthdate or age specified">N/A</abbr>');
+                                }
+                            } else
+                            {
+                                echo('<abbr title="automatically generated">'.$age.'</abbr>');
+                            }
                             ?>
                         </p>
                         <p>
@@ -106,13 +106,13 @@ $idpDetails = getIDPExtensiveDetails($id);
                             <button type="button" id="religionTrigger" data-toggle="modal" data-target="#myModal" style="display:none"></button>
                         </p>
                     </div>
-                    
+
                     <div class="col-md-6">
                         <p>
                             <b>Educational Attainment:&nbsp;</b>
                             <u><?php
                                 echo(getEducationalAttainment($idpDetails[0]['Education']));
-                            ?></u>
+                                ?></u>
                             &nbsp;
                             <a onClick="load_modal(<?php echo($id); ?>, 'educAttain')"><i class="fa fa-edit"></i></a>
                             <button type="button" id="educAttainTrigger" data-toggle="modal" data-target="#myModal" style="display:none"></button>
@@ -151,43 +151,43 @@ $idpDetails = getIDPExtensiveDetails($id);
                 </div>
             </div>
         </div>
-        
+
         <div id="modal-container">
         </div>
 
         <?php includeCommonJS(); ?>
+        <script>
+            window.load_modal = function(clicked_id, target) {
+                $("#modal-container").load("/includes/fragments/idp.modal.edit.php?editing="+target+"&id="+clicked_id, function() {
+                    if(target === "homeAddress") {
+                        $('#homeTrigger').click();
+                    } else if(target === "gender") {
+                        $('#genderTrigger').click();
+                    } else if(target === "bdate") {
+                        $('#bdateTrigger').click();
+                    } else if(target === "ethnicity") {
+                        $('#ethnicityTrigger').click();
+                    } else if(target === "religion") {
+                        $('#religionTrigger').click();
+                    } else if(target === "educAttain") {
+                        $('#educAttainTrigger').click();
+                    } else if(target === "maritalStat") {
+                        $('#maritalStatTrigger').click();
+                    } else if(target === "phoneNum") {
+                        $('#phoneNumTrigger').click();
+                    } else if(target === "email") {
+                        $('#emailTrigger').click();
+                    } else if(target === "occupation") {
+                        $('#occupationTrigger').click();
+                    } else if(target === "evacuation") {
+                        $('#evacuationTrigger').click();
+                    } else if(target === "name") {
+                        $('#nameTrigger').click();
+                    }
+                });
+            }
+        </script>
 
     </body>
-    <script>
-        window.load_modal = function(clicked_id, target) {
-            $("#modal-container").load("/includes/fragments/idp.modal.edit.php?editing="+target+"&id="+clicked_id, function() {
-                if(target === "homeAddress") {
-                    $('#homeTrigger').click();
-                } else if(target === "gender") {
-                    $('#genderTrigger').click();
-                } else if(target === "bdate") {
-                    $('#bdateTrigger').click();
-                } else if(target === "ethnicity") {
-                    $('#ethnicityTrigger').click();
-                } else if(target === "religion") {
-                    $('#religionTrigger').click();
-                } else if(target === "educAttain") {
-                    $('#educAttainTrigger').click();
-                } else if(target === "maritalStat") {
-                    $('#maritalStatTrigger').click();
-                } else if(target === "phoneNum") {
-                    $('#phoneNumTrigger').click();
-                } else if(target === "email") {
-                    $('#emailTrigger').click();
-                } else if(target === "occupation") {
-                    $('#occupationTrigger').click();
-                } else if(target === "evacuation") {
-                    $('#evacuationTrigger').click();
-                } else if(target === "name") {
-                    $('#nameTrigger').click();
-                }
-            });
-        }
-    </script>
 
 </html>

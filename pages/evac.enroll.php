@@ -110,34 +110,34 @@ $barangays = getBarangays();
 
         <?php includeCommonJS(); ?>
 
+        <script type='text/javascript'>
+            $(document).ready(function(){
+
+                $('#province').change(function(){
+                    $("#city_mun").show();
+                    $("#city_mun option[name*='province-']").hide();
+                    $("#city_mun option[name='province-"+$(this).val()+"']").show();
+                });
+                $('#city_mun').change(function(){
+                    $("#barangay1").show();
+                    $("#barangay1 option[name*='city-']").hide();
+                    $("#barangay1 option[name='city-"+$(this).val()+"']").show();
+                    $("#specAdd").show();
+                });
+                $('#province2').change(function(){
+                    $("#city_mun2").show();
+                    $("#city_mun2 option[name*='province2-']").hide();
+                    $("#city_mun2 option[name='province2-"+$(this).val()+"']").show();
+                });
+                $('#city_mun2').change(function(){
+                    $("#Barangay").show();
+                    $("#Barangay option[name*='city2-']").hide();
+                    $("#Barangay option[name='city2-"+$(this).val()+"']").show();
+                    $("#specAdd").show();
+                });
+            });
+        </script>
+
     </body>
-
-    <script type='text/javascript'>
-        $(document).ready(function(){
-
-            $('#province').change(function(){
-                $("#city_mun").show();
-                $("#city_mun option[name*='province-']").hide();
-                $("#city_mun option[name='province-"+$(this).val()+"']").show();
-            });
-            $('#city_mun').change(function(){
-                $("#barangay1").show();
-                $("#barangay1 option[name*='city-']").hide();
-                $("#barangay1 option[name='city-"+$(this).val()+"']").show();
-                $("#specAdd").show();
-            });
-            $('#province2').change(function(){
-                $("#city_mun2").show();
-                $("#city_mun2 option[name*='province2-']").hide();
-                $("#city_mun2 option[name='province2-"+$(this).val()+"']").show();
-            });
-            $('#city_mun2').change(function(){
-                $("#Barangay").show();
-                $("#Barangay option[name*='city2-']").hide();
-                $("#Barangay option[name='city2-"+$(this).val()+"']").show();
-                $("#specAdd").show();
-            });
-        });
-    </script>
 
     </html>
