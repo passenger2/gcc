@@ -45,6 +45,11 @@ function includeListFunctions()
     include($_SERVER['DOCUMENT_ROOT'].ROOT."includes/global.functions.list.php");
 }
 
+function includeVisualizationFunctions()
+{
+    include($_SERVER['DOCUMENT_ROOT'].ROOT."includes/global.functions.visualization.php");
+}
+
 function includeNav()
 {
     include($_SERVER['DOCUMENT_ROOT'].ROOT."includes/global.navigation.php");

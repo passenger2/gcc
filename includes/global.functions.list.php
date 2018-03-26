@@ -327,19 +327,58 @@ function getList($data, $listType = 'Student', $listTarget = '')
         }
         if($order != '')
         {
-            if($order['0']['dir'] == 'asc')
+            
+            if(!empty($order['1']))
             {
-                $query .=
-                    "GROUP BY
-                        assessmenttoolanswers.AssessmentToolAnswerID
-                     ORDER BY :orderColumn ASC ";
-            }
-            else
+                if($order['0']['dir'] == 'asc')
+                {
+                    if($order['1']['dir'] == 'asc')
+                    {
+                        $query .=
+                            "GROUP BY
+                                assessmenttoolanswers.AssessmentToolAnswerID
+                             ORDER BY :orderColumn ASC, :orderColumn2 ASC ";
+                    }
+                    else
+                    {
+                        $query .=
+                            "GROUP BY
+                                assessmenttoolanswers.AssessmentToolAnswerID
+                            ORDER BY :orderColumn ASC, :orderColumn2 DESC ";
+                    }
+                } else
+                {
+                    if($order['1']['dir'] == 'asc')
+                    {
+                        $query .=
+                            "GROUP BY
+                                assessmenttoolanswers.AssessmentToolAnswerID
+                             ORDER BY :orderColumn DESC, :orderColumn2 ASC ";
+                    }
+                    else
+                    {
+                        $query .=
+                            "GROUP BY
+                                assessmenttoolanswers.AssessmentToolAnswerID
+                            ORDER BY :orderColumn DESC, :orderColumn2 DESC ";
+                    }
+                }
+            } else
             {
-                $query .=
-                    "GROUP BY
-                        assessmenttoolanswers.AssessmentToolAnswerID
-                    ORDER BY :orderColumn DESC ";
+                if($order['0']['dir'] == 'asc')
+                {
+                    $query .=
+                        "GROUP BY
+                            assessmenttoolanswers.AssessmentToolAnswerID
+                         ORDER BY :orderColumn ASC ";
+                }
+                else
+                {
+                    $query .=
+                        "GROUP BY
+                            assessmenttoolanswers.AssessmentToolAnswerID
+                        ORDER BY :orderColumn DESC ";
+                }
             }
 
         }
@@ -534,7 +573,15 @@ function getList($data, $listType = 'Student', $listTarget = '')
 
     if($order != '')
     {
-        $db_handle->bindVar(':orderColumn', ($order['0']['column'] + 1), PDO::PARAM_INT, 0);
+        if(!empty($order['1']))
+        {
+            $db_handle->bindVar(':orderColumn', ($order['0']['column'] + 1), PDO::PARAM_INT, 0);
+            $db_handle->bindVar(':orderColumn2', ($order['1']['column'] + 1), PDO::PARAM_INT, 0);
+            
+        } else
+        {
+            $db_handle->bindVar(':orderColumn', ($order['0']['column'] + 1), PDO::PARAM_INT, 0);
+        }
     }
 
     if($listType === 'AssessmentTaken')

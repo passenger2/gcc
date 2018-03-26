@@ -9,7 +9,7 @@ includeCore();
         
         <?php
         includeHead("PSRMS - Tables");
-        includeDataTables();
+        includeDataTables('advanced');
         ?>
 
     </head>
@@ -34,9 +34,9 @@ includeCore();
                     <div class="col-lg-12">
                         <div id="tabs">
                             <ul>
-                                <li><a href="#tabs-1">Overview</a></li>
-                                <li><a href="ajax/content1.html">Set 1</a></li>
-                                <li><a href="ajax/content2.html">Set 2</a></li>
+                                <li><a href="#tabs-1">Scores Overview</a></li>
+                                <!--<li><a href="ajax/content1.html">Set 1</a></li>
+                                <li><a href="ajax/content2.html">Set 2</a></li>-->
                             </ul>
                             <div id="tabs-1">
                                 <table width="100%" class="table table-bordered table-hover" id="table-report-overview">
@@ -89,7 +89,34 @@ includeCore();
                     "ajax":{
                         url :"/includes/actions/reports.generate.overview.php",
                         method: "POST",
-                    }/*,
+                    },
+                    "dom": 'Blfrtip',
+                    "buttons": [
+                        {
+                            extend: 'print',
+                            exportOptions: {
+                                columns: [ 0, 1, 2, 3, 4, 5 ]
+                            }
+                        },
+                        {
+                            extend: 'pdf',
+                            exportOptions: {
+                                columns: [ 0, 1, 2, 3, 4, 5 ]
+                            }
+                        },
+                        {
+                            extend: 'csv',
+                            exportOptions: {
+                                columns: [ 0, 1, 2, 3, 4, 5 ]
+                            }
+                        },
+                        {
+                            extend: 'excel',
+                            exportOptions: {
+                                columns: [ 0, 1, 2, 3, 4, 5 ]
+                            }
+                        },
+                    ]/*,
                     "columnDefs":[
                         {
                             "targets": [1],

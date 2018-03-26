@@ -31,7 +31,7 @@ $(function() {
     
     var url = window.location+'';
     var element = $('ul.nav a').filter(function() {
-        console.log(this.href.split('.')[0]+'.'+this.href.split('.')[1]);
+        //console.log(this.href.split('.')[0]+'.'+this.href.split('.')[1]);
         return this.href.split('.')[0]+'.'+this.href.split('.')[1] == url.split('.')[0]+'.'+url.split('.')[1];
     }).addClass('active').parent();
 

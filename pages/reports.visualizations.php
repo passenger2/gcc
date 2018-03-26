@@ -6,13 +6,12 @@ includeCore();
 <html lang="en">
 
     <head>
-        <script src="/assets/vendor/d3/d3.min.js"></script>
-        <script src="/assets/vendor/dimple/lib/d3.v4.3.0.min.js"></script>
+        <script src="/assets/vendor/dimple/lib/d3.v4.3.0.js"></script>
+        <script src="/assets/vendor/dimple/dist/dimple.latest.js"></script>
 
         <?php
         includeHead("PSRMS - Visualizations");
         ?>
-
     </head>
 
     <body>
@@ -33,7 +32,14 @@ includeCore();
                         <h3 class="title">&nbsp;Visualizations</h3>
                     </div>
                     <div class="col-lg-12">
-                        <!--content-->
+
+                        <div id="tabs">
+                            <ul>
+                                <li><a href="/includes/fragments/reports.visualizations.demographics.php">Demographics</a></li>
+                                <li><a href="/includes/fragments/reports.visualizations.scores.php">Assessment Scores</a></li>
+                                <li><a href="ajax/content2.html">Set 2</a></li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -42,6 +48,19 @@ includeCore();
         </div>
 
         <?php includeCommonJS(); ?>
+
+        <script>
+            $( function() {
+                $( "#tabs" ).tabs({
+                    beforeLoad: function( event, ui ) {
+                        ui.jqXHR.fail(function() {
+                            ui.panel.html(
+                                "Under construction.");
+                        });
+                    }
+                });
+            } );
+        </script>
 
     </body>
 
