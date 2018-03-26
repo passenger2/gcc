@@ -36,14 +36,18 @@ function getScores($assessmentToolID = '', $usersCollegeID = '')
             scores.Score,
             assessmenttools.Name AS 'Assessment Tool'
         FROM scores
-        LEFT JOIN assessmenttoolanswers ON assessmenttoolanswers.AssessmentToolAnswerID = scores.AssessmentToolAnswerID
-        LEFT JOIN assessmenttools ON assessmenttools.AssessmentToolID = assessmenttoolanswers.AssessmentToolID ";
+        LEFT JOIN assessmenttoolanswers
+            ON assessmenttoolanswers.AssessmentToolAnswerID = scores.AssessmentToolAnswerID
+        LEFT JOIN assessmenttools
+            ON assessmenttools.AssessmentToolID = assessmenttoolanswers.AssessmentToolID ";
     
     if(!$isGlobalAdmin)
     {
         $query .= "
-        LEFT JOIN students ON students.StudentID = assessmenttoolanswers.StudentID
-        LEFT JOIN departments ON departments.DepartmentID = students.DepartmentID ";
+        LEFT JOIN students
+            ON students.StudentID = assessmenttoolanswers.StudentID
+        LEFT JOIN departments
+            ON departments.DepartmentID = students.DepartmentID ";
     }
     
     $query .= " WHERE assessmenttools.AssessmentToolID = :assessmentToolID ";
