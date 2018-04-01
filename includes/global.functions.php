@@ -1127,7 +1127,7 @@ function getTotalRecords($type, $target = '')
     }
     else if($type === 'Users')
     {
-        $db_handle->prepareStatement("SELECT COUNT(*) AS total FROM `user`");
+        $db_handle->prepareStatement("SELECT COUNT(*) AS total FROM `users`");
         $result = $db_handle->runFetch();
     }
     else if($type === 'Tool')
@@ -1156,6 +1156,11 @@ function getTotalRecords($type, $target = '')
     {
         $db_handle->prepareStatement("SELECT COUNT(*) AS total FROM `assessmenttoolanswers` LEFT JOIN students ON students.StudentID = assessmenttoolanswers.StudentID LEFT JOIN departments ON departments.DepartmentID = students.DepartmentID JOIN colleges ON colleges.CollegeID = departments.DepartmentID AND colleges.CollegeID = :collegeID");
         $db_handle->bindVar(':collegeID', $target, PDO::PARAM_INT, 0);
+        $result = $db_handle->runFetch();
+    }
+    else if($type === 'StudentsAssessed')
+    {
+        $db_handle->prepareStatement("SELECT COUNT(*) AS 'total' FROM (SELECT students.StudentID FROM `students` JOIN assessmenttoolanswers ON assessmenttoolanswers.StudentID = students.StudentID GROUP BY students.StudentID) A");
         $result = $db_handle->runFetch();
     }
 

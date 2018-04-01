@@ -32,7 +32,7 @@ $(function() {
     var url = window.location+'';
     var element = $('ul.nav a').filter(function() {
         //console.log(this.href.split('.')[0]+'.'+this.href.split('.')[1]);
-        return this.href.split('.')[0]+'.'+this.href.split('.')[1] == url.split('.')[0]+'.'+url.split('.')[1];
+        return this.href.split('.')[1]+'.'+this.href.split('.')[2] == url.split('.')[1]+'.'+url.split('.')[2];
     }).addClass('active').parent();
 
     while (true) {

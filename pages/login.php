@@ -5,10 +5,10 @@ include("../initialize.php");
 <html lang="en">
 
     <head>
-        <?php includeHead("PSRMS - Login"); ?>
+        <?php includeHead("PSRMS GCC - Login"); ?>
     </head>
 
-    <body class="main">
+    <body class="loginmain">
 
         <div class="container">
             <div class="row">
@@ -16,7 +16,7 @@ include("../initialize.php");
                     <div class="panel panel-default" id="panel-login">
                         <div class="panel-body" id="panel-body-login">
                             <h3 class="text-center">Account Login</h3>
-                            <p class="text-center" style="margin-bottom: 40px;">Sign In to your account</p>
+                            <p class="text-center">Sign In to your account</p>
                             <hr>
                             <form action="/includes/actions/global.login.php" method="post">
                                 <div class="form-group">
@@ -43,7 +43,6 @@ include("../initialize.php");
                                 }
                                 ?>
                                 <input type="submit" class="btn btn-lg btn-primary btn-block" id="login-btn" value="Sign in">
-                                <!--<a href="https://docs.google.com/spreadsheets/d/1eR6-KJx_tf3MGM8Y6evQ7DtDF8g1nDEi6KsO_qayigA/edit?usp=sharing" >Retrieve</a>-->
                             </form>
                             <hr>
                         </div>

@@ -35,7 +35,7 @@ includeCore();
                 <!-- /.row -->
                 <div class="row">
                     <div class="header">
-                        <h3 class="title">&nbsp;Students Enrolled&nbsp;<a href="student.enroll.php" type="button" class="btn btn-success btn-xs btn-fill">Enroll</a></h3>
+                        <h3 class="title">&nbsp;List of Students&nbsp;<a href="student.enroll.php" type="button" class="btn btn-success btn-xs btn-fill">Enroll</a></h3>
                     </div>
                     <div class="col-lg-12">
                         <div class="panel panel-default">
